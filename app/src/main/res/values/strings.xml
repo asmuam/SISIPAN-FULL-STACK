@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2020 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="app_name">Sisipan</string>
+
+    <string name="connection_error_title">Connection error</string>
+    <string name="connection_error_message">Unable to fetch podcasts feeds.\nCheck your internet connection and try again.</string>
+    <string name="retry_label">Retry</string>
+    
+    <string name="your_podcasts">Your podcasts</string>
+    <string name="latest_episodes">Latest episodes</string>
+
+    <string name="home_library">Your library</string>
+    <string name="home_discover">Discover</string>
+
+    <string name="updated_longer">Updated a while ago</string>
+    <plurals name="updated_weeks_ago">
+        <item quantity="one">Updated %d week ago</item>
+        <item quantity="other">Updated %d weeks ago</item>
+    </plurals>
+    <plurals name="updated_days_ago">
+        <item quantity="one">Updated yesterday</item>
+        <item quantity="other">Updated %d days ago</item>
+    </plurals>
+    <string name="updated_today">Updated today</string>
+
+    <string name="episode_date_duration">%1$s &#8226; %2$d mins</string>
+
+    <string name="cd_search">Search</string>
+    <string name="cd_account">Account</string>
+    <string name="cd_add">Add</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_more">More</string>
+    <string name="cd_play">Play</string>
+    <string name="cd_skip_previous">Skip previous</string>
+    <string name="cd_reply10">Reply 10 seconds</string>
+    <string name="cd_forward30">Forward 30 seconds</string>
+    <string name="cd_skip_next">Skip next</string>
+    <string name="cd_unfollow">Unfollow</string>
+    <string name="cd_follow">Follow</string>
+    <string name="cd_following">Following</string>
+    <string name="cd_not_following">Not following</string>
+    <string name="home_title">Home</string>
+
+    //signin
+    <string name="app_tagline">Better surveys with Jetpack Compose</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_in_guest">Sign in as guest</string>
+    <string name="sign_in_create_account">Sign in or create an account</string>
+    <string name="or">or</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="user_continue">Continue</string>
+    <string name="create_account">Create account</string>
+    <string name="terms_and_conditions">By continuing, you agree to our Terms of Service. We’ll
+        handle your data according to our Privacy Policy.</string>
+    <string name="feature_not_available">Feature not available</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="done">Done</string>
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="user_register">Register</string>
+    <string name="user_login">Login</string>
+
+</resources>
