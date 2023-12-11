@@ -17,6 +17,8 @@
 package com.polstat.sisipan.ui.signinsignup
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ccom.polstat.sisipan.ui.signinsignup.SignUpScreen
 
@@ -26,10 +28,13 @@ fun SignUpRoute(
     onNavUp: () -> Unit,
 ) {
     val signUpViewModel: SignUpViewModel = viewModel(factory = SignUpViewModelFactory())
+    val authResult by signUpViewModel.authResult.collectAsState()
     SignUpScreen(
         onSignUpSubmitted = { email, password ->
-            signUpViewModel.signUp(email, password, onSignUpSubmitted)
+            signUpViewModel.signUp(email, password)
         },
         onNavUp = onNavUp,
+        authResult = authResult,
+        onSignUpSuccess = onSignUpSubmitted
     )
 }

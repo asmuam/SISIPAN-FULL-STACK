@@ -25,9 +25,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
 import com.polstat.sisipan.api.ApiClient.authService
+import com.polstat.sisipan.api.AuthRequest
 import com.polstat.sisipan.api.AuthResult
 import com.polstat.sisipan.api.AuthService
-import com.polstat.sisipan.api.LoginRequest
 import com.polstat.sisipan.api.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,7 +44,8 @@ class SignInViewModel : ViewModel() {
     fun signIn(email: String, password: String, onLoginSuccess: () -> Unit) {
         viewModelScope.launch {
             try {
-                val response = authService.login(LoginRequest(email, password))
+                _authResult.value = null
+                val response = authService.login(AuthRequest(email, password))
 
                 if (response.httpStatusCode == 200) {
                     response.data?.let { data ->

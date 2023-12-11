@@ -18,8 +18,8 @@ package com.polstat.sisipan.ui.signinsignup
 
 import java.util.regex.Pattern
 
-// Consider an email valid if there's some text before and after a "@"
-private const val EMAIL_VALIDATION_REGEX = "^(.+)@(.+)\$"
+// Consider an email valid if using @stis.ac.id domain
+private const val EMAIL_VALIDATION_REGEX = "^.+@stis\\.ac\\.id\$"
 
 class EmailState(val email: String? = null) :
     TextFieldState(validator = ::isEmailValid, errorFor = ::emailValidationError) {
@@ -34,7 +34,7 @@ class EmailState(val email: String? = null) :
  * Returns an error to be displayed or null if no error was found
  */
 private fun emailValidationError(email: String): String {
-    return "Invalid email: $email"
+    return "Invalid email: $email (Gunakan Email STIS)"
 }
 
 private fun isEmailValid(email: String): Boolean {

@@ -16,27 +16,38 @@
 
 package ccom.polstat.sisipan.ui.signinsignup
 
+import android.util.Log
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.polstat.sisipan.R
+import com.polstat.sisipan.api.AuthResult
 import com.polstat.sisipan.ui.signinsignup.ConfirmPasswordState
 import com.polstat.sisipan.ui.signinsignup.Email
 import com.polstat.sisipan.ui.signinsignup.EmailState
+import com.polstat.sisipan.ui.signinsignup.ErrorSnackbar
 import com.polstat.sisipan.ui.signinsignup.Password
 import com.polstat.sisipan.ui.signinsignup.PasswordState
 import com.polstat.sisipan.ui.signinsignup.SignInSignUpScreen
@@ -44,13 +55,54 @@ import com.polstat.sisipan.ui.signinsignup.SignInSignUpTopAppBar
 import com.polstat.sisipan.ui.theme.SisipanTheme
 import com.polstat.sisipan.ui.theme.stronglyDeemphasizedAlpha
 import com.polstat.sisipan.util.supportWideScreen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SignUpScreen(
     onSignUpSubmitted: (email: String, password: String) -> Unit,
     onNavUp: () -> Unit,
-) {
-    Scaffold(
+    authResult : AuthResult?,
+    onSignUpSuccess :()->Unit
+    ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val snackbarErrorText = stringResource(id = R.string.feature_not_available)
+    val snackbarActionLabel = stringResource(id = R.string.dismiss)
+
+    LaunchedEffect(authResult) {
+        keyboardController?.hide()
+        Log.i("TAG", "SignUpScreen: $authResult")
+        when (authResult) {
+            AuthResult.FAILURE -> {
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = "Terjadi Kesalahan",
+                        actionLabel = snackbarActionLabel
+                    )
+                }
+            }
+            AuthResult.SUCCESS -> {
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = "Registrasi berhasil! Redirecting...",
+                        actionLabel = snackbarActionLabel
+                    )
+                }
+
+                // Tunggu sebentar sebelum menavigasi
+                delay(2000)
+
+                // Eksekusi callback untuk menavigasi ke layar selanjutnya
+                onSignUpSuccess()
+            }
+            else -> Unit
+        }
+    }
+        Scaffold(
         topBar = {
             SignInSignUpTopAppBar(
                 topAppBarText = stringResource(id = R.string.create_account),
@@ -70,7 +122,15 @@ fun SignUpScreen(
             }
         }
     )
+    Box(modifier = Modifier.fillMaxSize()) {
+        ErrorSnackbar(
+            snackbarHostState = snackbarHostState,
+            onDismiss = { snackbarHostState.currentSnackbarData?.dismiss() },
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
 }
+
 
 @Composable
 fun SignUpContent(
@@ -127,6 +187,8 @@ fun SignUpPreview() {
         SignUpScreen(
             onSignUpSubmitted = { _, _ -> },
             onNavUp = {},
-        )
+            authResult = null,
+            onSignUpSuccess = {  -> },
+            )
     }
 }

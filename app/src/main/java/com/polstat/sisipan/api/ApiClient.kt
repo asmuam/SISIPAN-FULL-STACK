@@ -40,16 +40,16 @@ object ApiClient {
 interface AuthService {
     @Headers("Content-Type: application/json")
     @POST("login")
-    suspend fun login(@Body credentials: LoginRequest): LoginResponse
+    suspend fun login(@Body credentials: AuthRequest): LoginResponse
 
     @Headers("Content-Type: application/json")
-    @POST("signup")
-    suspend fun signUp(@Body credentials: SignUpRequest): SignUpResponse
+    @POST("register")
+    suspend fun register(@Body credentials: AuthRequest): SignUpResponse
 }
 
 interface FormasiService {
     @Headers("Content-Type: application/json")
-    @GET("login")
+    @GET("formasi")
     suspend fun getAll(): FormasiAllResponse
 
 }

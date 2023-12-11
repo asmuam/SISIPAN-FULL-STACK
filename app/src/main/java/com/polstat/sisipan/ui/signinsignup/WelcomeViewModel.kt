@@ -19,17 +19,28 @@ package com.polstat.sisipan.ui.signinsignup
 import UserRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-class WelcomeViewModel(private val userRepository: UserRepository) : ViewModel() {
+class WelcomeViewModel : ViewModel() {
+    private val _registerSuccess = MutableStateFlow(false)
+    val registerSuccess: StateFlow<Boolean> = _registerSuccess
 
+    fun setRegisterSuccess(value: Boolean) {
+        _registerSuccess.value = value
+    }
 
+    fun resetRegisterSuccess() {
+        _registerSuccess.value = false
+    }
 }
+
 
 class WelcomeViewModelFactory : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(WelcomeViewModel::class.java)) {
-            return WelcomeViewModel(UserRepository) as T
+            return WelcomeViewModel() as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

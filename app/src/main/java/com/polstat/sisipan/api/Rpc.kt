@@ -5,9 +5,7 @@ import com.squareup.moshi.JsonClass
 
 // Data classes for request and response
 @JsonClass(generateAdapter = true)
-data class LoginRequest(val email: String, val password: String)
-@JsonClass(generateAdapter = true)
-data class SignUpRequest(val email: String, val password: String)
+data class AuthRequest(val email: String, val password: String)
 @JsonClass(generateAdapter = true)
 data class LoginResponse(
     val data: DataLogin?,

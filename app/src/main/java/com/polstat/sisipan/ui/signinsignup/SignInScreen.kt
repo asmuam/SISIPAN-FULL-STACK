@@ -73,7 +73,6 @@ fun SignInScreen(
     val snackbarActionLabel = stringResource(id = R.string.dismiss)
 
     // Observe the authResult and show Snackbar on failure
-    Log.i("AUTH", "SignInScreen: $authResult")
     LaunchedEffect(authResult) {
         if (authResult == AuthResult.FAILURE) {
             keyboardController?.hide()
