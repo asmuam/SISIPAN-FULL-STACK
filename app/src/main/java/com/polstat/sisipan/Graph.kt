@@ -16,6 +16,7 @@
 
 package com.polstat.sisipan
 
+import UserRepository
 import android.content.Context
 import androidx.room.Room
 import com.polstat.sisipan.data.room.TransactionRunner
@@ -23,6 +24,10 @@ import com.polstat.sisipan.data.room.SisipanDatabase
 import com.polstat.sisipan.BuildConfig
 import com.polstat.sisipan.api.ApiClient
 import com.polstat.sisipan.api.AuthService
+import com.polstat.sisipan.api.FormasiService
+import com.polstat.sisipan.api.TokenManager
+import com.polstat.sisipan.data.FormasiRepository
+import com.polstat.sisipan.data.FormasiStore
 import com.rometools.rome.io.SyndFeedInput
 import java.io.File
 import kotlinx.coroutines.CoroutineDispatcher
@@ -55,6 +60,24 @@ object Graph {
     val authService: AuthService
         get() = ApiClient.authService
 
+    val formasiService: FormasiService
+        get() = ApiClient.formasiService
+
+    lateinit var userRepository: UserRepository
+        private set
+
+    val formasiRepository by lazy {
+        FormasiRepository(
+            formasiService = formasiService,
+            formasiStore = formasiStore
+        )
+    }
+
+    val formasiStore by lazy {
+        FormasiStore(
+            formasiDao = database.formasiDao()
+        )
+    }
     fun provide(context: Context) {
         okHttpClient = OkHttpClient.Builder()
             .cache(Cache(File(context.cacheDir, "http_cache"), (20 * 1024 * 1024).toLong()))
@@ -68,9 +91,8 @@ object Graph {
             // showcase all of Room.
             .fallbackToDestructiveMigration()
             .build()
+
+        userRepository = UserRepository
+
     }
-
-    private val syndFeedInput by lazy { SyndFeedInput() }
-
-
 }

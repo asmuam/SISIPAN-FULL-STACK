@@ -37,6 +37,7 @@ import androidx.navigation.compose.rememberNavController
  */
 sealed class Screen(val route: String) {
     object Home : Screen("home")
+    object Formasi : Screen("formasi")
     object Welcome : Screen("welcome")
     object SignUp : Screen("signup")
     object SignIn : Screen("signin")

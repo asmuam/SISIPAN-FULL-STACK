@@ -16,6 +16,7 @@
 
 package com.polstat.sisipan.ui.signinsignup
 
+import UserRepository
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -27,6 +28,7 @@ import com.polstat.sisipan.api.ApiClient.authService
 import com.polstat.sisipan.api.AuthResult
 import com.polstat.sisipan.api.AuthService
 import com.polstat.sisipan.api.LoginRequest
+import com.polstat.sisipan.api.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -34,6 +36,8 @@ import kotlinx.coroutines.launch
 class SignInViewModel : ViewModel() {
 
     private val authService: AuthService = Graph.authService
+    private val userRepository: UserRepository = Graph.userRepository
+
     private val _authResult = MutableStateFlow<AuthResult?>(null)
     val authResult: StateFlow<AuthResult?> = _authResult
 
@@ -43,7 +47,15 @@ class SignInViewModel : ViewModel() {
                 val response = authService.login(LoginRequest(email, password))
 
                 if (response.httpStatusCode == 200) {
-                    _authResult.value = AuthResult.SUCCESS
+                    response.data?.let { data ->
+                        userRepository.setAllUserData(
+                            accessToken = data.accessToken ?: "",
+                            role = data.role ?: "",
+                            id = data.id ?: 0L,
+                            email = data.email ?: "",
+                            idMhs = data.idMhs ?: 0L
+                        )
+                    }
                     onLoginSuccess()
                 } else {
                     _authResult.value = AuthResult.FAILURE

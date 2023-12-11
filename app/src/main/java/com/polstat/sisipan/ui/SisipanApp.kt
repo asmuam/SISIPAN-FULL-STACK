@@ -34,6 +34,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.window.layout.DisplayFeature
 import com.polstat.sisipan.R
+import com.polstat.sisipan.ui.formasi.Formasi
 import com.polstat.sisipan.ui.home.Home
 import com.polstat.sisipan.ui.signinsignup.SignInRoute
 import com.polstat.sisipan.ui.signinsignup.SignUpRoute
@@ -60,6 +61,7 @@ fun SisipanApp(
                     AppDrawer(
                         currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route.orEmpty(),
                         navigateToHome = { navController.navigate(Screen.Home.route) },
+                        navigateToFormasi = { navController.navigate(Screen.Formasi.route) },
                         closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } }
                     )
                 },
@@ -71,7 +73,8 @@ fun SisipanApp(
                         AppNavRail(
                             currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route.orEmpty(),
                             navigateToHome = { navController.navigate(Screen.Home.route) },
-                        )
+                            navigateToFormasi = { navController.navigate(Screen.Formasi.route) },
+                            )
                     }
                     NavHost(
                         navController = navController,
@@ -82,7 +85,11 @@ fun SisipanApp(
                                 openDrawer={ coroutineScope.launch { sizeAwareDrawerState.open() } }
                             )
                         }
-
+                        composable(Screen.Formasi.route) { backStackEntry ->
+                            Formasi(
+                                openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } }
+                            )
+                        }
                         composable(Screen.Welcome.route) { backStackEntry ->
                             WelcomeRoute(
                                 onNavigateToSignIn = {

@@ -14,32 +14,26 @@
  * limitations under the License.
  */
 
-package com.polstat.sisipan.ui.home
+package com.polstat.sisipan.ui.formasi
 
 import UserRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-class HomeViewModel(
+class FormasiViewModel(
     private val userRepository:UserRepository = Graph.userRepository
 ) : ViewModel() {
 
     // Holds our view state which the UI collects via [state]
-    private val _state = MutableStateFlow(HomeViewState())
+    private val _state = MutableStateFlow(FormasiViewState())
 
     private val refreshing = MutableStateFlow(false)
 
-    val state: StateFlow<HomeViewState>
+    val state: StateFlow<FormasiViewState>
         get() = _state
 
     init {
@@ -64,7 +58,7 @@ class HomeViewModel(
 
 }
 
-data class HomeViewState(
+data class FormasiViewState(
     val role: String? = null,
     val refreshing: Boolean = false,
     val errorMessage: String? = null

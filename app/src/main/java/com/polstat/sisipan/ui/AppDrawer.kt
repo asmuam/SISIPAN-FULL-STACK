@@ -46,6 +46,7 @@ import com.polstat.sisipan.ui.theme.SisipanTheme
 fun AppDrawer(
     currentRoute: String,
     navigateToHome: () -> Unit,
+    navigateToFormasi: () -> Unit,
     closeDrawer: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -62,10 +63,10 @@ fun AppDrawer(
         )
         Spacer(Modifier.height(8.dp))
         NavigationDrawerItem(
-            label = { Text(stringResource(id = R.string.home_title)) },
+            label = { Text(stringResource(id = R.string.formasi_title)) },
             icon = { Icon(Icons.Filled.Home, null) },
-            selected = currentRoute == Screen.Home.route,
-            onClick = { navigateToHome(); closeDrawer() },
+            selected = currentRoute == Screen.Formasi.route,
+            onClick = { navigateToFormasi(); closeDrawer() },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
     }
@@ -92,6 +93,7 @@ fun PreviewAppDrawer() {
         AppDrawer(
             currentRoute = Screen.Home.route,
             navigateToHome = {},
+            navigateToFormasi = {},
             closeDrawer = { }
         )
     }

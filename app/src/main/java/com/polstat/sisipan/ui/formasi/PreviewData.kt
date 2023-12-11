@@ -14,23 +14,8 @@
  * limitations under the License.
  */
 
-package com.polstat.sisipan.ui.signinsignup
+package com.polstat.sisipan.ui.formasi
 
-import UserRepository
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
-class WelcomeViewModel(private val userRepository: UserRepository) : ViewModel() {
-
-
-}
-
-class WelcomeViewModelFactory : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(WelcomeViewModel::class.java)) {
-            return WelcomeViewModel(UserRepository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}

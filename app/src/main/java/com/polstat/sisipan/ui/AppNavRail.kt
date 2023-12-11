@@ -39,6 +39,7 @@ import com.polstat.sisipan.ui.theme.SisipanTheme
 fun AppNavRail(
     currentRoute: String,
     navigateToHome: () -> Unit,
+    navigateToFormasi: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavigationRail(
@@ -61,6 +62,14 @@ fun AppNavRail(
             alwaysShowLabel = false
         )
         Spacer(Modifier.weight(1f))
+        NavigationRailItem(
+            selected = currentRoute == Screen.Formasi.route,
+            onClick = navigateToFormasi,
+            icon = { Icon(Icons.Filled.Home, stringResource(R.string.home_title)) },
+            label = { Text(stringResource(R.string.home_title)) },
+            alwaysShowLabel = false
+        )
+        Spacer(Modifier.weight(1f))
     }
 }
 
@@ -72,6 +81,7 @@ fun PreviewAppNavRail() {
         AppNavRail(
             currentRoute = Screen.Home.route,
             navigateToHome = {},
+            navigateToFormasi = {},
         )
     }
 }

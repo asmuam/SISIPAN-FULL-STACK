@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 
@@ -25,6 +26,14 @@ object ApiClient {
             .build()
             .create(AuthService::class.java)
     }
+
+    val formasiService: FormasiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(FormasiService::class.java)
+    }
 }
 
 // Define your API interface
@@ -36,4 +45,11 @@ interface AuthService {
     @Headers("Content-Type: application/json")
     @POST("signup")
     suspend fun signUp(@Body credentials: SignUpRequest): SignUpResponse
+}
+
+interface FormasiService {
+    @Headers("Content-Type: application/json")
+    @GET("login")
+    suspend fun getAll(): FormasiAllResponse
+
 }

@@ -16,6 +16,7 @@
 
 package com.polstat.sisipan.ui.signinsignup
 
+import UserRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
@@ -29,14 +30,12 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
         password: String,
         onSignUpComplete: () -> Unit,
     ) {
-        userRepository.signUp(email, password)
         onSignUpComplete()
     }
 
     fun signInAsGuest(
         onSignInComplete: () -> Unit,
     ) {
-        userRepository.signInAsGuest()
         onSignInComplete()
     }
 }
