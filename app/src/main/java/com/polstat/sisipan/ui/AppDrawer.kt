@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -47,7 +49,9 @@ fun AppDrawer(
     currentRoute: String,
     navigateToHome: () -> Unit,
     navigateToFormasi: () -> Unit,
+    navigateToWelcome: () -> Unit,
     closeDrawer: () -> Unit,
+    deleteUser: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ModalDrawerSheet(modifier) {
@@ -64,13 +68,26 @@ fun AppDrawer(
         Spacer(Modifier.height(8.dp))
         NavigationDrawerItem(
             label = { Text(stringResource(id = R.string.formasi_title)) },
-            icon = { Icon(Icons.Filled.Home, null) },
+            icon = { Icon(Icons.Filled.Groups, null) },
             selected = currentRoute == Screen.Formasi.route,
             onClick = { navigateToFormasi(); closeDrawer() },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
+        Spacer(Modifier.height(8.dp))
+        NavigationDrawerItem(
+            label = { Text("Logout") }, // You can replace this with the appropriate string resource
+            icon = { Icon(Icons.Filled.ExitToApp, null) }, // You can replace this with the appropriate icon
+            selected = false, // You may want to adjust this based on your logic
+            onClick = {
+                navigateToWelcome()
+                deleteUser()
+                closeDrawer()
+            },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+        )
     }
 }
+
 
 @Composable
 private fun JetNewsLogo(modifier: Modifier = Modifier) {
@@ -94,6 +111,8 @@ fun PreviewAppDrawer() {
             currentRoute = Screen.Home.route,
             navigateToHome = {},
             navigateToFormasi = {},
+            navigateToWelcome = {},
+            deleteUser = {},
             closeDrawer = { }
         )
     }

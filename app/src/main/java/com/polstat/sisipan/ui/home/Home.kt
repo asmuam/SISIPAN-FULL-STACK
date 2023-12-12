@@ -16,10 +16,12 @@
 
 package com.polstat.sisipan.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,6 +42,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -68,6 +71,8 @@ fun Home(
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
+        Log.i("HOME", "WelcomeRoute: ${UserRepository.toString()}")
+
         HomeContent(
             openDrawer,
             isRefreshing = viewState.refreshing,
@@ -174,7 +179,11 @@ fun HomeContent(
 
             }
         }
+        Box(modifier = Modifier){
+            Text(text = "INI HOME")
+        }
 
+        
         if (isRefreshing) {
             // TODO show a progress indicator or similar
         }

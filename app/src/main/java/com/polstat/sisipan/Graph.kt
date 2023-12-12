@@ -69,13 +69,16 @@ object Graph {
     val formasiRepository by lazy {
         FormasiRepository(
             formasiService = formasiService,
-            formasiStore = formasiStore
-        )
+            formasiStore = formasiStore,
+            mainDispatcher = mainDispatcher,
+            transactionRunner = transactionRunner,
+            )
     }
 
     val formasiStore by lazy {
         FormasiStore(
-            formasiDao = database.formasiDao()
+            formasiDao = database.formasiDao(),
+            transactionRunner = transactionRunner
         )
     }
     fun provide(context: Context) {

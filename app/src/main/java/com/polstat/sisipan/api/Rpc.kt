@@ -1,5 +1,6 @@
 package com.polstat.sisipan.api
 
+import com.polstat.sisipan.data.Formasi
 import com.squareup.moshi.JsonClass
 
 
@@ -27,19 +28,21 @@ data class SignUpResponse(val httpStatus: String, val httpStatusCode: Int, val m
 
 @JsonClass(generateAdapter = true)
 data class FormasiAllResponse(
-    val data: DataFormasi?,
+    val data: List<Formasi>?,
     val message: String?,
     val httpStatus: String?,
     val httpStatusCode: Int?
 )
-@JsonClass(generateAdapter = true)
-data class DataFormasi(
-    val email: String?,
-    val accessToken: String?,
-    val id: Long?,  // Menambahkan properti id
-    val idMhs: Long?,  // Menambahkan properti idMhs
-    val role: String?
-)
+//@JsonClass(generateAdapter = true)
+//data class DataFormasi(
+//    val id: Long,
+//    val provinsi: Int,
+//    val kodeSatker: String,
+//    val namaSatuanKerja: String,
+//    val kuotaSt: Int,
+//    val kuotaKs: Int,
+//    val kuotaD3: Int
+//)
 
 
 

@@ -31,6 +31,7 @@ data class Formasi(
     @ColumnInfo(name = "kuotaD3Tersedia") val kuotaD3Tersedia: Int
 )
 
+
 // Kotlin data class for Provinsi entity
 @Entity(tableName = "provinsi")
 data class Provinsi(

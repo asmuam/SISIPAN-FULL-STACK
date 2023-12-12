@@ -17,15 +17,23 @@
 package com.polstat.sisipan.ui.formasi
 
 import UserRepository
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
+import com.polstat.sisipan.data.Formasi
+import com.polstat.sisipan.data.FormasiRepository
+import com.polstat.sisipan.data.FormasiStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class FormasiViewModel(
-    private val userRepository:UserRepository = Graph.userRepository
+    private val userRepository: UserRepository = Graph.userRepository,
+    private val formasiRepository: FormasiRepository = Graph.formasiRepository,
+    private val formasiStore: FormasiStore = Graph.formasiStore
 ) : ViewModel() {
 
     // Holds our view state which the UI collects via [state]
@@ -37,9 +45,25 @@ class FormasiViewModel(
         get() = _state
 
     init {
-        _state.value = _state.value.copy(role = userRepository.getRole())
-
         viewModelScope.launch {
+            // Combines the latest value from each of the flows, allowing us to generate a
+            // view state instance which only contains the latest values.
+            combine(
+                formasiStore.formasiBuka(),
+                refreshing
+            ) { formasiList, refreshing ->
+                FormasiViewState(
+                    role = userRepository.getRole(),
+                    formasiList = formasiList,
+                    refreshing = refreshing,
+                    errorMessage = null /* TODO */
+                )
+            }.catch { throwable ->
+                // TODO: emit a UI error here. For now, we'll just rethrow
+                throw throwable
+            }.collect {
+                _state.value = it
+            }
         }
 
         refresh(force = false)
@@ -47,19 +71,26 @@ class FormasiViewModel(
 
     private fun refresh(force: Boolean) {
         viewModelScope.launch {
-            runCatching {
+            try {
                 refreshing.value = true
+                formasiRepository.refreshFormasi(force)
+                // Handle the response
+            } catch (e: Exception) {
+                // Handle the error
+                Log.e("FormasiViewModel", "Error refreshing formasi", e)
+            } finally {
+                refreshing.value = false
             }
-            // TODO: look at result of runCatching and show any errors
-
-            refreshing.value = false
         }
     }
+
 
 }
 
 data class FormasiViewState(
     val role: String? = null,
+    val formasiList: List<Formasi> = emptyList(),
     val refreshing: Boolean = false,
     val errorMessage: String? = null
 )
+

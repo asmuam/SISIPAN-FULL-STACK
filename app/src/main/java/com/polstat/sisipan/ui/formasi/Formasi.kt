@@ -20,6 +20,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +35,8 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -44,6 +47,8 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -55,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.sisipan.R
+import com.polstat.sisipan.data.Formasi
 import com.polstat.sisipan.ui.theme.MinContrastOfPrimaryVsSurface
 import com.polstat.sisipan.util.DynamicThemePrimaryColorsFromImage
 import com.polstat.sisipan.util.contrastAgainst
@@ -70,6 +76,8 @@ fun Formasi(
     Surface(Modifier.fillMaxSize()) {
         FormasiContent(
             openDrawer,
+            formasiList = viewState.formasiList,
+            onFormasiClick = { /* Handle formasi item click */ },
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
         )
@@ -129,6 +137,8 @@ fun FormasiAppBar(
 @Composable
 fun FormasiContent(
     openDrawer: () -> Unit,
+    formasiList: List<Formasi>,
+    onFormasiClick: (Formasi) -> Unit,
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
     ) {
@@ -174,6 +184,14 @@ fun FormasiContent(
 
             }
         }
+        Box(modifier = Modifier){
+            Text(text = "INI FORMASI")
+        }
+        LazyColumn {
+            items(formasiList) { formasi ->
+                FormasiCard(formasi = formasi, onItemClick = onFormasiClick)
+            }
+        }
 
         if (isRefreshing) {
             // TODO show a progress indicator or similar
@@ -181,3 +199,20 @@ fun FormasiContent(
     }
 }
 
+@Composable
+fun FormasiCard(formasi: Formasi, onItemClick: (Formasi) -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onItemClick(formasi) }
+    ) {
+        // Isi card dengan informasi formasi
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Text(text = formasi.namaSatuanKerja, style = MaterialTheme.typography.h6)
+            // Tambahkan informasi lainnya sesuai kebutuhan
+        }
+    }
+}

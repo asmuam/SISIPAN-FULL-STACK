@@ -6,7 +6,7 @@ object UserRepository {
     private var email: String? = null
     private var idMhs: Long? = null
 
-    fun setAccessToken(token: String) {
+    fun setAccessToken(token: String?) {
         accessToken = token
     }
 
@@ -14,7 +14,7 @@ object UserRepository {
         return accessToken
     }
 
-    fun setRole(userRole: String) {
+    fun setRole(userRole: String?) {
         role = userRole
     }
 
@@ -22,7 +22,7 @@ object UserRepository {
         return role
     }
 
-    fun setId(userId: Long) {
+    fun setId(userId: Long?) {
         id = userId
     }
 
@@ -30,7 +30,7 @@ object UserRepository {
         return id
     }
 
-    fun setEmail(userEmail: String) {
+    fun setEmail(userEmail: String?) {
         email = userEmail
     }
 
@@ -38,7 +38,7 @@ object UserRepository {
         return email
     }
 
-    fun setIdMhs(studentId: Long) {
+    fun setIdMhs(studentId: Long?) {
         idMhs = studentId
     }
 
@@ -58,5 +58,17 @@ object UserRepository {
         setId(id)
         setEmail(email)
         setIdMhs(idMhs)
+    }
+
+    fun clear() {
+        setAccessToken(null)
+        setRole(null)
+        setId(null)
+        setEmail(null)
+        setIdMhs(null)
+    }
+
+    override fun toString(): String {
+        return "UserRepository(accessToken=$accessToken, role=$role, id=$id, email=$email, idMhs=$idMhs)"
     }
 }

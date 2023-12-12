@@ -16,6 +16,7 @@
 
 package com.polstat.sisipan.ui
 
+import UserRepository
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DrawerState
@@ -64,7 +65,9 @@ fun SisipanApp(
                         currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route.orEmpty(),
                         navigateToHome = { navController.navigate(Screen.Home.route) },
                         navigateToFormasi = { navController.navigate(Screen.Formasi.route) },
-                        closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } }
+                        closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } },
+                        navigateToWelcome = { navController.navigate(Screen.Welcome.route) },
+                        deleteUser = {UserRepository.clear()}
                     )
                 },
                 drawerState = sizeAwareDrawerState,
@@ -81,6 +84,7 @@ fun SisipanApp(
                     NavHost(
                         navController = navController,
                         startDestination = Screen.Welcome.route
+//                        startDestination = Screen.Home.route
                     ) {
                         composable(Screen.Home.route) { backStackEntry ->
                             Home(

@@ -16,6 +16,8 @@
 
 package com.polstat.sisipan.ui.signinsignup
 
+import UserRepository
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -25,7 +27,7 @@ fun WelcomeRoute(
     onNavigateToSignUp: () -> Unit,
 ) {
     val welcomeViewModel: WelcomeViewModel = viewModel(factory = WelcomeViewModelFactory())
-
+    Log.i("WELCOME", "WelcomeRoute: ${UserRepository.toString()}")
     WelcomeScreen(
         onNavigateToSignIn = onNavigateToSignIn,
         onNavigateToSignUp = onNavigateToSignUp,
