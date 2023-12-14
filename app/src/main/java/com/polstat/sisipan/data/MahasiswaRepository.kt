@@ -25,13 +25,14 @@ class MahasiswaRepository(
             refreshingJob = scope.launch {
                 transactionRunner {
                     Log.e("repomhs", "cek")
-                    val id: Long = UserRepository.getIdMhs() ?: 0L
-                    Log.e("repomhs", "idmhs:${id}")
+                    val id: Long? = UserRepository.idMhs
 
                     // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
-                    val mahasiswaList = mahasiswaService.getById(id).data
-                    mahasiswaList?.let {
-                        mahasiswaStore.addMahasiwa(it)
+                    if (id != null) {
+                        val mahasiswaList = mahasiswaService.getById(id).data
+                        mahasiswaList?.let {
+                            mahasiswaStore.addMahasiwa(it)
+                        }
                     }
                 }
 

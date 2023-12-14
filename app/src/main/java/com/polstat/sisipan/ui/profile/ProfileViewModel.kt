@@ -51,12 +51,12 @@ class ProfileViewModel(
 
         viewModelScope.launch {
             combine(
-                mahasiswaStore.getMahasiwa(userRepository.getIdMhs()),
+                mahasiswaStore.getMahasiwa(userRepository.idMhs),
                 refreshing
             ) { mahasiswaDetail, refreshing ->
                 ProfileViewState(
-                    role = userRepository.getRole(),
-                    email = userRepository.getEmail(),
+                    role = userRepository.role,
+                    email = userRepository.email,
                     mahasiswa = mahasiswaDetail,
                     refreshing = refreshing,
                     errorMessage = null /* TODO */

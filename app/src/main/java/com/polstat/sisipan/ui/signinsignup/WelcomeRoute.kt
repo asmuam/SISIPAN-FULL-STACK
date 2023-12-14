@@ -30,7 +30,7 @@ fun WelcomeRoute(
 ) {
     val welcomeViewModel: WelcomeViewModel = viewModel(factory = WelcomeViewModelFactory())
 // Cek apakah ada token akses yang masih berlaku
-    val expiresIn = UserRepository.getExpiresIn()
+    val expiresIn = UserRepository.expiresIn
     Log.i("AccessWelcome", "ExpiresIn: ${expiresIn}")
     if (expiresIn > System.currentTimeMillis()) {
         // Token akses masih berlaku, langsung navigasi ke halaman utama

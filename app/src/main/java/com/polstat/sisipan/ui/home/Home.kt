@@ -73,7 +73,7 @@ fun Home(
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
-        Log.i("AccessHome", "ExpiresIn: ${UserRepository.getExpiresIn()} time now: ${System.currentTimeMillis()}")
+        Log.i("AccessHome", "ExpiresIn: ${UserRepository.expiresIn} time now: ${System.currentTimeMillis()}")
 
         HomeContent(
             openDrawer,

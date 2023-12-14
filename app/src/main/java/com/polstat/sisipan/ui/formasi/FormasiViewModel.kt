@@ -53,7 +53,7 @@ class FormasiViewModel(
                 refreshing
             ) { formasiList, refreshing ->
                 FormasiViewState(
-                    role = userRepository.getRole(),
+                    role = userRepository.role,
                     formasiList = formasiList,
                     refreshing = refreshing,
                     errorMessage = null /* TODO */
