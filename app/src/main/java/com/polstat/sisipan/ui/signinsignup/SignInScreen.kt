@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Button
@@ -179,7 +180,8 @@ fun ErrorSnackbar(
         hostState = snackbarHostState,
         snackbar = { data ->
             Snackbar(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(16.dp)
+                    .navigationBarsPadding(), // <-- Tambahkan ini
                 content = {
                     Text(
                         text = data.visuals.message,

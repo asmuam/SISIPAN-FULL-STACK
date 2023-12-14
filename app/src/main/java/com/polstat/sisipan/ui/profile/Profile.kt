@@ -77,9 +77,6 @@ fun Profile(
     ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
-        Log.i("Profile", "WelcomeRoute: ${UserRepository.toString()}")
-        Log.i("Profile", "Mahasiswa: ${viewState.mahasiswa.toString()}")
-
         ProfileContent(
             openDrawer,
             isRefreshing = viewState.refreshing,
