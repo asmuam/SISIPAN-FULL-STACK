@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.polstat.sisipan.ui.home
+package com.polstat.sisipan.ui
 
 import java.time.OffsetDateTime
 import java.time.ZoneOffset

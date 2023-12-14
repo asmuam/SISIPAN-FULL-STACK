@@ -16,7 +16,7 @@
 
 package com.polstat.sisipan.ui.formasi
 
-import UserRepository
+import com.polstat.sisipan.data.UserRepository
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

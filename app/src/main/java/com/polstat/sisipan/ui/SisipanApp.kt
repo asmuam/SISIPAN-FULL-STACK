@@ -16,7 +16,7 @@
 
 package com.polstat.sisipan.ui
 
-import UserRepository
+import com.polstat.sisipan.data.UserRepository
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.AlertDialog
@@ -29,9 +29,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -75,7 +73,7 @@ fun SisipanApp(
                         navigateToFormasi = { navController.navigate(Screen.Formasi.route) },
                         closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } },
                         navigateToWelcome = { navController.navigate(Screen.Welcome.route) },
-                        deleteUser = {UserRepository.clear()}
+                        deleteUser = { UserRepository.clear()}
                     )
                 },
                 drawerState = sizeAwareDrawerState,

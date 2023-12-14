@@ -16,7 +16,7 @@
 
 package com.polstat.sisipan
 
-import UserRepository
+import com.polstat.sisipan.data.UserRepository
 import android.content.Context
 import androidx.room.Room
 import com.polstat.sisipan.data.room.TransactionRunner
@@ -24,8 +24,11 @@ import com.polstat.sisipan.data.room.SisipanDatabase
 import com.polstat.sisipan.api.ApiClient
 import com.polstat.sisipan.api.AuthService
 import com.polstat.sisipan.api.FormasiService
+import com.polstat.sisipan.api.MahasiswaService
 import com.polstat.sisipan.data.FormasiRepository
 import com.polstat.sisipan.data.FormasiStore
+import com.polstat.sisipan.data.MahasiswaRepository
+import com.polstat.sisipan.data.MahasiswaStore
 import java.io.File
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +63,9 @@ object Graph {
     val formasiService: FormasiService
         get() = ApiClient.formasiService
 
+    val mahasiswaService: MahasiswaService
+        get() = ApiClient.mahasiswaService
+
     lateinit var userRepository: UserRepository
         private set
 
@@ -75,6 +81,22 @@ object Graph {
     val formasiStore by lazy {
         FormasiStore(
             formasiDao = database.formasiDao(),
+            transactionRunner = transactionRunner
+        )
+    }
+
+    val mahasiswaRepository by lazy {
+        MahasiswaRepository(
+            mahasiswaService = mahasiswaService,
+            mahasiswaStore = mahasiswaStore,
+            mainDispatcher = mainDispatcher,
+            transactionRunner = transactionRunner,
+        )
+    }
+
+    val mahasiswaStore by lazy {
+        MahasiswaStore(
+            mahasiswaDao = database.mahasiswaDao(),
             transactionRunner = transactionRunner
         )
     }

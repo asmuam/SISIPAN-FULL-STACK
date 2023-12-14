@@ -1,6 +1,7 @@
 package com.polstat.sisipan.api
 
 import com.polstat.sisipan.data.Formasi
+import com.polstat.sisipan.data.Mahasiswa
 import com.squareup.moshi.JsonClass
 
 
@@ -27,31 +28,27 @@ data class DataLogin(
 data class SignUpResponse(val httpStatus: String, val httpStatusCode: Int, val message: String)
 
 @JsonClass(generateAdapter = true)
-data class FormasiAllResponse(
-    val data: List<Formasi>?,
+data class ApiResponse<T>(
+    val data: T?,
     val message: String?,
     val httpStatus: String?,
     val httpStatusCode: Int?
 )
 //@JsonClass(generateAdapter = true)
-//data class DataFormasi(
-//    val id: Long,
-//    val provinsi: Int,
-//    val kodeSatker: String,
-//    val namaSatuanKerja: String,
-//    val kuotaSt: Int,
-//    val kuotaKs: Int,
-//    val kuotaD3: Int
+//data class FormasiAllResponse(
+//    val data: List<Formasi>?,
+//    val message: String?,
+//    val httpStatus: String?,
+//    val httpStatusCode: Int?
 //)
-
-
-
-
-
-
-
-
-
+//
+//@JsonClass(generateAdapter = true)
+//data class MahasiswaAllResponse(
+//    val data: List<Mahasiswa>?,
+//    val message: String?,
+//    val httpStatus: String?,
+//    val httpStatusCode: Int?
+//)
 
 
 enum class AuthResult {

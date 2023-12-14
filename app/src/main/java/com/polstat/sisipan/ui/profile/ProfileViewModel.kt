@@ -14,26 +14,33 @@
  * limitations under the License.
  */
 
-package com.polstat.sisipan.ui.home
+package com.polstat.sisipan.ui.profile
 
 import com.polstat.sisipan.data.UserRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
+import com.polstat.sisipan.data.FormasiRepository
+import com.polstat.sisipan.data.FormasiStore
+import com.polstat.sisipan.data.Mahasiswa
+import com.polstat.sisipan.data.MahasiswaRepository
+import com.polstat.sisipan.data.MahasiswaStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class HomeViewModel(
-    private val userRepository: UserRepository = Graph.userRepository
+class ProfileViewModel(
+    private val userRepository: UserRepository = Graph.userRepository,
+    private val mahasiswaRepository: MahasiswaRepository = Graph.mahasiswaRepository,
+    private val mahasiswaStore: MahasiswaStore = Graph.mahasiswaStore
 ) : ViewModel() {
 
     // Holds our view state which the UI collects via [state]
-    private val _state = MutableStateFlow(HomeViewState())
+    private val _state = MutableStateFlow(ProfileViewState())
 
     private val refreshing = MutableStateFlow(false)
 
-    val state: StateFlow<HomeViewState>
+    val state: StateFlow<ProfileViewState>
         get() = _state
 
     init {
@@ -58,8 +65,11 @@ class HomeViewModel(
 
 }
 
-data class HomeViewState(
+data class ProfileViewState(
     val role: String? = null,
     val refreshing: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val email: String ="",
+    val password: String ="",
+    val mahasiswa: Mahasiswa? = null,
 )

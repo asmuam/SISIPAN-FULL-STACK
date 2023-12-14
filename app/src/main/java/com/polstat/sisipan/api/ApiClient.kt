@@ -2,6 +2,8 @@ package com.polstat.sisipan.api
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.polstat.sisipan.data.Formasi
+import com.polstat.sisipan.data.Mahasiswa
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -34,6 +36,14 @@ object ApiClient {
             .build()
             .create(FormasiService::class.java)
     }
+
+    val mahasiswaService: MahasiswaService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(MahasiswaService::class.java)
+    }
 }
 
 // Define your API interface
@@ -50,6 +60,13 @@ interface AuthService {
 interface FormasiService {
     @Headers("Content-Type: application/json")
     @GET("formasi")
-    suspend fun getAll(): FormasiAllResponse
+    suspend fun getAll(): ApiResponse<List<Formasi>>
+
+}
+
+interface MahasiswaService {
+    @Headers("Content-Type: application/json")
+    @GET("mahasiswa")
+    suspend fun getAll(): ApiResponse<List<Mahasiswa>>
 
 }

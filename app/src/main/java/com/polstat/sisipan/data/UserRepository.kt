@@ -1,3 +1,5 @@
+package com.polstat.sisipan.data
+
 object UserRepository {
 
     private var accessToken: String? = null
@@ -69,6 +71,6 @@ object UserRepository {
     }
 
     override fun toString(): String {
-        return "UserRepository(accessToken=$accessToken, role=$role, id=$id, email=$email, idMhs=$idMhs)"
+        return "com.polstat.sisipan.data.UserRepository(accessToken=$accessToken, role=$role, id=$id, email=$email, idMhs=$idMhs)"
     }
 }

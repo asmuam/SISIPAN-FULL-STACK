@@ -16,7 +16,7 @@
 
 package com.polstat.sisipan.ui.signinsignup
 
-import UserRepository
+import com.polstat.sisipan.data.UserRepository
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel

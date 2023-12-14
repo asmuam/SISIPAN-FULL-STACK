@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.polstat.sisipan.ui.home
+package com.polstat.sisipan.ui.profile
 
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -66,15 +66,15 @@ import com.polstat.sisipan.util.rememberDominantColorState
 import com.polstat.sisipan.util.verticalGradientScrim
 
 @Composable
-fun Home(
+fun Profile(
     openDrawer: () -> Unit,
-    viewModel: HomeViewModel = viewModel(),
+    viewModel: ProfileViewModel = viewModel(),
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
-        Log.i("HOME", "WelcomeRoute: ${UserRepository.toString()}")
+        Log.i("Profile", "WelcomeRoute: ${UserRepository.toString()}")
 
-        HomeContent(
+        ProfileContent(
             openDrawer,
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
@@ -83,7 +83,7 @@ fun Home(
 }
 
 @Composable
-fun HomeAppBar(
+fun ProfileAppBar(
     openDrawer: () -> Unit,
     backgroundColor: Color,
     modifier: Modifier = Modifier
@@ -133,7 +133,7 @@ fun HomeAppBar(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeContent(
+fun ProfileContent(
     openDrawer: () -> Unit,
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
@@ -172,7 +172,7 @@ fun HomeContent(
                         .windowInsetsTopHeight(WindowInsets.statusBars)
                 )
 
-                HomeAppBar(
+                ProfileAppBar(
                     openDrawer,
                     backgroundColor = appBarColor,
                     modifier = Modifier.fillMaxWidth()
@@ -181,7 +181,7 @@ fun HomeContent(
             }
         }
         Box(modifier = Modifier){
-            Text(text = "INI HOME")
+            Text(text = "INI Profile")
         }
 
         
