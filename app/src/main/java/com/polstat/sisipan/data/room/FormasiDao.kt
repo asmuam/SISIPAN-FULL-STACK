@@ -11,7 +11,7 @@ abstract class FormasiDao : BaseDao<Formasi> {
     abstract fun formasiBuka(): Flow<List<Formasi>>
 
     @Query("SELECT COUNT(*) FROM formasi")
-    abstract fun count(): Int
+    abstract suspend fun count(): Int
 
     @Query("DELETE FROM formasi")
     abstract suspend fun deleteAll()

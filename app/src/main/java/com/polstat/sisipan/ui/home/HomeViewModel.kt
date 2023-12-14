@@ -37,9 +37,9 @@ class HomeViewModel(
         get() = _state
 
     init {
-        _state.value = _state.value.copy(role = userRepository.getRole())
 
         viewModelScope.launch {
+            _state.value = _state.value.copy(role = userRepository.getRole())
         }
 
         refresh(force = false)

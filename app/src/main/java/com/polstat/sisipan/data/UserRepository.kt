@@ -5,7 +5,7 @@ object UserRepository {
     private var accessToken: String? = null
     private var role: String? = null
     private var id: Long? = null
-    private var email: String? = null
+    private var email: String = ""
     private var idMhs: Long? = null
 
     fun setAccessToken(token: String?) {
@@ -20,7 +20,7 @@ object UserRepository {
         role = userRole
     }
 
-    fun getRole(): String? {
+    suspend fun getRole(): String? {
         return role
     }
 
@@ -32,11 +32,11 @@ object UserRepository {
         return id
     }
 
-    fun setEmail(userEmail: String?) {
+    fun setEmail(userEmail: String) {
         email = userEmail
     }
 
-    fun getEmail(): String? {
+    suspend fun getEmail(): String {
         return email
     }
 
@@ -66,7 +66,7 @@ object UserRepository {
         setAccessToken(null)
         setRole(null)
         setId(null)
-        setEmail(null)
+        setEmail("")
         setIdMhs(null)
     }
 

@@ -69,6 +69,7 @@ import com.polstat.sisipan.util.verticalGradientScrim
 fun Home(
     openDrawer: () -> Unit,
     viewModel: HomeViewModel = viewModel(),
+    onAccount: ()-> Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
@@ -78,6 +79,7 @@ fun Home(
             openDrawer,
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
+            onAccount,
         )
     }
 }
@@ -86,8 +88,9 @@ fun Home(
 fun HomeAppBar(
     openDrawer: () -> Unit,
     backgroundColor: Color,
-    modifier: Modifier = Modifier
-) {
+    modifier: Modifier = Modifier,
+    onAccount: ()-> Unit,
+    ) {
     TopAppBar(
         title = {
                 Row {
@@ -117,7 +120,7 @@ fun HomeAppBar(
                     )
                 }
                 IconButton(
-                    onClick = { /* TODO: Open account? */ }
+                    onClick = { onAccount() }
                 ) {
                     Icon(
                         imageVector = Icons.Default.AccountCircle,
@@ -137,6 +140,7 @@ fun HomeContent(
     openDrawer: () -> Unit,
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
+    onAccount: ()-> Unit,
     ) {
     Column(
         modifier = modifier.windowInsetsPadding(
@@ -175,7 +179,8 @@ fun HomeContent(
                 HomeAppBar(
                     openDrawer,
                     backgroundColor = appBarColor,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    onAccount,
                 )
 
             }

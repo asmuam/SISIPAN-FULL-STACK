@@ -10,7 +10,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
-
+import retrofit2.http.Path
 
 
 // Singleton object to create the Retrofit instance
@@ -68,5 +68,9 @@ interface MahasiswaService {
     @Headers("Content-Type: application/json")
     @GET("mahasiswa")
     suspend fun getAll(): ApiResponse<List<Mahasiswa>>
+
+    @Headers("Content-Type: application/json")
+    @GET("mahasiswa/{id}")
+    suspend fun getById(@Path("id") id: Long): ApiResponse<Mahasiswa>
 
 }

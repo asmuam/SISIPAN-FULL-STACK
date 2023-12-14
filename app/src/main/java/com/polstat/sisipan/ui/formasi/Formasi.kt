@@ -71,7 +71,8 @@ import com.polstat.sisipan.util.verticalGradientScrim
 fun Formasi(
     openDrawer: () -> Unit,
     viewModel: FormasiViewModel = viewModel(),
-) {
+    onAccount: ()-> Unit,
+    ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
         FormasiContent(
@@ -80,6 +81,7 @@ fun Formasi(
             onFormasiClick = { /* Handle formasi item click */ },
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
+            onAccount,
         )
     }
 }
@@ -88,8 +90,9 @@ fun Formasi(
 fun FormasiAppBar(
     openDrawer: () -> Unit,
     backgroundColor: Color,
-    modifier: Modifier = Modifier
-) {
+    modifier: Modifier = Modifier,
+    onAccount: ()-> Unit,
+    ) {
     TopAppBar(
         title = {
                 Row {
@@ -119,7 +122,7 @@ fun FormasiAppBar(
                     )
                 }
                 IconButton(
-                    onClick = { /* TODO: Open account? */ }
+                    onClick = { onAccount() }
                 ) {
                     Icon(
                         imageVector = Icons.Default.AccountCircle,
@@ -141,6 +144,7 @@ fun FormasiContent(
     onFormasiClick: (Formasi) -> Unit,
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
+    onAccount: ()-> Unit,
     ) {
     Column(
         modifier = modifier.windowInsetsPadding(
@@ -179,7 +183,8 @@ fun FormasiContent(
                 FormasiAppBar(
                     openDrawer,
                     backgroundColor = appBarColor,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    onAccount,
                 )
 
             }

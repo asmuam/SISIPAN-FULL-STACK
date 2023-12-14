@@ -16,6 +16,7 @@
 
 package com.polstat.sisipan.ui.profile
 
+import android.util.Log
 import com.polstat.sisipan.data.UserRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,8 +26,11 @@ import com.polstat.sisipan.data.FormasiStore
 import com.polstat.sisipan.data.Mahasiswa
 import com.polstat.sisipan.data.MahasiswaRepository
 import com.polstat.sisipan.data.MahasiswaStore
+import com.polstat.sisipan.ui.formasi.FormasiViewState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(
@@ -44,9 +48,25 @@ class ProfileViewModel(
         get() = _state
 
     init {
-        _state.value = _state.value.copy(role = userRepository.getRole())
 
         viewModelScope.launch {
+            combine(
+                mahasiswaStore.getMahasiwa(userRepository.getIdMhs()),
+                refreshing
+            ) { mahasiswaDetail, refreshing ->
+                ProfileViewState(
+                    role = userRepository.getRole(),
+                    email = userRepository.getEmail(),
+                    mahasiswa = mahasiswaDetail,
+                    refreshing = refreshing,
+                    errorMessage = null /* TODO */
+                )
+            }.catch { throwable ->
+                // TODO: emit a UI error here. For now, we'll just rethrow
+                throw throwable
+            }.collect {
+                _state.value = it
+            }
         }
 
         refresh(force = false)
@@ -54,12 +74,16 @@ class ProfileViewModel(
 
     private fun refresh(force: Boolean) {
         viewModelScope.launch {
-            runCatching {
+            try {
                 refreshing.value = true
+                mahasiswaRepository.refreshMahasiwa(force)
+                // Handle the response
+            } catch (e: Exception) {
+                // Handle the error
+                Log.e("MhsViewModel", "Error refreshing MHS", e)
+            } finally {
+                refreshing.value = false
             }
-            // TODO: look at result of runCatching and show any errors
-
-            refreshing.value = false
         }
     }
 
@@ -69,7 +93,7 @@ data class ProfileViewState(
     val role: String? = null,
     val refreshing: Boolean = false,
     val errorMessage: String? = null,
-    val email: String ="",
+    val email: String = "",
     val password: String ="",
     val mahasiswa: Mahasiswa? = null,
 )

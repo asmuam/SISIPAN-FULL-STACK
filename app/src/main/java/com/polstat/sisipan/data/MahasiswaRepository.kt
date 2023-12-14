@@ -1,5 +1,6 @@
 package com.polstat.sisipan.data
 
+import android.util.Log
 import com.polstat.sisipan.api.MahasiswaService
 import com.polstat.sisipan.data.room.TransactionRunner
 import kotlinx.coroutines.CoroutineDispatcher
@@ -23,12 +24,17 @@ class MahasiswaRepository(
         } else if (force || mahasiswaStore.isEmpty()) {
             refreshingJob = scope.launch {
                 transactionRunner {
+                    Log.e("repomhs", "cek")
+                    val id: Long = UserRepository.getIdMhs() ?: 0L
+                    Log.e("repomhs", "idmhs:${id}")
+
                     // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
-                    val mahasiswaList = mahasiswaService.getAll().data
+                    val mahasiswaList = mahasiswaService.getById(id).data
                     mahasiswaList?.let {
-                        mahasiswaStore.saveMahasiwaList(it)
+                        mahasiswaStore.addMahasiwa(it)
                     }
                 }
+
             }
         }
     }

@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -54,10 +55,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.sisipan.R
+import com.polstat.sisipan.data.Mahasiswa
 import com.polstat.sisipan.data.UserRepository
 import com.polstat.sisipan.ui.theme.MinContrastOfPrimaryVsSurface
 import com.polstat.sisipan.util.DynamicThemePrimaryColorsFromImage
@@ -69,15 +73,20 @@ import com.polstat.sisipan.util.verticalGradientScrim
 fun Profile(
     openDrawer: () -> Unit,
     viewModel: ProfileViewModel = viewModel(),
-) {
+    onAccount: ()-> Unit,
+    ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
         Log.i("Profile", "WelcomeRoute: ${UserRepository.toString()}")
+        Log.i("Profile", "Mahasiswa: ${viewState.mahasiswa.toString()}")
 
         ProfileContent(
             openDrawer,
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
+            profil = viewState.mahasiswa,
+            email = viewState.email,
+            onAccount,
         )
     }
 }
@@ -86,8 +95,9 @@ fun Profile(
 fun ProfileAppBar(
     openDrawer: () -> Unit,
     backgroundColor: Color,
-    modifier: Modifier = Modifier
-) {
+    modifier: Modifier = Modifier,
+    onAccount: ()-> Unit,
+    ) {
     TopAppBar(
         title = {
                 Row {
@@ -117,7 +127,7 @@ fun ProfileAppBar(
                     )
                 }
                 IconButton(
-                    onClick = { /* TODO: Open account? */ }
+                    onClick = { onAccount }
                 ) {
                     Icon(
                         imageVector = Icons.Default.AccountCircle,
@@ -137,6 +147,9 @@ fun ProfileContent(
     openDrawer: () -> Unit,
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
+    profil: Mahasiswa?,
+    email: String,
+    onAccount: ()-> Unit,
     ) {
     Column(
         modifier = modifier.windowInsetsPadding(
@@ -175,16 +188,32 @@ fun ProfileContent(
                 ProfileAppBar(
                     openDrawer,
                     backgroundColor = appBarColor,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    onAccount,
                 )
 
             }
         }
-        Box(modifier = Modifier){
-            Text(text = "INI Profile")
+        Box(modifier = Modifier.padding(16.dp)) {
+            Text(text = "Profile", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color.Black)
+            Column(
+                modifier = Modifier
+                    .background(Color.White)
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                profil?.let { // Periksa apakah 'profil' null sebelum mengakses propertinya
+                    Text(text = "Name: ${it.name ?: "Not Available"}", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.Black)
+                    Text(text = "NIM: ${it.nim ?: "Not Available"}", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Gray)
+                    Text(text = "Prodi: ${it.prodi ?: "Not Available"}", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Gray)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = "Email: ${email ?: "Not Available"}", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black)
+            }
         }
 
-        
+
+
         if (isRefreshing) {
             // TODO show a progress indicator or similar
         }
