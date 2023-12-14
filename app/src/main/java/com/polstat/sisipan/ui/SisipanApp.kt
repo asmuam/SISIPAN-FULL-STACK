@@ -17,6 +17,7 @@
 package com.polstat.sisipan.ui
 
 import UserRepository
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DrawerState
@@ -59,6 +60,13 @@ fun SisipanApp(
             val coroutineScope = rememberCoroutineScope()
             val isExpandedScreen = widthSizeClass == WindowWidthSizeClass.Expanded
             val sizeAwareDrawerState = rememberSizeAwareDrawerState(isExpandedScreen)
+            if (sizeAwareDrawerState.isOpen) {
+                BackHandler {
+                    coroutineScope.launch {
+                        sizeAwareDrawerState.close()
+                    }
+                }
+            }
             ModalNavigationDrawer(
                 drawerContent = {
                     AppDrawer(
