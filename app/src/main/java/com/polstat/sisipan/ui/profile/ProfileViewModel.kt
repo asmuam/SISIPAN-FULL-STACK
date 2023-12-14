@@ -16,6 +16,10 @@
 
 package com.polstat.sisipan.ui.profile
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.provider.MediaStore
 import android.util.Log
 import com.polstat.sisipan.data.UserRepository
 import androidx.lifecycle.ViewModel
@@ -26,7 +30,11 @@ import com.polstat.sisipan.data.FormasiStore
 import com.polstat.sisipan.data.Mahasiswa
 import com.polstat.sisipan.data.MahasiswaRepository
 import com.polstat.sisipan.data.MahasiswaStore
+import com.polstat.sisipan.data.Provinsi
+import com.polstat.sisipan.data.ProvinsiRepository
+import com.polstat.sisipan.data.ProvinsiStore
 import com.polstat.sisipan.ui.formasi.FormasiViewState
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -36,7 +44,8 @@ import kotlinx.coroutines.launch
 class ProfileViewModel(
     private val userRepository: UserRepository = Graph.userRepository,
     private val mahasiswaRepository: MahasiswaRepository = Graph.mahasiswaRepository,
-    private val mahasiswaStore: MahasiswaStore = Graph.mahasiswaStore
+    private val mahasiswaStore: MahasiswaStore = Graph.mahasiswaStore,
+    private val provinsiStore: ProvinsiStore = Graph.provinsiStore,
 ) : ViewModel() {
 
     // Holds our view state which the UI collects via [state]
@@ -52,20 +61,23 @@ class ProfileViewModel(
         viewModelScope.launch {
             combine(
                 mahasiswaStore.getMahasiwa(userRepository.idMhs),
-                refreshing
+                refreshing,
             ) { mahasiswaDetail, refreshing ->
+                val provinsi = mahasiswaDetail?.id?.let { provinsiStore.getById(it) }
                 ProfileViewState(
                     role = userRepository.role,
                     email = userRepository.email,
                     mahasiswa = mahasiswaDetail,
                     refreshing = refreshing,
-                    errorMessage = null /* TODO */
+                    errorMessage = null /* TODO */,
+                    provinsi = provinsi,
+                    //disini baru mengkonstruk state namun provinsi belum bisa dimasukkan karena mahasiswa blm ada
                 )
             }.catch { throwable ->
                 // TODO: emit a UI error here. For now, we'll just rethrow
                 throw throwable
             }.collect {
-                _state.value = it
+                _state.value = it //tambahkan provinsi ke state
             }
         }
 
@@ -87,6 +99,17 @@ class ProfileViewModel(
         }
     }
 
+    fun editProfilePhoto(context: Context) {
+        // Buka galeri atau kamera, dan tangani hasilnya di sini
+        // Misalnya, menggunakan Intent untuk membuka galeri:
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        intent.type = "image/*"
+        (context as? Activity)?.startActivityForResult(intent, REQUEST_IMAGE_PICK)
+    }
+
+    companion object {
+        const val REQUEST_IMAGE_PICK = 123
+    }
 }
 
 data class ProfileViewState(
@@ -96,4 +119,5 @@ data class ProfileViewState(
     val email: String = "",
     val password: String ="",
     val mahasiswa: Mahasiswa? = null,
+    val provinsi: Provinsi? = null,
 )

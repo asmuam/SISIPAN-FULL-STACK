@@ -1,12 +1,11 @@
 package com.polstat.sisipan.data
 
-import com.polstat.sisipan.data.room.FormasiDao
 import com.polstat.sisipan.data.room.MahasiswaDao
 import com.polstat.sisipan.data.room.TransactionRunner
 import kotlinx.coroutines.flow.Flow
 
 /**
- * A data repository for [Formasi] instances.
+ * A data repository for [Mahasiswa] instances.
  */
 class MahasiswaStore(
     private val mahasiswaDao: MahasiswaDao,

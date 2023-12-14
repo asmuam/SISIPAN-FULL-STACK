@@ -16,7 +16,6 @@
 
 package com.polstat.sisipan.ui.profile
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,10 +32,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -47,26 +48,31 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.sisipan.R
 import com.polstat.sisipan.data.Mahasiswa
-import com.polstat.sisipan.data.UserRepository
-import com.polstat.sisipan.ui.theme.MinContrastOfPrimaryVsSurface
+import com.polstat.sisipan.data.Provinsi
+import com.polstat.sisipan.ui.theme.SisipanTheme
 import com.polstat.sisipan.util.DynamicThemePrimaryColorsFromImage
-import com.polstat.sisipan.util.contrastAgainst
-import com.polstat.sisipan.util.rememberDominantColorState
+import com.polstat.sisipan.util.baselineHeight
 import com.polstat.sisipan.util.verticalGradientScrim
 
 @Composable
@@ -76,6 +82,8 @@ fun Profile(
     onAccount: ()-> Unit,
     ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
     Surface(Modifier.fillMaxSize()) {
         ProfileContent(
             openDrawer,
@@ -83,7 +91,11 @@ fun Profile(
             modifier = Modifier.fillMaxSize(),
             profil = viewState.mahasiswa,
             email = viewState.email,
+            provinsi =viewState.provinsi,
             onAccount,
+            onEditProfilePhoto = {
+                viewModel.editProfilePhoto(context)
+            },
         )
     }
 }
@@ -146,25 +158,17 @@ fun ProfileContent(
     modifier: Modifier = Modifier,
     profil: Mahasiswa?,
     email: String,
-    onAccount: ()-> Unit,
-    ) {
+    provinsi: Provinsi?,
+    onAccount: () -> Unit,
+    onEditProfilePhoto: () -> Unit
+) {
     Column(
         modifier = modifier.windowInsetsPadding(
             WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
         )
     ) {
-        // We dynamically theme this sub-section of the layout to match the selected
-        // 'top podcast'
-
-        val surfaceColor = MaterialTheme.colors.surface
-        val appBarColor = surfaceColor.copy(alpha = 0.87f)
-        val dominantColorState = rememberDominantColorState { color ->
-            // We want a color which has sufficient contrast against the surface color
-            color.contrastAgainst(surfaceColor) >= MinContrastOfPrimaryVsSurface
-        }
-
-        DynamicThemePrimaryColorsFromImage(dominantColorState) {
-
+        // Scrim dan AppBar
+        DynamicThemePrimaryColorsFromImage {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -177,39 +181,83 @@ fun ProfileContent(
                 // Draw a scrim over the status bar which matches the app bar
                 Spacer(
                     Modifier
-                        .background(appBarColor)
+                        .background(MaterialTheme.colors.surface.copy(alpha = 0.87f))
                         .fillMaxWidth()
                         .windowInsetsTopHeight(WindowInsets.statusBars)
                 )
 
+                // AppBar dengan tombol navigasi dan ikon pengaturan
                 ProfileAppBar(
                     openDrawer,
-                    backgroundColor = appBarColor,
+                    backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.87f),
                     modifier = Modifier.fillMaxWidth(),
                     onAccount,
                 )
-
             }
         }
-        Box(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Profile", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color.Black)
+
+        // Bagian tengah layout dengan foto profil, ikon kamera, dan data mahasiswa
+        Box(
+            modifier = Modifier
+                .padding(16.dp)
+                .background(Color.Transparent)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            // Foto profil (gantilah dengan gambar sesuai profil)
+            Image(
+                painter = painterResource(id = R.drawable.profil),
+                contentDescription = null,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .align(Alignment.Center)
+                    .background(Color.Transparent)
+            )
+
+            // Ikon kamera untuk mengedit foto profil
+            Icon(
+                imageVector = Icons.Default.PhotoCamera,
+                contentDescription = "Edit Profile Photo",
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .align(Alignment.BottomEnd)
+                    .size(50.dp)
+                    .background(Color.Blue)
+                    .zIndex(2f) // Menempatkan ikon di atas gambar profil
+                    .clickable { onEditProfilePhoto() } // Tambahkan fungsi klik untuk ikon kamera
+                    .graphicsLayer(scaleY = 0.5f, scaleX = 0.5f) // Sesuaikan nilai scale sesuai keinginan Anda
+            )
+        }
+
+
+        // Data mahasiswa dan email
+        Box(
+            modifier = Modifier
+                .padding(16.dp)
+                .background(MaterialTheme.colors.surface)
+                .fillMaxWidth()
+        ) {
             Column(
                 modifier = Modifier
-                    .background(Color.White)
                     .padding(16.dp)
                     .fillMaxWidth()
             ) {
-                profil?.let { // Periksa apakah 'profil' null sebelum mengakses propertinya
-                    Text(text = "Name: ${it.name ?: "Not Available"}", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.Black)
-                    Text(text = "NIM: ${it.nim ?: "Not Available"}", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Gray)
-                    Text(text = "Prodi: ${it.prodi ?: "Not Available"}", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Gray)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                profil?.let {
+                    NameAndEmail(profil,email)
+
+                    ProfileProperty(stringResource(R.string.nama_mahasiswa), profil.name)
+                    ProfileProperty(stringResource(R.string.nim_mahasiswa), profil.nim)
+                    ProfileProperty(stringResource(R.string.prodi_mahasiswa), profil.prodi)
+                    ProfileProperty(stringResource(R.string.ipk_mahasiswa), (profil.ipk).toString())
+                    ProfileProperty(
+                        stringResource(R.string.prov_mahasiswa),
+                        provinsi?.namaProvinsi ?: "Not Available"
+                    )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "Email: ${email ?: "Not Available"}", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black)
             }
         }
-
-
 
         if (isRefreshing) {
             // TODO show a progress indicator or similar
@@ -217,3 +265,86 @@ fun ProfileContent(
     }
 }
 
+@Composable
+fun ProfileProperty(label: String, value: String, isLink: Boolean = false) {
+    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+        Divider()
+        androidx.compose.material3.Text(
+            text = label,
+            modifier = Modifier.baselineHeight(24.dp),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        val style = if (isLink) {
+            androidx.compose.material3.MaterialTheme.typography.bodyLarge.copy(color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+        } else {
+            androidx.compose.material3.MaterialTheme.typography.bodyLarge
+        }
+        androidx.compose.material3.Text(
+            text = value.takeIf { it.isNotBlank() } ?: "Not Available",
+            modifier = Modifier.baselineHeight(24.dp),
+            style = style
+        )
+    }
+}
+@Composable
+private fun NameAndEmail(
+    userData: Mahasiswa,
+    email:String,
+) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Name(
+            userData,
+            modifier = Modifier.baselineHeight(32.dp)
+        )
+        Email(
+            email,
+            modifier = Modifier
+                .padding(bottom = 20.dp)
+                .baselineHeight(24.dp)
+        )
+    }
+}
+
+@Composable
+private fun Name(userData: Mahasiswa, modifier: Modifier = Modifier) {
+    Text(
+        text = userData.name,
+        modifier = modifier,
+        style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
+    )
+}
+
+@Composable
+private fun Email(email: String, modifier: Modifier = Modifier) {
+    Text(
+        text = email,
+        modifier = modifier,
+        style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+@Preview
+@Composable
+fun ProfileContentPreview() {
+    val fakeMahasiswa = Mahasiswa(
+        name = "John Doe",
+        nim = "123456789",
+        prodi = "Computer Science",
+        ipk = 3.4f,
+        provinsiId = 2,
+    )
+
+    SisipanTheme {
+        ProfileContent(
+            openDrawer = {},
+            isRefreshing = false,
+            modifier = Modifier.fillMaxSize(),
+            profil = fakeMahasiswa,
+            email = "john.doe@example.com",
+            onAccount = {},
+            onEditProfilePhoto = {},
+            provinsi = Provinsi(1,"12","jkk")
+        )
+    }
+}

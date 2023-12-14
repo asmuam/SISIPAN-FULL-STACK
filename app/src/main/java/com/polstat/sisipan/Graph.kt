@@ -25,10 +25,13 @@ import com.polstat.sisipan.api.ApiClient
 import com.polstat.sisipan.api.AuthService
 import com.polstat.sisipan.api.FormasiService
 import com.polstat.sisipan.api.MahasiswaService
+import com.polstat.sisipan.api.ProvinsiService
 import com.polstat.sisipan.data.FormasiRepository
 import com.polstat.sisipan.data.FormasiStore
 import com.polstat.sisipan.data.MahasiswaRepository
 import com.polstat.sisipan.data.MahasiswaStore
+import com.polstat.sisipan.data.ProvinsiRepository
+import com.polstat.sisipan.data.ProvinsiStore
 import java.io.File
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -63,6 +66,8 @@ object Graph {
     val formasiService: FormasiService
         get() = ApiClient.formasiService
 
+    val provinsiService: ProvinsiService
+        get() = ApiClient.provinsiService
     val mahasiswaService: MahasiswaService
         get() = ApiClient.mahasiswaService
 
@@ -77,7 +82,22 @@ object Graph {
             transactionRunner = transactionRunner,
             )
     }
+    val provinsiRepository by lazy {
+        ProvinsiRepository(
+            provinsiService = provinsiService,
+            provinsiStore = provinsiStore,
+            mainDispatcher = mainDispatcher,
+            transactionRunner = transactionRunner,
+        )
+    }
 
+    val provinsiStore by lazy {
+        ProvinsiStore(
+            provinsiDao = database.provinsiDao(),
+            transactionRunner = transactionRunner
+        )
+    }
+    
     val formasiStore by lazy {
         FormasiStore(
             formasiDao = database.formasiDao(),
@@ -116,7 +136,21 @@ object Graph {
 
         userRepository = UserRepository
         userRepository.initialize(context)  // Memanggil initialize di sini
-
-
     }
+
+    fun clearDatabase(context: Context) {
+        // Close the database to ensure it's not in use
+        database.close()
+
+        // Delete the database file
+        context.getDatabasePath("data.db").delete()
+
+        // Reinitialize the database
+        database = Room.databaseBuilder(context, SisipanDatabase::class.java, "data.db")
+            .fallbackToDestructiveMigration()
+            .build()
+
+        // You may need to reinitialize other components or repositories here if necessary
+    }
+
 }

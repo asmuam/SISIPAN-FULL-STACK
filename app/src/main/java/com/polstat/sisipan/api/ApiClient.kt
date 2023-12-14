@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.polstat.sisipan.data.Formasi
 import com.polstat.sisipan.data.Mahasiswa
+import com.polstat.sisipan.data.Provinsi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -37,6 +38,14 @@ object ApiClient {
             .create(FormasiService::class.java)
     }
 
+    val provinsiService: ProvinsiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ProvinsiService::class.java)
+    }
+
     val mahasiswaService: MahasiswaService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -62,6 +71,12 @@ interface FormasiService {
     @GET("formasi")
     suspend fun getAll(): ApiResponse<List<Formasi>>
 
+}
+
+interface ProvinsiService {
+    @Headers("Content-Type: application/json")
+    @GET("provinsi")
+    suspend fun getAll(): ApiResponse<List<Provinsi>>
 }
 
 interface MahasiswaService {

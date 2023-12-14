@@ -2,6 +2,7 @@ package com.polstat.sisipan.api
 
 import com.polstat.sisipan.data.Formasi
 import com.polstat.sisipan.data.Mahasiswa
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 
@@ -57,3 +58,4 @@ enum class AuthResult {
     FAILURE
     // Tambahan status jika diperlukan
 }
+

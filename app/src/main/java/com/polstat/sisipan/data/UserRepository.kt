@@ -2,7 +2,8 @@ package com.polstat.sisipan.data
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.polstat.sisipan.SisipanApplication
+import com.polstat.sisipan.Graph
+
 
 object UserRepository {
 
@@ -65,8 +66,9 @@ object UserRepository {
         this.expiresIn = expiresIn
     }
 
-    fun clear() {
+    fun clear(context: Context) {
         sharedPreferences.edit().clear().apply()
+        Graph.clearDatabase(context)
     }
 
     private fun calculateExpiryTime(expiresIn: Long): Long {

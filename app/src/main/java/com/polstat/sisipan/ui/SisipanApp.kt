@@ -74,7 +74,8 @@ fun SisipanApp(
                         navigateToFormasi = { navController.navigate(Screen.Formasi.route) },
                         closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } },
                         navigateToWelcome = { navController.navigate(Screen.Welcome.route) },
-                        deleteUser = { UserRepository.clear()}
+                        deleteUser = { UserRepository.clear(appState.navController.context)
+                        }
                     )
                 },
                 drawerState = sizeAwareDrawerState,

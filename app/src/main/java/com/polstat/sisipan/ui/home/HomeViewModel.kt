@@ -20,13 +20,15 @@ import com.polstat.sisipan.data.UserRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
+import com.polstat.sisipan.data.ProvinsiRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val userRepository: UserRepository = Graph.userRepository
-) : ViewModel() {
+    private val userRepository: UserRepository = Graph.userRepository,
+    private val provinsiRepository: ProvinsiRepository = Graph.provinsiRepository,
+    ) : ViewModel() {
 
     // Holds our view state which the UI collects via [state]
     private val _state = MutableStateFlow(HomeViewState())
@@ -49,6 +51,8 @@ class HomeViewModel(
         viewModelScope.launch {
             runCatching {
                 refreshing.value = true
+                provinsiRepository.refreshrovinsi(force)
+
             }
             // TODO: look at result of runCatching and show any errors
 
