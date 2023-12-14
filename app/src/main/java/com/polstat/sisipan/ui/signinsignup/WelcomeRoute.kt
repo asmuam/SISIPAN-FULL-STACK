@@ -19,15 +19,24 @@ package com.polstat.sisipan.ui.signinsignup
 import com.polstat.sisipan.data.UserRepository
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun WelcomeRoute(
     onNavigateToSignIn: () -> Unit,
     onNavigateToSignUp: () -> Unit,
+    onNavigateToHome: () -> Unit,
 ) {
     val welcomeViewModel: WelcomeViewModel = viewModel(factory = WelcomeViewModelFactory())
-    Log.i("WELCOME", "WelcomeRoute: ${UserRepository.toString()}")
+// Cek apakah ada token akses yang masih berlaku
+    val expiresIn = UserRepository.getExpiresIn()
+    Log.i("AccessWelcome", "ExpiresIn: ${expiresIn}")
+    if (expiresIn > System.currentTimeMillis()) {
+        // Token akses masih berlaku, langsung navigasi ke halaman utama
+        onNavigateToHome()
+        return
+    }
     WelcomeScreen(
         onNavigateToSignIn = onNavigateToSignIn,
         onNavigateToSignUp = onNavigateToSignUp,

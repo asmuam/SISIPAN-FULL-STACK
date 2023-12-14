@@ -115,6 +115,8 @@ object Graph {
             .build()
 
         userRepository = UserRepository
+        userRepository.initialize(context)  // Memanggil initialize di sini
+
 
     }
 }

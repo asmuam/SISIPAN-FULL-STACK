@@ -22,7 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.polstat.sisipan.Graph.userRepository
 import com.polstat.sisipan.api.AuthResult
 
 
@@ -34,11 +36,18 @@ fun SignInRoute(
     val signInViewModel: SignInViewModel = viewModel(factory = SignInViewModelFactory())
     val authResult by signInViewModel.authResult.collectAsState()
 
+    LaunchedEffect(authResult) {
+        if (authResult == AuthResult.SUCCESS) {
+            onLoginSuccess()
+        }
+    }
+
     SignInScreen(
         onLoginSuccess = { email, password ->
-            signInViewModel.signIn(email, password, onLoginSuccess)
+            signInViewModel.signIn(email, password)
         },
         onNavUp = onNavUp,
         authResult = authResult
     )
 }
+

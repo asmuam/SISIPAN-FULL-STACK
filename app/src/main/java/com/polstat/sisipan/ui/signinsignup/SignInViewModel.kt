@@ -16,6 +16,7 @@
 
 package com.polstat.sisipan.ui.signinsignup
 
+import androidx.compose.ui.platform.LocalContext
 import com.polstat.sisipan.data.UserRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -36,9 +37,9 @@ class SignInViewModel : ViewModel() {
     private val _authResult = MutableStateFlow<AuthResult?>(null)
     val authResult: StateFlow<AuthResult?> = _authResult
 
-    fun signIn(email: String, password: String, onLoginSuccess: () -> Unit) {
+    fun signIn(email: String, password: String) {
         viewModelScope.launch {
-            try {
+            runCatching {
                 _authResult.value = null
                 val response = authService.login(AuthRequest(email, password))
 
@@ -49,15 +50,17 @@ class SignInViewModel : ViewModel() {
                             role = data.role ?: "",
                             id = data.id ?: 0L,
                             email = data.email ?: "",
-                            idMhs = data.idMhs ?: 0L
+                            idMhs = data.idMhs ?: 0L,
+                            expiresIn = data.expiresIn ?: 0L
                         )
+                        _authResult.value = AuthResult.SUCCESS
                     }
-                    onLoginSuccess()
                 } else {
                     _authResult.value = AuthResult.FAILURE
                 }
-            } catch (e: Exception) {
+            }.onFailure { e ->
                 _authResult.value = AuthResult.FAILURE
+                // Handle the exception here if needed
             }
         }
     }

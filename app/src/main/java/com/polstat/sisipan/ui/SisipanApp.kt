@@ -125,6 +125,9 @@ fun SisipanApp(
                                 onNavigateToSignUp = {
                                     navController.navigate("signup")
                                 },
+                                onNavigateToHome = {
+                                    navController.navigate("home")
+                                },
                             )
                         }
                         composable(Screen.SignIn.route) {

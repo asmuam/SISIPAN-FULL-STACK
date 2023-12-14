@@ -23,16 +23,9 @@ import coil.ImageLoaderFactory
 /**
  * Application which sets up our dependency [Graph] with a context.
  */
-class SisipanApplication : Application(), ImageLoaderFactory {
+class SisipanApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         Graph.provide(this)
-    }
-
-    override fun newImageLoader(): ImageLoader {
-        return ImageLoader.Builder(this)
-            // Disable `Cache-Control` header support as some podcast images disable disk caching.
-            .respectCacheHeaders(false)
-            .build()
     }
 }

@@ -73,7 +73,7 @@ fun Home(
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
-        Log.i("HOME", "WelcomeRoute: ${UserRepository.toString()}")
+        Log.i("AccessHome", "ExpiresIn: ${UserRepository.getExpiresIn()} time now: ${System.currentTimeMillis()}")
 
         HomeContent(
             openDrawer,

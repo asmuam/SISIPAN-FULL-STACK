@@ -22,7 +22,8 @@ data class DataLogin(
     val accessToken: String?,
     val id: Long?,  // Menambahkan properti id
     val idMhs: Long?,  // Menambahkan properti idMhs
-    val role: String?
+    val role: String?,
+    val expiresIn: Long?
 )
 @JsonClass(generateAdapter = true)
 data class SignUpResponse(val httpStatus: String, val httpStatusCode: Int, val message: String)
