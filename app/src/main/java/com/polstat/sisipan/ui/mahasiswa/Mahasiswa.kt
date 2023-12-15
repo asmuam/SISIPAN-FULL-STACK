@@ -37,8 +37,11 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
@@ -50,6 +53,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -82,7 +88,6 @@ fun Mahasiswa(
     onAccount: ()-> Unit,
     ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     Surface(Modifier.fillMaxSize()) {
         MahasiswaContent(
@@ -90,7 +95,8 @@ fun Mahasiswa(
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
             onAccount,
-        )
+            doRefresh = { viewModel.refresh(force = true) },
+            )
     }
 }
 
@@ -144,18 +150,23 @@ fun MahasiswaAppBar(
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MahasiswaContent(
     openDrawer: () -> Unit,
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
     onAccount: () -> Unit,
-) {
-    Column(
+    doRefresh: ()-> Unit,
+    ) {
+    val state = rememberPullRefreshState(isRefreshing, doRefresh)
+
+    Box(
         modifier = modifier.windowInsetsPadding(
             WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
         )
+            .pullRefresh(state = state)
+            .verticalScroll(rememberScrollState())
     ) {
         // Scrim dan AppBar
         DynamicThemePrimaryColorsFromImage {
@@ -185,11 +196,11 @@ fun MahasiswaContent(
                 )
             }
         }
-
-
-        if (isRefreshing) {
-            // TODO show a progress indicator or similar
-        }
+        PullRefreshIndicator(
+            refreshing = isRefreshing,
+            state = state,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 
@@ -269,6 +280,7 @@ fun MahasiswaContentPreview() {
             isRefreshing = false,
             modifier = Modifier.fillMaxSize(),
             onAccount = {},
-        )
+            doRefresh = {  },
+            )
     }
 }

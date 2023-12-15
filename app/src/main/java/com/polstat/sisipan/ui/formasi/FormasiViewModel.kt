@@ -71,7 +71,7 @@ class FormasiViewModel(
         refresh(force = false)
     }
 
-    private fun refresh(force: Boolean) {
+    fun refresh(force: Boolean) {
         viewModelScope.launch {
             try {
                 refreshing.value = true
@@ -84,11 +84,6 @@ class FormasiViewModel(
                 refreshing.value = false
             }
         }
-    }
-
-    fun initRefresh() {
-        Log.i("TAG", "initRefresh: execute")
-        refresh(force = true)
     }
 }
 

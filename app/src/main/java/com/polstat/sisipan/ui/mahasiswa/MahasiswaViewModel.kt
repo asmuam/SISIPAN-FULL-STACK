@@ -85,7 +85,7 @@ class MahasiswaViewModel(
         }
     }
 
-    private fun refresh(force: Boolean) {
+    fun refresh(force: Boolean) {
         viewModelScope.launch {
             try {
                 refreshing.value = true

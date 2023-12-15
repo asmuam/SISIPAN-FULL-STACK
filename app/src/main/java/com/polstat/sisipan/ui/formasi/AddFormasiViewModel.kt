@@ -106,7 +106,7 @@ data class FormasiDetails(
 
 fun FormasiDetails.toFormasi(): Formasi = Formasi(
     id = id,
-    provinsiId = if (provinsiId == 0L) null else provinsiId,
+    provinsi = if (provinsiId == 0L) null else provinsiId,
     kodeSatker = kodeSatker,
     namaSatuanKerja = namaSatuanKerja,
     kuotaSt = kuotaSt.toIntOrNull() ?: 0,
@@ -115,7 +115,7 @@ fun FormasiDetails.toFormasi(): Formasi = Formasi(
 )
 fun Formasi.toFormasiDetails(): FormasiDetails = FormasiDetails(
     id = id,
-    provinsiId = provinsiId,
+    provinsiId = provinsi,
     kodeSatker = kodeSatker,
     namaSatuanKerja = namaSatuanKerja,
     kuotaSt = kuotaSt.toString(),

@@ -21,7 +21,10 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
@@ -31,6 +34,8 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -67,7 +72,8 @@ fun Pilihan(
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
             onAccount,
-        )
+            doRefresh = { viewModel.refresh(force = true) },
+            )
     }
 }
 
@@ -121,7 +127,7 @@ fun PilihanAppBar(
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun PilihanContent(
     openDrawer: () -> Unit,
@@ -130,11 +136,16 @@ fun PilihanContent(
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
     onAccount: ()-> Unit,
+    doRefresh: ()-> Unit,
 ) {
-    Column(
+    val state = rememberPullRefreshState(isRefreshing, doRefresh)
+
+    Box(
         modifier = modifier.windowInsetsPadding(
             WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
         )
+            .pullRefresh(state)
+            .verticalScroll(rememberScrollState())
     ) {
         // We dynamically theme this sub-section of the layout to match the selected
         // 'top podcast'

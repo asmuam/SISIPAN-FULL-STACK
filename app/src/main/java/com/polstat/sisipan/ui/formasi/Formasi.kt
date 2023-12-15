@@ -49,6 +49,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
@@ -60,6 +61,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
@@ -100,7 +103,7 @@ fun FormasiPrev() {
 
     FormasiContent(
         openDrawer = {},
-        formasiBukaList = formasiDummy.subList(1,5) ,
+        formasiBukaList = formasiDummy.subList(1, 5),
         formasiTutupList = emptyList<Formasi>(),
         onFormasiClick = { /* Handle formasi item click */ },
         isRefreshing = false, // Set to true if you want to preview the refreshing state
@@ -108,7 +111,8 @@ fun FormasiPrev() {
         onAccount = {},
         role = "ADMIN", // Provide a dummy role for the preview
         navigateToAddFormasi = {},
-    )
+        doRefresh = {  },
+        )
 }
 
 @Composable
@@ -116,12 +120,9 @@ fun Formasi(
     openDrawer: () -> Unit,
     viewModel: FormasiViewModel = viewModel(),
     onAccount: () -> Unit,
-    navigateToAddFormasi:()->Unit,
+    navigateToAddFormasi: () -> Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
-    LaunchedEffect(viewModel) {
-        viewModel.initRefresh()
-    }
 
     Surface(Modifier.fillMaxSize()) {
         FormasiContent(
@@ -133,7 +134,8 @@ fun Formasi(
             modifier = Modifier.fillMaxSize(),
             onAccount,
             role = viewState.role,
-            navigateToAddFormasi = navigateToAddFormasi
+            navigateToAddFormasi = navigateToAddFormasi,
+            doRefresh = { viewModel.refresh(force = true) },
         )
     }
 }
@@ -187,6 +189,7 @@ fun FormasiAppBar(
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FormasiContent(
     openDrawer: () -> Unit,
@@ -198,57 +201,60 @@ fun FormasiContent(
     onAccount: () -> Unit,
     role: String,
     navigateToAddFormasi: () -> Unit,
+    doRefresh: () -> Unit,
 ) {
+    val state = rememberPullRefreshState(isRefreshing, doRefresh)
     val surfaceColor = MaterialTheme.colors.surface
-        val appBarColor = surfaceColor.copy(alpha = 0.87f)
-        val dominantColorState = rememberDominantColorState { color ->
-            // We want a color which has sufficient contrast against the surface color
-            color.contrastAgainst(surfaceColor) >= MinContrastOfPrimaryVsSurface
-        }
-    Column(
-            modifier = modifier
-                .windowInsetsPadding(
+    val appBarColor = surfaceColor.copy(alpha = 0.87f)
+    val dominantColorState = rememberDominantColorState { color ->
+        // We want a color which has sufficient contrast against the surface color
+        color.contrastAgainst(surfaceColor) >= MinContrastOfPrimaryVsSurface
+    }
+    Box(
+        modifier = modifier
+            .windowInsetsPadding(
                 WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
             )
-                .windowInsetsPadding(
-                    WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
-                )
+            .windowInsetsPadding(
+                WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
+            )
+            .pullRefresh(state = state)
+            .verticalScroll(rememberScrollState())
     )
-
     {
         Scaffold(
             topBar = {
                 Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalGradientScrim(
-                        color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
-                        startYPercentage = 1f,
-                        endYPercentage = 0f
-                    )
-            ) {
-                // Draw a scrim over the status bar which matches the app bar
-                Spacer(
-                    Modifier
-                        .background(appBarColor)
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .windowInsetsTopHeight(WindowInsets.statusBars)
-                )
+                        .verticalGradientScrim(
+                            color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
+                            startYPercentage = 1f,
+                            endYPercentage = 0f
+                        )
+                ) {
+                    // Draw a scrim over the status bar which matches the app bar
+                    Spacer(
+                        Modifier
+                            .background(appBarColor)
+                            .fillMaxWidth()
+                            .windowInsetsTopHeight(WindowInsets.statusBars)
+                    )
 
-                FormasiAppBar(
-                    openDrawer,
-                    backgroundColor = appBarColor,
-                    modifier = Modifier.fillMaxWidth(),
-                    onAccount,
-                )
+                    FormasiAppBar(
+                        openDrawer,
+                        backgroundColor = appBarColor,
+                        modifier = Modifier.fillMaxWidth(),
+                        onAccount,
+                    )
                 }
-                     },
+            },
             floatingActionButton = {
                 if (role.equals("ADMIN", ignoreCase = true)) {
                     FloatingActionButton(
                         onClick = {
                             navigateToAddFormasi()
-                                  },
+                        },
                         modifier = Modifier
                             .padding(16.dp)
                             .animateContentSize()
@@ -308,7 +314,6 @@ fun FormasiContent(
     }
 
 }
-
 
 
 @Composable
