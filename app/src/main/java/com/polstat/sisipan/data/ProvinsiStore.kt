@@ -17,7 +17,7 @@ class ProvinsiStore(
         provinsiDao.insertAll(it)
     }
 
-    suspend fun getById(id:Long):Provinsi{
+    suspend fun getById(id:Long):Flow<Provinsi>{
         return provinsiDao.getProvById(id)
     }
 

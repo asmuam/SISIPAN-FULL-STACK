@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.polstat.sisipan.ui.profile
+package com.polstat.sisipan.ui.mahasiswa
 
 import android.app.Activity
 import android.content.Context
@@ -25,26 +25,18 @@ import com.polstat.sisipan.data.UserRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
-import com.polstat.sisipan.data.FormasiRepository
-import com.polstat.sisipan.data.FormasiStore
-import com.polstat.sisipan.data.Mahasiswa
 import com.polstat.sisipan.data.MahasiswaRepository
 import com.polstat.sisipan.data.MahasiswaStore
 import com.polstat.sisipan.data.Provinsi
-import com.polstat.sisipan.data.ProvinsiRepository
 import com.polstat.sisipan.data.ProvinsiStore
-import com.polstat.sisipan.ui.formasi.FormasiViewState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
-class ProfileViewModel(
+class MahasiswaViewModel(
     private val userRepository: UserRepository = Graph.userRepository,
     private val mahasiswaRepository: MahasiswaRepository = Graph.mahasiswaRepository,
     private val mahasiswaStore: MahasiswaStore = Graph.mahasiswaStore,
@@ -52,33 +44,37 @@ class ProfileViewModel(
 ) : ViewModel() {
 
     // Holds our view state which the UI collects via [state]
-    private val _state = MutableStateFlow(ProfileViewState())
+    private val _state = MutableStateFlow(MahasiswaViewState())
 
     private val refreshing = MutableStateFlow(false)
 
-    val state: StateFlow<ProfileViewState>
+    val state: StateFlow<MahasiswaViewState>
         get() = _state
 
     init {
         refresh(force = false)
         viewModelScope.launch {
-            val idMhs: Long? = userRepository.idMhs
             combine(
-                idMhs?.let { mahasiswaStore.getMahasiwa(it) } ?: flowOf(null),
+                mahasiswaStore.getAll(),
                 refreshing,
-            ) { mahasiswaDetail, refreshing ->
-                val provinsi: Provinsi? = mahasiswaDetail?.id?.let { provinsiId ->
-                    runBlocking {
-                        provinsiStore.getById(provinsiId).firstOrNull()
-                    }
+            ) { mahasiswaCollection, refreshing ->
+                val mappedMahasiwaList = mahasiswaCollection.map { mhs ->
+                    val prov = provinsiStore.getById(mhs.provinsiId)
+                MahasiswaCollection(
+                    id = mhs.id,
+                    nim = mhs.nim,
+                    name = mhs.name,
+                    prodi = mhs.prodi,
+                    provinsi = prov,
+                    ipk = mhs.ipk,
+                )
                 }
-                ProfileViewState(
+                MahasiswaViewState(
                     role = userRepository.role,
                     email = userRepository.email,
-                    mahasiswa = mahasiswaDetail,
+                    mahasiswa = mappedMahasiwaList,
                     refreshing = refreshing,
                     errorMessage = null /* TODO */,
-                    provinsi = provinsi,
                 )
             }.catch { throwable ->
                 // TODO: emit a UI error here. For now, we'll just rethrow
@@ -104,7 +100,7 @@ class ProfileViewModel(
         }
     }
 
-    fun editProfilePhoto(context: Context) {
+    fun editMahasiswaPhoto(context: Context) {
         // Buka galeri atau kamera, dan tangani hasilnya di sini
         // Misalnya, menggunakan Intent untuk membuka galeri:
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -117,12 +113,21 @@ class ProfileViewModel(
     }
 }
 
-data class ProfileViewState(
+data class MahasiswaViewState(
     val role: String? = null,
     val refreshing: Boolean = false,
     val errorMessage: String? = null,
     val email: String = "",
     val password: String ="",
-    val mahasiswa: Mahasiswa? = null,
-    val provinsi: Provinsi? = null ,
+    val mahasiswa: List<MahasiswaCollection> = emptyList(),
+    val provinsi: Provinsi? = null,
+)
+
+data class MahasiswaCollection (
+    val id: Long,
+    val nim: String,
+    val name: String,
+    val prodi: String,
+    val provinsi: Flow<Provinsi>,
+    val ipk: Float,
 )

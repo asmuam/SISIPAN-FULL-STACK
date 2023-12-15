@@ -12,5 +12,5 @@ abstract class ProvinsiDao : BaseDao<Provinsi> {
     @Query("DELETE FROM provinsi")
     abstract suspend fun deleteAll()
     @Query("SELECT * FROM provinsi WHERE id=:id")
-    abstract suspend fun getProvById(id:Long): Provinsi
+    abstract fun getProvById(id:Long): Flow<Provinsi>
 }

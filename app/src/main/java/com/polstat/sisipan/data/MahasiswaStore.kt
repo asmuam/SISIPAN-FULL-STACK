@@ -24,6 +24,10 @@ class MahasiswaStore(
     suspend fun getMahasiwa(id: Long): Flow<Mahasiswa> {
         return mahasiswaDao.findById(id)
     }
+
+    suspend fun getAll(): Flow<List<Mahasiswa>> {
+        return mahasiswaDao.findAll()
+    }
     suspend fun saveMahasiwaList(mahasiswaList: List<Mahasiswa>) {
         // Hapus data lama di database (jika ada)
         mahasiswaDao.deleteAll()
