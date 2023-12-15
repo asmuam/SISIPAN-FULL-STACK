@@ -25,11 +25,14 @@ import com.polstat.sisipan.api.ApiClient
 import com.polstat.sisipan.api.AuthService
 import com.polstat.sisipan.api.FormasiService
 import com.polstat.sisipan.api.MahasiswaService
+import com.polstat.sisipan.api.PilihanService
 import com.polstat.sisipan.api.ProvinsiService
 import com.polstat.sisipan.data.FormasiRepository
 import com.polstat.sisipan.data.FormasiStore
 import com.polstat.sisipan.data.MahasiswaRepository
 import com.polstat.sisipan.data.MahasiswaStore
+import com.polstat.sisipan.data.PilihanRepository
+import com.polstat.sisipan.data.PilihanStore
 import com.polstat.sisipan.data.ProvinsiRepository
 import com.polstat.sisipan.data.ProvinsiStore
 import java.io.File
@@ -70,7 +73,8 @@ object Graph {
         get() = ApiClient.provinsiService
     val mahasiswaService: MahasiswaService
         get() = ApiClient.mahasiswaService
-
+    val pilihanService: PilihanService
+        get() = ApiClient.pilihanService
     lateinit var userRepository: UserRepository
         private set
 
@@ -81,6 +85,14 @@ object Graph {
             mainDispatcher = mainDispatcher,
             transactionRunner = transactionRunner,
             )
+    }
+ 
+    
+    val formasiStore by lazy {
+        FormasiStore(
+            formasiDao = database.formasiDao(),
+            transactionRunner = transactionRunner
+        )
     }
     val provinsiRepository by lazy {
         ProvinsiRepository(
@@ -97,14 +109,21 @@ object Graph {
             transactionRunner = transactionRunner
         )
     }
-    
-    val formasiStore by lazy {
-        FormasiStore(
-            formasiDao = database.formasiDao(),
-            transactionRunner = transactionRunner
+    val pilihanRepository by lazy {
+        PilihanRepository(
+            pilihanService = pilihanService,
+            pilihanStore = pilihanStore,
+            mainDispatcher = mainDispatcher,
+            transactionRunner = transactionRunner,
         )
     }
 
+    val pilihanStore by lazy {
+        PilihanStore(
+            pilihanDao = database.pilihanDao(),
+            transactionRunner = transactionRunner
+        )
+    }
     val mahasiswaRepository by lazy {
         MahasiswaRepository(
             mahasiswaService = mahasiswaService,
@@ -133,7 +152,6 @@ object Graph {
             // showcase all of Room.
             .fallbackToDestructiveMigration()
             .build()
-
         userRepository = UserRepository
         userRepository.initialize(context)  // Memanggil initialize di sini
     }
@@ -144,13 +162,11 @@ object Graph {
 
         // Delete the database file
         context.getDatabasePath("data.db").delete()
-
-        // Reinitialize the database
         database = Room.databaseBuilder(context, SisipanDatabase::class.java, "data.db")
+            // This is not recommended for normal apps, but the goal of this sample isn't to
+            // showcase all of Room.
             .fallbackToDestructiveMigration()
             .build()
-
-        // You may need to reinitialize other components or repositories here if necessary
     }
 
 }

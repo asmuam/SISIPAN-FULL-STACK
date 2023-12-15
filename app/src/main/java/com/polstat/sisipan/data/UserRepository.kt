@@ -40,10 +40,11 @@ object UserRepository {
         }
 
     var idMhs: Long?
-        get() = sharedPreferences.getLong(KEY_ID_MHS, 0)
+        get() = sharedPreferences.getLong(KEY_ID_MHS, 0).takeIf { it != 0L }
         set(value) {
             sharedPreferences.edit().putLong(KEY_ID_MHS, value ?: 0).apply()
         }
+
 
     var accessToken: String?
         get() = sharedPreferences.getString(KEY_ACCESS_TOKEN, null)

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 abstract class MahasiswaDao : BaseDao<Mahasiswa> {
 
     @Query("SELECT * FROM mahasiswa WHERE id=:id")
-    abstract fun findById(id: Long?): Flow<Mahasiswa?>
+    abstract fun findById(id: Long): Flow<Mahasiswa>
 
     @Query("DELETE FROM mahasiswa")
     abstract suspend fun deleteAll()

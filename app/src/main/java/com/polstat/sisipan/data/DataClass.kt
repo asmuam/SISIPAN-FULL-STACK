@@ -3,6 +3,7 @@ package com.polstat.sisipan.data
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
 // Kotlin data class for Mahasiswa entity
@@ -54,5 +55,19 @@ data class Pilihan(
     @ColumnInfo(name = "indeksPilihan3") val indeksPilihan3: Float,
     @ColumnInfo(name = "ipk") val ipk: Float,
     //@ColumnInfo(name = "waktuMemilih") val waktuMemilih: Date,
-    @ColumnInfo(name = "hasil") val hasil: String
+    @ColumnInfo(name = "hasil") val hasil: String?
+)
+
+data class PilihanNested(
+    val id: Long,
+    val mahasiswa: Flow<Mahasiswa>,
+    val pilihan1: Flow<Formasi>,
+    val pilihan2: Flow<Formasi>,
+    val pilihan3: Flow<Formasi>,
+    val pilihanSistem: Flow<Formasi>,
+    val indeksPilihan1: Float,
+    val indeksPilihan2: Float,
+    val indeksPilihan3: Float,
+    val ipk: Float,
+    val hasil: String?
 )

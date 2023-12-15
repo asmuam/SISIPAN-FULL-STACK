@@ -18,6 +18,10 @@ class FormasiStore(
         return formasiDao.formasiBuka()
     }
 
+    fun formasiById(id:Long): Flow<Formasi> {
+        return formasiDao.formasiById(id)
+    }
+
     /**
      * Add a new [Formasi] to this store.
      *

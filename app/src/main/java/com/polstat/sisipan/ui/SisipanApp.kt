@@ -38,6 +38,7 @@ import androidx.window.layout.DisplayFeature
 import com.polstat.sisipan.R
 import com.polstat.sisipan.ui.formasi.Formasi
 import com.polstat.sisipan.ui.home.Home
+import com.polstat.sisipan.ui.pilihan.Pilihan
 import com.polstat.sisipan.ui.profile.Profile
 import com.polstat.sisipan.ui.signinsignup.SignInRoute
 import com.polstat.sisipan.ui.signinsignup.SignUpRoute
@@ -106,6 +107,14 @@ fun SisipanApp(
                             Formasi(
                                 openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
                                 onAccount ={
+                                    navController.navigate("profil")
+                                },
+                            )
+                        }
+                        composable(Screen.Pilihan.route) { backStackEntry ->
+                            Pilihan(
+                                openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
+                                onAccount = {
                                     navController.navigate("profil")
                                 },
                             )

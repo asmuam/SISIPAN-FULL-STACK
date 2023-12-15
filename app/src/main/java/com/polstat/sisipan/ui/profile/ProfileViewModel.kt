@@ -57,7 +57,7 @@ class ProfileViewModel(
         get() = _state
 
     init {
-
+        refresh(force = false)
         viewModelScope.launch {
             combine(
                 mahasiswaStore.getMahasiwa(userRepository.idMhs),
@@ -71,17 +71,14 @@ class ProfileViewModel(
                     refreshing = refreshing,
                     errorMessage = null /* TODO */,
                     provinsi = provinsi,
-                    //disini baru mengkonstruk state namun provinsi belum bisa dimasukkan karena mahasiswa blm ada
                 )
             }.catch { throwable ->
                 // TODO: emit a UI error here. For now, we'll just rethrow
                 throw throwable
             }.collect {
-                _state.value = it //tambahkan provinsi ke state
+                _state.value = it
             }
         }
-
-        refresh(force = false)
     }
 
     private fun refresh(force: Boolean) {

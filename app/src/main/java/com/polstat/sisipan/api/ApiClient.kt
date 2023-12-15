@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.polstat.sisipan.data.Formasi
 import com.polstat.sisipan.data.Mahasiswa
+import com.polstat.sisipan.data.Pilihan
 import com.polstat.sisipan.data.Provinsi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -53,6 +54,13 @@ object ApiClient {
             .build()
             .create(MahasiswaService::class.java)
     }
+    val pilihanService: PilihanService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(PilihanService::class.java)
+    }
 }
 
 // Define your API interface
@@ -79,6 +87,22 @@ interface ProvinsiService {
     suspend fun getAll(): ApiResponse<List<Provinsi>>
 }
 
+interface PilihanService {
+    @Headers("Content-Type: application/json")
+    @GET("pilihan")
+    suspend fun getAll(): ApiResponse<List<Pilihan>>
+
+    @Headers("Content-Type: application/json")
+    @POST("pilihan")
+    suspend fun pilih(@Body request: PilihanRequest): ApiResponse<Pilihan>
+
+}
+
+data class PilihanRequest(
+    val pilihan1:Long,
+    val pilihan2:Long,
+    val pilihan3:Long,
+)
 interface MahasiswaService {
     @Headers("Content-Type: application/json")
     @GET("mahasiswa")

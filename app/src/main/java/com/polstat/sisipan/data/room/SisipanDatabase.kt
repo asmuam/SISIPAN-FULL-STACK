@@ -31,7 +31,7 @@ import com.polstat.sisipan.data.Provinsi
 // Room database class
 @Database(
     entities = [Formasi::class, Mahasiswa::class, Pilihan::class, Provinsi::class],
-    version = 1,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(DateTimeTypeConverters::class) // Assuming you need a TypeConverter for Date

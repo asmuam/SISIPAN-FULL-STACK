@@ -21,7 +21,7 @@ class MahasiswaStore(
         mahasiswaDao.insert(mahasiswa)
     }
 
-    suspend fun getMahasiwa(id: Long?): Flow<Mahasiswa?> {
+    suspend fun getMahasiwa(id: Long): Flow<Mahasiswa> {
         return mahasiswaDao.findById(id)
     }
     suspend fun saveMahasiwaList(mahasiswaList: List<Mahasiswa>) {
