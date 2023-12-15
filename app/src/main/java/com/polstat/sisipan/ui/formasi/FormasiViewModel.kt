@@ -39,7 +39,7 @@ class FormasiViewModel(
     // Holds our view state which the UI collects via [state]
     private val _state = MutableStateFlow(FormasiViewState())
 
-    private val refreshing = MutableStateFlow(false)
+    private val refreshing = MutableStateFlow(true)
 
     val state: StateFlow<FormasiViewState>
         get() = _state
@@ -50,11 +50,13 @@ class FormasiViewModel(
             // view state instance which only contains the latest values.
             combine(
                 formasiStore.formasiBuka(),
+                formasiStore.formasiTutup(),
                 refreshing
-            ) { formasiList, refreshing ->
+            ) { formasiBukaList,formasiTutupList, refreshing ->
                 FormasiViewState(
-                    role = userRepository.role,
-                    formasiList = formasiList,
+                    role = userRepository.role ?: "", //default ""
+                    formasiBukaList = formasiBukaList,
+                    formasiTutupList = formasiTutupList,
                     refreshing = refreshing,
                     errorMessage = null /* TODO */
                 )
@@ -84,12 +86,16 @@ class FormasiViewModel(
         }
     }
 
-
+    fun initRefresh() {
+        Log.i("TAG", "initRefresh: execute")
+        refresh(force = true)
+    }
 }
 
 data class FormasiViewState(
-    val role: String? = null,
-    val formasiList: List<Formasi> = emptyList(),
+    val role: String = "",
+    val formasiBukaList: List<Formasi> = emptyList(),
+    val formasiTutupList: List<Formasi> = emptyList(),
     val refreshing: Boolean = false,
     val errorMessage: String? = null
 )

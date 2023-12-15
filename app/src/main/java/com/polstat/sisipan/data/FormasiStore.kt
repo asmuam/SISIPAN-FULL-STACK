@@ -18,6 +18,10 @@ class FormasiStore(
         return formasiDao.formasiBuka()
     }
 
+    fun formasiTutup(): Flow<List<Formasi>> {
+        return formasiDao.formasiTutup()
+    }
+
     fun formasiById(id:Long): Flow<Formasi> {
         return formasiDao.formasiById(id)
     }

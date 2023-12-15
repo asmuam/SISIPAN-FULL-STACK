@@ -27,9 +27,6 @@ data class Formasi(
     @ColumnInfo(name = "kuotaSt") val kuotaSt: Int,
     @ColumnInfo(name = "kuotaKs") val kuotaKs: Int,
     @ColumnInfo(name = "kuotaD3") val kuotaD3: Int,
-    @ColumnInfo(name = "kuotaKsTersedia") val kuotaKsTersedia: Int,
-    @ColumnInfo(name = "kuotaStTersedia") val kuotaStTersedia: Int,
-    @ColumnInfo(name = "kuotaD3Tersedia") val kuotaD3Tersedia: Int
 )
 
 
