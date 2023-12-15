@@ -36,6 +36,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.window.layout.DisplayFeature
 import com.polstat.sisipan.R
+import com.polstat.sisipan.ui.formasi.AddFormasi
 import com.polstat.sisipan.ui.formasi.Formasi
 import com.polstat.sisipan.ui.home.Home
 import com.polstat.sisipan.ui.pilihan.Pilihan
@@ -107,6 +108,17 @@ fun SisipanApp(
                             Formasi(
                                 openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
                                 onAccount ={
+                                    navController.navigate("profil")
+                                },
+                                navigateToAddFormasi = {navController.navigate("addFormasi")}
+                            )
+                        }
+                        composable(Screen.AddFormasi.route) {
+                            AddFormasi(
+                                navigateBack = { navController.popBackStack() },
+                                onNavigateUp = { navController.navigateUp() },
+                                openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
+                                onAccount = {
                                     navController.navigate("profil")
                                 },
                             )

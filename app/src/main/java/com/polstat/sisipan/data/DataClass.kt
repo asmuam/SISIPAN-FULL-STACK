@@ -21,7 +21,7 @@ data class Mahasiswa(
 @Entity(tableName = "formasi")
 data class Formasi(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long = 0,
-    @ColumnInfo(name = "provinsi_id") val provinsiId: Long,
+    @ColumnInfo(name = "provinsi") val provinsi: Long?,
     @ColumnInfo(name = "kodeSatker") val kodeSatker: String,
     @ColumnInfo(name = "namaSatuanKerja") val namaSatuanKerja: String,
     @ColumnInfo(name = "kuotaSt") val kuotaSt: Int,
@@ -33,7 +33,7 @@ data class Formasi(
 // Kotlin data class for Provinsi entity
 @Entity(tableName = "provinsi")
 data class Provinsi(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long = 0,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long? = null,
     @ColumnInfo(name = "kodeProvinsi") val kodeProvinsi: String,
     @ColumnInfo(name = "namaProvinsi") val namaProvinsi: String
 )

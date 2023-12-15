@@ -32,9 +32,9 @@ data class SignUpResponse(val httpStatus: String, val httpStatusCode: Int, val m
 @JsonClass(generateAdapter = true)
 data class ApiResponse<T>(
     val data: T?,
-    val message: String?,
-    val httpStatus: String?,
-    val httpStatusCode: Int?
+    val message: String,
+    val httpStatus: String,
+    val httpStatusCode: Int
 )
 //@JsonClass(generateAdapter = true)
 //data class FormasiAllResponse(

@@ -36,5 +36,22 @@ class FormasiRepository(
         }
     }
 
+    suspend fun insertFormasi(formasi: Formasi) {
+        // Lakukan operasi penyimpanan menggunakan service atau store, sesuai kebutuhan
+        // Misalnya, jika Anda memiliki service untuk menyimpan data ke server:
+        try {
+            val response = formasiService.insert(formasi)
+            if (response.httpStatusCode==200) {
+                // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
+                refreshFormasi(force = true)
+            } else {
+                // Handle kesalahan jika diperlukan
+                Log.e("FormasiRepository", "Failed to insert formasi. Response: ${response.message}")
+            }
+        } catch (e: Exception) {
+            // Handle exception jika terjadi kesalahan dalam komunikasi dengan server
+            Log.e("FormasiRepository", "Error inserting formasi", e)
+        }
+    }
     // Metode lain sesuai kebutuhan
 }

@@ -87,5 +87,15 @@
     <string name="prodi_mahasiswa">Program Studi</string>
     <string name="ipk_mahasiswa">Indeks Prestasi Kumulatif</string>
     <string name="prov_mahasiswa">Asal Daerah</string>
+    <string name="add_formasi">Tambah Formasi</string>
+    <string name="save_action">Save</string>
+    <string name="kode_satker_req">Kode Satuan Kerja*</string>
+    <string name="nama_satker_req">Nama Satuan Kerja*</string>
+    <string name="nama_provinsi_req">Provinsi*</string>
+    <string name="kuota_ks_req">Kuota Prodi Komputasi Statistik*</string>
+    <string name="kuota_st_req">Kuota Prodi D4 Statistik*</string>
+    <string name="kuota_d3_req">Kuota Prodi D3 Statistik*</string>
+    <string name="required_fields">*required fields</string>
+
 
 </resources>

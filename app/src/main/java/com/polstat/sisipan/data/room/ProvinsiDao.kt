@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.Flow
 abstract class ProvinsiDao : BaseDao<Provinsi> {
     @Query("SELECT COUNT(*) FROM provinsi")
     abstract suspend fun count(): Int
+    @Query("SELECT * FROM provinsi")
+    abstract fun getAll(): Flow<List<Provinsi>>
     @Query("DELETE FROM provinsi")
     abstract suspend fun deleteAll()
     @Query("SELECT * FROM provinsi WHERE id=:id")

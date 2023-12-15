@@ -78,6 +78,9 @@ interface FormasiService {
     @Headers("Content-Type: application/json")
     @GET("formasi")
     suspend fun getAll(): ApiResponse<List<Formasi>>
+    @Headers("Content-Type: application/json")
+    @POST("formasi")
+    suspend fun insert(@Body request: Formasi): ApiResponse<Formasi>
 
 }
 

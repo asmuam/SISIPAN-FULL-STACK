@@ -34,11 +34,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsEndWidth
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -68,6 +70,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -103,7 +106,8 @@ fun FormasiPrev() {
         isRefreshing = false, // Set to true if you want to preview the refreshing state
         modifier = Modifier.fillMaxSize(),
         onAccount = {},
-        role = "ADMIN" // Provide a dummy role for the preview
+        role = "ADMIN", // Provide a dummy role for the preview
+        navigateToAddFormasi = {},
     )
 }
 
@@ -112,6 +116,7 @@ fun Formasi(
     openDrawer: () -> Unit,
     viewModel: FormasiViewModel = viewModel(),
     onAccount: () -> Unit,
+    navigateToAddFormasi:()->Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(viewModel) {
@@ -127,7 +132,8 @@ fun Formasi(
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
             onAccount,
-            role = viewState.role
+            role = viewState.role,
+            navigateToAddFormasi = navigateToAddFormasi
         )
     }
 }
@@ -191,6 +197,7 @@ fun FormasiContent(
     modifier: Modifier = Modifier,
     onAccount: () -> Unit,
     role: String,
+    navigateToAddFormasi: () -> Unit,
 ) {
     val surfaceColor = MaterialTheme.colors.surface
         val appBarColor = surfaceColor.copy(alpha = 0.87f)
@@ -199,8 +206,15 @@ fun FormasiContent(
             color.contrastAgainst(surfaceColor) >= MinContrastOfPrimaryVsSurface
         }
     Column(
-            modifier = modifier.windowInsetsPadding(
-                WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)))
+            modifier = modifier
+                .windowInsetsPadding(
+                WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
+            )
+                .windowInsetsPadding(
+                    WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
+                )
+    )
+
     {
         Scaffold(
             topBar = {
@@ -233,9 +247,8 @@ fun FormasiContent(
                 if (role.equals("ADMIN", ignoreCase = true)) {
                     FloatingActionButton(
                         onClick = {
-                            // Handle FAB click
-                            // Contoh: Navigasi ke layar pembuatan formasi
-                        },
+                            navigateToAddFormasi()
+                                  },
                         modifier = Modifier
                             .padding(16.dp)
                             .animateContentSize()
@@ -296,115 +309,7 @@ fun FormasiContent(
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-//@Composable
-//fun FormasiContent(
-//    openDrawer: () -> Unit,
-//    formasiBukaList: List<Formasi>,
-//    formasiTutupList: List<Formasi>,
-//    onFormasiClick: (Formasi) -> Unit,
-//    isRefreshing: Boolean,
-//    modifier: Modifier = Modifier,
-//    onAccount: () -> Unit,
-//    role: String,
-//) {
-//    Column(
-//        modifier = modifier.windowInsetsPadding(
-//            WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
-//        )
-//    ) {
-//        // We dynamically theme this sub-section of the layout to match the selected
-//        // 'top podcast'
-//
-//        val surfaceColor = MaterialTheme.colors.surface
-//        val appBarColor = surfaceColor.copy(alpha = 0.87f)
-//        val dominantColorState = rememberDominantColorState { color ->
-//            // We want a color which has sufficient contrast against the surface color
-//            color.contrastAgainst(surfaceColor) >= MinContrastOfPrimaryVsSurface
-//        }
-//
-//
-//
-//        DynamicThemePrimaryColorsFromImage(dominantColorState) {
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .verticalGradientScrim(
-//                        color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
-//                        startYPercentage = 1f,
-//                        endYPercentage = 0f
-//                    )
-//            ) {
-//                // Draw a scrim over the status bar which matches the app bar
-//                Spacer(
-//                    Modifier
-//                        .background(appBarColor)
-//                        .fillMaxWidth()
-//                        .windowInsetsTopHeight(WindowInsets.statusBars)
-//                )
-//
-//                FormasiAppBar(
-//                    openDrawer,
-//                    backgroundColor = appBarColor,
-//                    modifier = Modifier.fillMaxWidth(),
-//                    onAccount,
-//                )
-//
-//                LazyColumn(
-//                    contentPadding = PaddingValues(16.dp),
-//                    verticalArrangement = Arrangement.spacedBy(8.dp)
-//                ) {
-//                    items(formasiBukaList) { formasi ->
-//                        FormasiCard(
-//                            formasi = formasi,
-//                            onItemClick = onFormasiClick,
-//                        )
-//                    }
-//
-//                    // Divider untuk memberikan garis pemisah
-//                    item {
-//                        Divider(
-//                            color = Color.Black, // Warna garis pemisah
-//                            thickness = 3.dp, // Ketebalan garis pemisah
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .padding(vertical = 8.dp) // Sesuaikan padding garis pemisah sesuai kebutuhan
-//                        )
-//                    }
-//
-//                    items(formasiTutupList) { formasi ->
-//                        FormasiCard(
-//                            formasi = formasi,
-//                            onItemClick = onFormasiClick,
-//                        )
-//                    }
-//                }
-//
-//            }
-//        }
-//            // Conditionally show FAB based on role
-//            if (role.equals("ADMIN", ignoreCase = true)) {
-//                FloatingActionButton(
-//                    onClick = {
-//                        // Handle FAB click
-//                        // For example, navigate to the formasi creation screen
-//                    },
-//                    modifier = Modifier
-//                        .padding(16.dp)
-//                        .animateContentSize()
-//                        .background(Color.Transparent)
-//                        .align(Alignment.End)
-//                ) {
-//                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add Formasi")
-//                }
-//            }
-//
-//
-//        if (isRefreshing) {
-//            // TODO show a progress indicator or similar
-//        }
-//    }
-//}
+
 
 @Composable
 fun FormasiCard(

@@ -20,6 +20,9 @@ class ProvinsiStore(
     suspend fun getById(id:Long):Flow<Provinsi>{
         return provinsiDao.getProvById(id)
     }
+    suspend fun getAll():Flow<List<Provinsi>>{
+        return provinsiDao.getAll()
+    }
 
 
 }
