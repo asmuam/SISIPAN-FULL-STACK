@@ -58,7 +58,7 @@ fun AppDrawer(
     navigateToMahasiswa: () -> Unit,
     navigateToPilihan: () -> Unit,
     closeDrawer: () -> Unit,
-    deleteUser: () -> Unit,
+    logOut: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ModalDrawerSheet(modifier) {
@@ -103,7 +103,7 @@ fun AppDrawer(
             selected = false, // You may want to adjust this based on your logic
             onClick = {
                 navigateToWelcome()
-                deleteUser()
+                logOut()
                 closeDrawer()
             },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -137,7 +137,7 @@ fun PreviewAppDrawer() {
             navigateToWelcome = {},
             navigateToMahasiswa = {},
             navigateToPilihan = {},
-            deleteUser = {},
+            logOut = {},
             closeDrawer = { }
         )
     }

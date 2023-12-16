@@ -16,8 +16,11 @@
 
 package com.polstat.sisipan
 
+import android.app.ActivityManager
+import android.app.LauncherActivity
 import com.polstat.sisipan.data.UserRepository
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.room.Room
 import com.polstat.sisipan.data.room.TransactionRunner
@@ -36,6 +39,7 @@ import com.polstat.sisipan.data.PilihanRepository
 import com.polstat.sisipan.data.PilihanStore
 import com.polstat.sisipan.data.ProvinsiRepository
 import com.polstat.sisipan.data.ProvinsiStore
+import com.polstat.sisipan.ui.MainActivity
 import java.io.File
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -78,6 +82,8 @@ object Graph {
         get() = ApiClient.pilihanService
     lateinit var userRepository: UserRepository
         private set
+    private var isDatabaseInitialized = false
+
 
     val formasiRepository by lazy {
         FormasiRepository(
@@ -85,10 +91,10 @@ object Graph {
             formasiStore = formasiStore,
             mainDispatcher = mainDispatcher,
             transactionRunner = transactionRunner,
-            )
+        )
     }
- 
-    
+
+
     val formasiStore by lazy {
         FormasiStore(
             formasiDao = database.formasiDao(),
@@ -140,31 +146,48 @@ object Graph {
             transactionRunner = transactionRunner
         )
     }
-    fun provide(context: Context) {
-        okHttpClient = OkHttpClient.Builder()
-            .cache(Cache(File(context.cacheDir, "http_cache"), (20 * 1024 * 1024).toLong()))
-            .apply {
-                if (BuildConfig.DEBUG) eventListenerFactory(LoggingEventListener.Factory())
-            }
-            .build()
 
-        database = Room.databaseBuilder(context, SisipanDatabase::class.java, "data.db")
-            // This is not recommended for normal apps, but the goal of this sample isn't to
-            // showcase all of Room.
-            .fallbackToDestructiveMigration()
-            .build()
-        userRepository = UserRepository
-        userRepository.initialize(context)  // Memanggil initialize di sini
+    fun isDatabaseInitialized(): Boolean {
+        return isDatabaseInitialized
     }
 
-    fun clearDatabase(context: Context) {
+    fun isDatabaseOpen(): Boolean {
+        return database.isOpen
+    }
+
+    fun provide(context: Context) {
+        if (!isDatabaseInitialized) {
+            okHttpClient = OkHttpClient.Builder()
+                .cache(Cache(File(context.cacheDir, "http_cache"), (20 * 1024 * 1024).toLong()))
+                .apply {
+                    if (BuildConfig.DEBUG) eventListenerFactory(LoggingEventListener.Factory())
+                }
+                .build()
+
+            database = Room.databaseBuilder(context, SisipanDatabase::class.java, "data.db")
+                // This is not recommended for normal apps, but the goal of this sample isn't to
+                // showcase all of Room.
+                .fallbackToDestructiveMigration()
+                .build()
+            userRepository = UserRepository
+            userRepository.initialize(context)  // Memanggil initialize di sini
+            isDatabaseInitialized = true
+            Log.i("TAGra", "DATABASE STATUS: ${database.isOpen}")
+        }
+    }
+
+    fun logOut(context: Context) {
         // Close the database to ensure it's not in use
         database.close()
+        Log.i("TAGra", "DATABASE CLOSING STATUS: ${database.isOpen}")
 
-        // Delete the database file
-        context.getDatabasePath("data.db").delete()
-        provide(context)
-        Log.i("TAG", "GraphclearDatabaseContext: ${context}")
+        // Start the launcher activity to restart the application
+        // Start the MainActivity to restart the application
+        val intent = Intent(context, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+        Log.i("TAGra", "Is database initialized: ${isDatabaseInitialized()}")
+        Log.i("TAGra", "GraphclearDatabaseContext: ${context}")
+        Log.i("TAGra", "DATABASE STATUS: ${database.isOpen}")
     }
-
 }

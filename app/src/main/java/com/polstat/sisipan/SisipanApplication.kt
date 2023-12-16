@@ -28,6 +28,9 @@ class SisipanApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         Graph.provide(this)
-        Log.i("TAG", "onCreateContext: ${this}")
+        Log.i("TAGAPP", "onCreateContext: ${this}")
+        Log.i("TAGAPP", "Is database initialized: ${Graph.isDatabaseInitialized()}")
+        Log.i("TAGAPP", "Is database open: ${Graph.isDatabaseOpen()}")
     }
 }
+

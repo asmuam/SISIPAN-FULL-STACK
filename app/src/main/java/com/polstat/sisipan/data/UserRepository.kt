@@ -67,9 +67,9 @@ object UserRepository {
         this.expiresIn = expiresIn
     }
 
-    fun clear(context: Context) {
+    fun logOut(context: Context) {
         sharedPreferences.edit().clear().apply()
-        Graph.clearDatabase(context)
+        Graph.logOut(context)
     }
 
     private fun calculateExpiryTime(expiresIn: Long): Long {
