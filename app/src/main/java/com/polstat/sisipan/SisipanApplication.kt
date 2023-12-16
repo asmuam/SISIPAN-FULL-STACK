@@ -17,9 +17,6 @@
 package com.polstat.sisipan
 
 import android.app.Application
-import android.util.Log
-import coil.ImageLoader
-import coil.ImageLoaderFactory
 
 /**
  * Application which sets up our dependency [Graph] with a context.
@@ -27,10 +24,9 @@ import coil.ImageLoaderFactory
 class SisipanApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        Graph.provide(this)
-        Log.i("TAGAPP", "onCreateContext: ${this}")
-        Log.i("TAGAPP", "Is database initialized: ${Graph.isDatabaseInitialized()}")
-        Log.i("TAGAPP", "Is database open: ${Graph.isDatabaseOpen()}")
+        if (!Graph.isDatabaseInitialized()){
+            Graph.provide(this)
+        }
     }
 }
 

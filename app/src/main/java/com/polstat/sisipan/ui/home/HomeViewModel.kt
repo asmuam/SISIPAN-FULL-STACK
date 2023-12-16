@@ -54,8 +54,12 @@ class HomeViewModel(
         get() = _state
 
     init {
+        Log.i("TAGHomebefore","DATABASE init ${Graph.isDatabaseInitialized()}")
+        Log.i("TAGHomebefore","DATABASE open ${Graph.isDatabaseOpen()}")
         observeRefresh()
         refresh(force = false)
+        Log.i("TAGHomeafter","DATABASE init ${Graph.isDatabaseInitialized()}")
+        Log.i("TAGHomeafter","DATABASE open ${Graph.isDatabaseOpen()}")
     }
 
     private fun observeRefresh() {
@@ -64,7 +68,9 @@ class HomeViewModel(
                 refreshing
             ) { refreshingValue  ->
                 val idmhs = userRepository.idMhs
+                Log.i("TAG", "observeRefresh: Checkpoint1")
                 if (idmhs!=null) {
+                    Log.i("TAG", "observeRefresh: Checkpoint2")
                     val pilihan = pilihanStore.pilihanByMhs(idmhs)
                     val memilih = true
                     val mahasiswa = mahasiswaStore.getMahasiswa(pilihan.mahasiswa)
@@ -85,6 +91,7 @@ class HomeViewModel(
                         ipk = pilihan.ipk,
                         hasil = pilihan.hasil
                     )
+                    Log.i("TAG", "observeRefresh: Checkpoint3")
                     HomeViewState(
                         role = userRepository.role,
                         pilihanSaya = pilihanSaya,
@@ -95,6 +102,7 @@ class HomeViewModel(
                         errorMessage = null /* TODO */
                     )
                 } else{
+                    Log.i("TAG", "observeRefresh: Checkpoint4")
                     HomeViewState(
                         role = userRepository.role,
                         mahasiswaMemilih = pilihanStore.count(),
@@ -104,13 +112,14 @@ class HomeViewModel(
                         errorMessage = null /* TODO */
                     )
                 }
-
             }.catch { throwable ->
+                Log.i("TAG", "observeRefresh: Checkpoint5")
                 // TODO: emit a UI error here. For now, we'll just rethrow
                 throw throwable
             }.collect {
-                Log.e("PILIHAN_REPO", "COUNT${pilihanStore.count()}")
+                Log.i("TAG", "observeRefresh: Checkpoint6")
                 _state.value = it
+                Log.i("TAG", "DATABASE open after collect: ${Graph.isDatabaseOpen()}")
             }
         }
     }

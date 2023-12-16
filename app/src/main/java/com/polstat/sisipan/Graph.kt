@@ -16,15 +16,9 @@
 
 package com.polstat.sisipan
 
-import android.app.ActivityManager
-import android.app.LauncherActivity
-import com.polstat.sisipan.data.UserRepository
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import androidx.room.Room
-import com.polstat.sisipan.data.room.TransactionRunner
-import com.polstat.sisipan.data.room.SisipanDatabase
 import com.polstat.sisipan.api.ApiClient
 import com.polstat.sisipan.api.AuthService
 import com.polstat.sisipan.api.FormasiService
@@ -39,13 +33,15 @@ import com.polstat.sisipan.data.PilihanRepository
 import com.polstat.sisipan.data.PilihanStore
 import com.polstat.sisipan.data.ProvinsiRepository
 import com.polstat.sisipan.data.ProvinsiStore
-import com.polstat.sisipan.ui.MainActivity
-import java.io.File
+import com.polstat.sisipan.data.UserRepository
+import com.polstat.sisipan.data.room.SisipanDatabase
+import com.polstat.sisipan.data.room.TransactionRunner
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
+import java.io.File
 
 /**
  * A very simple global singleton dependency graph.
@@ -172,22 +168,13 @@ object Graph {
             userRepository = UserRepository
             userRepository.initialize(context)  // Memanggil initialize di sini
             isDatabaseInitialized = true
-            Log.i("TAGra", "DATABASE STATUS: ${database.isOpen}")
+            Log.i("TAGraProv", "DATABASE open: ${database.isOpen}")
         }
     }
 
     fun logOut(context: Context) {
-        // Close the database to ensure it's not in use
-        database.close()
-        Log.i("TAGra", "DATABASE CLOSING STATUS: ${database.isOpen}")
-
-        // Start the launcher activity to restart the application
-        // Start the MainActivity to restart the application
-        val intent = Intent(context, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(intent)
-        Log.i("TAGra", "Is database initialized: ${isDatabaseInitialized()}")
-        Log.i("TAGra", "GraphclearDatabaseContext: ${context}")
-        Log.i("TAGra", "DATABASE STATUS: ${database.isOpen}")
+        if (isDatabaseInitialized()) {
+            database.close()
+        }
     }
 }

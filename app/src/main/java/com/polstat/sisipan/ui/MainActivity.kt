@@ -24,8 +24,6 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.core.view.WindowCompat
 import com.google.accompanist.adaptive.calculateDisplayFeatures
-import com.polstat.sisipan.Graph
-import kotlinx.coroutines.CoroutineScope
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
