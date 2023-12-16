@@ -25,23 +25,28 @@ class PilihanRepository(
         } else if (force || pilihanStore.isEmpty()) {
             Log.e("PILIHAN_REPO", "cek")
             refreshingJob = scope.launch {
-                transactionRunner {
-                    // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
-                    val pilihanList = pilihanService.getAll().data
-                    pilihanList?.let {
-                        pilihanStore.savePilihanList(it)
+                try {
+                    transactionRunner {
+                        // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
+                        val pilihanList = pilihanService.getAll().data
+                        pilihanList?.let {
+                            pilihanStore.savePilihanList(it)
+                        }
                     }
+                } catch (e: Exception) {
+                    // Tangani kesalahan saat menyimpan data ke store
+                    Log.e("PILIHAN_REPO", "Error refreshing pilihan", e)
                 }
             }
         }
     }
 
-    suspend fun insertPilihan(id:Long,pilihan: PilihanRequest) {
+    suspend fun insertPilihan(id: Long, pilihan: PilihanRequest) {
         // Lakukan operasi penyimpanan menggunakan service atau store, sesuai kebutuhan
         // Misalnya, jika Anda memiliki service untuk menyimpan data ke server:
         try {
-            val response = pilihanService.pilih(id,pilihan)
-            if (response.httpStatusCode==200) {
+            val response = pilihanService.pilih(id, pilihan)
+            if (response.httpStatusCode == 200) {
                 // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
                 refreshPilihan(force = true)
             } else {
@@ -49,19 +54,19 @@ class PilihanRepository(
                 Log.e("PILIHANREPO", "Failed to insert pilihan. Response: ${response.message}")
             }
         } catch (e: Exception) {
-            // Handle exception jika terjadi kesalahan dalam komunikasi dengan server
+            // Handle exception jika terjadi kesalahan dalam komunikasi dengan server atau operasi penyimpanan
             Log.e("PILIHANREPO", "Error inserting pilihan", e)
         }
     }
 
-    suspend fun ubahPilihan(id:Long,pilihan: PilihanRequest) {
+    suspend fun ubahPilihan(id: Long, pilihan: PilihanRequest) {
         // Lakukan operasi penyimpanan menggunakan service atau store, sesuai kebutuhan
         // Misalnya, jika Anda memiliki service untuk menyimpan data ke server:
         try {
-            Log.e("TAG", "call api: ${id} : ${pilihan}")
-            val response = pilihanService.ubah(id,pilihan)
-            Log.e("TAG", "resp api: ${response}")
-            if (response.httpStatusCode==200) {
+            Log.e("TAG", "call api: $id : $pilihan")
+            val response = pilihanService.ubah(id, pilihan)
+            Log.e("TAG", "resp api: $response")
+            if (response.httpStatusCode == 200) {
                 // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
                 refreshPilihan(force = true)
             } else {
@@ -69,10 +74,9 @@ class PilihanRepository(
                 Log.e("PILIHANREPOResponse", "Failed to insert pilihan. Response: ${response.message}")
             }
         } catch (e: Exception) {
-            // Handle exception jika terjadi kesalahan dalam komunikasi dengan server
+            // Handle exception jika terjadi kesalahan dalam komunikasi dengan server atau operasi penyimpanan
             Log.e("PILIHANREPO", "Error inserting pilihan", e)
         }
     }
     // Metode lain sesuai kebutuhan
 }
-

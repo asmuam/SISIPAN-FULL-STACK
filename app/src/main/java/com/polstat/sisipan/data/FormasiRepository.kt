@@ -24,13 +24,18 @@ class FormasiRepository(
         } else if (force || formasiStore.isEmpty()) {
             Log.i("TAG", "refreshFormasi: FORCING ")
             refreshingJob = scope.launch {
-                transactionRunner {
-                    // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
-                    val formasiList = formasiService.getAll().data
-                    Log.i("TAG", "refreshFormasi: ${formasiList} ")
-                    formasiList?.let {
-                        formasiStore.saveFormasiList(it)
+                try {
+                    transactionRunner {
+                        // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
+                        val formasiList = formasiService.getAll().data
+                        Log.i("TAG", "refreshFormasi: ${formasiList} ")
+                        formasiList?.let {
+                            formasiStore.saveFormasiList(it)
+                        }
                     }
+                } catch (e: Exception) {
+                    // Tangani kesalahan saat menyimpan data ke store
+                    Log.e("FormasiRepository", "Error refreshing formasi", e)
                 }
             }
         }
@@ -41,7 +46,7 @@ class FormasiRepository(
         // Misalnya, jika Anda memiliki service untuk menyimpan data ke server:
         try {
             val response = formasiService.insert(formasi)
-            if (response.httpStatusCode==200) {
+            if (response.httpStatusCode == 200) {
                 // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
                 refreshFormasi(force = true)
             } else {

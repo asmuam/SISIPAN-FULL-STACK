@@ -2,10 +2,12 @@ package com.polstat.sisipan.api
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.polstat.sisipan.Graph.okHttpClient
 import com.polstat.sisipan.data.Formasi
 import com.polstat.sisipan.data.Mahasiswa
 import com.polstat.sisipan.data.Pilihan
 import com.polstat.sisipan.data.Provinsi
+import com.polstat.sisipan.data.UserRepository
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -28,6 +30,13 @@ object ApiClient {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient.newBuilder().addInterceptor { chain ->
+                val original = chain.request()
+                val requestBuilder = original.newBuilder()
+                    .header("Authorization", "Bearer ${UserRepository.accessToken}")
+                val request = requestBuilder.build()
+                chain.proceed(request)
+            }.build())
             .build()
             .create(AuthService::class.java)
     }
@@ -36,6 +45,13 @@ object ApiClient {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient.newBuilder().addInterceptor { chain ->
+                val original = chain.request()
+                val requestBuilder = original.newBuilder()
+                    .header("Authorization", "Bearer ${UserRepository.accessToken}")
+                val request = requestBuilder.build()
+                chain.proceed(request)
+            }.build())
             .build()
             .create(FormasiService::class.java)
     }
@@ -44,6 +60,13 @@ object ApiClient {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient.newBuilder().addInterceptor { chain ->
+                val original = chain.request()
+                val requestBuilder = original.newBuilder()
+                    .header("Authorization", "Bearer ${UserRepository.accessToken}")
+                val request = requestBuilder.build()
+                chain.proceed(request)
+            }.build())
             .build()
             .create(ProvinsiService::class.java)
     }
@@ -52,6 +75,13 @@ object ApiClient {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient.newBuilder().addInterceptor { chain ->
+                val original = chain.request()
+                val requestBuilder = original.newBuilder()
+                    .header("Authorization", "Bearer ${UserRepository.accessToken}")
+                val request = requestBuilder.build()
+                chain.proceed(request)
+            }.build())
             .build()
             .create(MahasiswaService::class.java)
     }
@@ -59,6 +89,13 @@ object ApiClient {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient.newBuilder().addInterceptor { chain ->
+                val original = chain.request()
+                val requestBuilder = original.newBuilder()
+                    .header("Authorization", "Bearer ${UserRepository.accessToken}")
+                val request = requestBuilder.build()
+                chain.proceed(request)
+            }.build())
             .build()
             .create(PilihanService::class.java)
     }

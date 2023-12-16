@@ -23,14 +23,19 @@ class MahasiswaRepository(
             refreshingJob?.join()
         } else if (force || mahasiswaStore.isEmpty()) {
             refreshingJob = scope.launch {
-                transactionRunner {
-                    // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
+                try {
+                    transactionRunner {
+                        // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
                         val mahasiswaList = mahasiswaService.getAll().data
                         mahasiswaList?.let {
                             mahasiswaStore.saveMahasiswaList(it)
+                        }
                     }
+                } catch (e: Exception) {
+                    // Tangani kesalahan di sini
+                    e.printStackTrace()
+                    // Misalnya, Anda dapat menampilkan pesan kesalahan atau melakukan tindakan lain
                 }
-
             }
         }
     }

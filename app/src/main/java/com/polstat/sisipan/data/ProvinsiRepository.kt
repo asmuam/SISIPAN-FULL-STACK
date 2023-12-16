@@ -26,12 +26,17 @@ class ProvinsiRepository(
         } else if (force || provinsiStore.isEmpty()) {
             Log.i("PROVINSI", "refreshFormasi: DO")
             refreshingJob = scope.launch {
-                transactionRunner {
-                    // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
-                    val provinsiList = provinsiService.getAll().data
-                    provinsiList?.let {
-                        provinsiStore.saveProvinsiList(it)
+                try {
+                    transactionRunner {
+                        // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
+                        val provinsiList = provinsiService.getAll().data
+                        provinsiList?.let {
+                            provinsiStore.saveProvinsiList(it)
+                        }
                     }
+                } catch (e: Exception) {
+                    // Tangani kesalahan saat menyimpan data ke store
+                    Log.e("PROVINSI_REPO", "Error refreshing provinsi", e)
                 }
             }
         }
