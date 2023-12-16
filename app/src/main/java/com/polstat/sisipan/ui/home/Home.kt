@@ -94,11 +94,14 @@ import java.time.format.DateTimeFormatter
 fun Home(
     openDrawer: () -> Unit,
     viewModel: HomeViewModel = viewModel(),
-    onAccount: ()-> Unit,
+    onAccount: () -> Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
-        Log.i("AccessHome", "ExpiresIn: ${UserRepository.expiresIn} time now: ${System.currentTimeMillis()}")
+        Log.i(
+            "AccessHome",
+            "ExpiresIn: ${UserRepository.expiresIn} time now: ${System.currentTimeMillis()}"
+        )
 
         HomeContent(
             openDrawer,
@@ -107,7 +110,7 @@ fun Home(
             onAccount,
             viewState = viewState,
             doRefresh = { viewModel.refresh(force = true) },
-            doPenempatan = {  },
+            doPenempatan = { },
         )
     }
 }
@@ -117,26 +120,26 @@ fun HomeAppBar(
     openDrawer: () -> Unit,
     backgroundColor: Color,
     modifier: Modifier = Modifier,
-    onAccount: ()-> Unit,
-    ) {
+    onAccount: () -> Unit,
+) {
     TopAppBar(
         title = {
-                Row {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = stringResource(R.string.app_name),
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .heightIn(max = 24.dp)
-                            .align(Alignment.CenterVertically)
-                            .clickable { openDrawer() }
-                    )
-                    Image(
-                        painter = painterResource(R.drawable.logo),
-                        contentDescription = null,
-                        modifier = Modifier.clickable { openDrawer() }
-                    )
-                }
+            Row {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = stringResource(R.string.app_name),
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                        .heightIn(max = 24.dp)
+                        .align(Alignment.CenterVertically)
+                        .clickable { openDrawer() }
+                )
+                Image(
+                    painter = painterResource(R.drawable.logo),
+                    contentDescription = null,
+                    modifier = Modifier.clickable { openDrawer() }
+                )
+            }
         },
         backgroundColor = backgroundColor,
         actions = {
@@ -156,23 +159,20 @@ fun HomeAppBar(
 }
 
 
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeContent(
     openDrawer: () -> Unit,
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
-    onAccount: ()-> Unit,
+    onAccount: () -> Unit,
     viewState: HomeViewState,
-    doRefresh: ()-> Unit,
-    doPenempatan: ()-> Unit,
+    doRefresh: () -> Unit,
+    doPenempatan: () -> Unit,
 ) {
     val state = rememberPullRefreshState(isRefreshing, doRefresh)
     Box(
         modifier = Modifier
-            .pullRefresh(state)
-            .verticalScroll(rememberScrollState())
     ) {
         Column(
             modifier = modifier
@@ -213,7 +213,6 @@ fun HomeContent(
                         modifier = Modifier.fillMaxWidth(),
                         onAccount,
                     )
-
                 }
             }
             when (viewState.role) {
@@ -229,6 +228,8 @@ fun HomeContent(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(16.dp)
+                                .pullRefresh(state)
+                                .verticalScroll(rememberScrollState())
                         ) {
                             // Header with timestamp
                             Row(
@@ -294,6 +295,11 @@ fun HomeContent(
                                 color = Color.Gray
                             )
                         }
+                        PullRefreshIndicator(
+                            refreshing = isRefreshing,
+                            state = state,
+                            modifier = Modifier.align(Alignment.TopCenter)
+                        )
                     }
                 }
 
@@ -303,6 +309,8 @@ fun HomeContent(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(16.dp)
+                                .pullRefresh(state = state)
+                                .verticalScroll(rememberScrollState())
                         ) {
                             Text(
                                 text = "INI HOME UNTUK MAHASISWA",
@@ -344,16 +352,16 @@ fun HomeContent(
                                 }
                             }
                         }
+                        PullRefreshIndicator(
+                            refreshing = isRefreshing,
+                            state = state,
+                            modifier = Modifier.align(Alignment.TopCenter)
+                        )
                     }
 
                 }
             }
         }
-        PullRefreshIndicator(
-            refreshing = isRefreshing,
-            state = state,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
     }
 }
 
@@ -363,20 +371,21 @@ fun getCurrentTimestamp(): String {
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     return currentDateTime.format(formatter)
 }
+
 @Composable
 fun HomeAdminPreview() {
     MaterialTheme {
         Surface(Modifier.fillMaxSize()) {
-        HomeContent(
-            openDrawer = {},
-            isRefreshing = false,
-            modifier = Modifier.fillMaxSize(),
-            onAccount = {},
-            viewState = HomeViewState(role = "ADMIN", mahasiswaMemilih = 2, jmlhMhs =40),
-            doRefresh = {},
-            doPenempatan = {  },
+            HomeContent(
+                openDrawer = {},
+                isRefreshing = false,
+                modifier = Modifier.fillMaxSize(),
+                onAccount = {},
+                viewState = HomeViewState(role = "ADMIN", mahasiswaMemilih = 2, jmlhMhs = 40),
+                doRefresh = {},
+                doPenempatan = { },
             )
-    }
+        }
     }
 }
 
@@ -392,16 +401,16 @@ fun HomeAdminPreviewPreview() {
 fun HomeMahasiswaPreview() {
     MaterialTheme {
         Surface(Modifier.fillMaxSize()) {
-        HomeContent(
-            openDrawer = {},
-            isRefreshing = false,
-            modifier = Modifier.fillMaxSize(),
-            onAccount = {},
-            viewState = HomeViewState(role = "MAHASISWA", mahasiswaMemilih = 21, jmlhMhs =44),
-            doRefresh = {},
-            doPenempatan = {  },
+            HomeContent(
+                openDrawer = {},
+                isRefreshing = false,
+                modifier = Modifier.fillMaxSize(),
+                onAccount = {},
+                viewState = HomeViewState(role = "MAHASISWA", mahasiswaMemilih = 21, jmlhMhs = 44),
+                doRefresh = {},
+                doPenempatan = { },
             )
-    }
+        }
     }
 }
 

@@ -18,6 +18,7 @@ package com.polstat.sisipan
 
 import com.polstat.sisipan.data.UserRepository
 import android.content.Context
+import android.util.Log
 import androidx.room.Room
 import com.polstat.sisipan.data.room.TransactionRunner
 import com.polstat.sisipan.data.room.SisipanDatabase
@@ -162,11 +163,8 @@ object Graph {
 
         // Delete the database file
         context.getDatabasePath("data.db").delete()
-        database = Room.databaseBuilder(context, SisipanDatabase::class.java, "data.db")
-            // This is not recommended for normal apps, but the goal of this sample isn't to
-            // showcase all of Room.
-            .fallbackToDestructiveMigration()
-            .build()
+        provide(context)
+        Log.i("TAG", "GraphclearDatabaseContext: ${context}")
     }
 
 }

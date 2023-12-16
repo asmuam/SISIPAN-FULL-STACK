@@ -83,7 +83,7 @@ fun SisipanApp(
                         navigateToMahasiswa = { navController.navigate(Screen.Mahasiswa.route) },
                         navigateToPilihan = { navController.navigate(Screen.Pilihan.route) },
                         closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } },
-                        deleteUser = { UserRepository.clear(appState.navController.context)
+                        deleteUser = { UserRepository.clear(appState.navController.context.applicationContext)
                         }
                     )
                 },

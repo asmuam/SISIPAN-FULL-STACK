@@ -16,6 +16,7 @@
 
 package com.polstat.sisipan.ui.formasi
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -113,6 +114,11 @@ fun Formasi(
     navigateToAddFormasi: () -> Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
+
+    // Display some debugging information
+    Log.d("FormasiComposable", "Role: ${viewState.role}")
+    Log.d("FormasiComposable", "Buka List Size: ${viewState.formasiBukaList.size}")
+    Log.d("FormasiComposable", "Tutup List Size: ${viewState.formasiTutupList.size}")
 
     Surface(Modifier.fillMaxSize()) {
         FormasiContent(

@@ -46,40 +46,46 @@ class FormasiViewModel(
 
     init {
         viewModelScope.launch {
-            // Combines the latest value from each of the flows, allowing us to generate a
-            // view state instance which only contains the latest values.
+            Log.d("FormasiViewModel", "Start collecting data...")
+
             combine(
                 formasiStore.formasiBuka(),
                 formasiStore.formasiTutup(),
                 refreshing
-            ) { formasiBukaList,formasiTutupList, refreshing ->
+            ) { formasiBukaList, formasiTutupList, refreshing ->
+                Log.d("FormasiViewModel", "Data collected - formasiBukaList size: ${formasiBukaList.size}, formasiTutupList size: ${formasiTutupList.size}, refreshing: $refreshing")
+
                 FormasiViewState(
-                    role = userRepository.role ?: "", //default ""
+                    role = userRepository.role ?: "",
                     formasiBukaList = formasiBukaList,
                     formasiTutupList = formasiTutupList,
                     refreshing = refreshing,
                     errorMessage = null /* TODO */
                 )
             }.catch { throwable ->
-                // TODO: emit a UI error here. For now, we'll just rethrow
+                Log.e("FormasiViewModel", "Error during data collection", throwable)
                 throw throwable
             }.collect {
+                Log.d("FormasiViewModel", "Updating state with new data")
                 _state.value = it
             }
         }
 
+        Log.d("FormasiViewModel", "Calling refresh...")
         refresh(force = false)
     }
 
     fun refresh(force: Boolean) {
         viewModelScope.launch {
             try {
+                Log.d("FormasiViewModel", "Refreshing data...")
                 refreshing.value = true
                 formasiRepository.refreshFormasi(force)
+                Log.d("FormasiViewModel", "Data refreshed successfully")
                 // Handle the response
             } catch (e: Exception) {
-                // Handle the error
                 Log.e("FormasiViewModel", "Error refreshing formasi", e)
+                // Handle the error
             } finally {
                 refreshing.value = false
             }

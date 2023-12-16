@@ -17,6 +17,7 @@
 package com.polstat.sisipan
 
 import android.app.Application
+import android.util.Log
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 
@@ -27,5 +28,6 @@ class SisipanApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         Graph.provide(this)
+        Log.i("TAG", "onCreateContext: ${this}")
     }
 }
