@@ -16,8 +16,14 @@
 
 package com.polstat.sisipan.ui
 
+import androidx.compose.runtime.Composable
 import com.polstat.sisipan.data.Formasi
+import com.polstat.sisipan.data.Mahasiswa
+import com.polstat.sisipan.data.PilihanNested
 import com.polstat.sisipan.data.Provinsi
+import com.polstat.sisipan.ui.mahasiswa.MahasiswaCollection
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 val formasiDummy: List<Formasi> = listOf(
     Formasi(provinsi = 1, kodeSatker = "1100", namaSatuanKerja = "BPS Provinsi Aceh", kuotaSt = 3, kuotaKs = 0, kuotaD3 = 1),
@@ -75,5 +81,40 @@ val provDummy: List<Provinsi> = listOf(
     Provinsi(id = 34, kodeProvinsi = "94", namaProvinsi = "Papua")
 )
 
+@Composable
+fun createDummyMhs(): List<MahasiswaCollection> {
+    return listOf(
+        MahasiswaCollection(
+            id = 1,
+            nim = "123456",
+            name = "John Doe",
+            prodi = "Computer Science",
+            provinsi = createDummyProvinsi(),
+            ipk = 3.9f
+        ),
+        MahasiswaCollection(
+            id = 2,
+            nim = "654321",
+            name = "Jane Doe",
+            prodi = "Data Science",
+            provinsi = createDummyProvinsi(),
+            ipk = 3.8f
+        ),
+        // Add more dummy data as needed
+    )
+}
+
+@Composable
+private fun createDummyProvinsi(): Flow<Provinsi> {
+    // Create a dummy Provinsi Flow
+    return flow {
+        emit(
+            Provinsi(
+                kodeProvinsi = "XYZ",
+                namaProvinsi = "Dummy Provinsi"
+            )
+        )
+    }
+}
 
 
