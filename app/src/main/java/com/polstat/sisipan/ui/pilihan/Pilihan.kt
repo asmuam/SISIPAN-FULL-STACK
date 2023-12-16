@@ -1,6 +1,5 @@
 package com.polstat.sisipan.ui.pilihan
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,7 +24,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
@@ -54,8 +52,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -83,19 +79,21 @@ fun Pilihan(
     openDrawer: () -> Unit,
     viewModel: PilihanViewModel = viewModel(),
     onAccount: () -> Unit,
+    navigateToEditPilihan:(Long)-> Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
         PilihanContent(
             openDrawer,
             pilihanList = viewState.pilihanList,
-            onPilihanClick = { /* Handle pilihan item click */ },
+            onPilihanClick = navigateToEditPilihan,
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
             onAccount,
             doRefresh = { viewModel.refresh(force = true) },
             pilihanSaya = viewState.pilihanSaya,
-        )
+            role = viewState.role,
+            )
     }
 }
 
@@ -156,12 +154,13 @@ fun PilihanAppBar(
 fun PilihanContent(
     openDrawer: () -> Unit,
     pilihanList: List<PilihanNested>,
-    onPilihanClick: (PilihanNested) -> Unit,
+    onPilihanClick: (Long) -> Unit,
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
     onAccount: () -> Unit,
     doRefresh: () -> Unit,
     pilihanSaya: PilihanNested?,
+    role :String,
 ) {
     val state = rememberPullRefreshState(isRefreshing, doRefresh)
 
@@ -211,42 +210,48 @@ fun PilihanContent(
                 LazyColumn(
                     modifier = Modifier.pullRefresh(state)
                 ) {
-                    item {
-                        // Text label for Pilihan Saya
-                        Text(
-                            text = "Pilihan Anda",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        )
-                        // PilihanSaya card
-                        if (pilihanSaya != null) {
-                            PilihanCard(pilihan = pilihanSaya, onItemClick = onPilihanClick)
-                            Divider(
-                                color = Color.Black,
-                                thickness = 3.dp,
+                    if (role=="MAHASISWA"){
+                        item {
+                            // Text label for Pilihan Saya
+                            Text(
+                                text = "Pilihan Anda",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 8.dp)
+                                    .padding(4.dp)
+                            )
+                            // PilihanSaya card
+                            if (pilihanSaya != null) {
+                                PilihanCard(
+                                    pilihan = pilihanSaya,
+                                    onItemClick = {onPilihanClick(it.id)})
+                                Divider(
+                                    color = Color.Black,
+                                    thickness = 3.dp,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp)
+                                )
+                            }
+                        }
+                        item {
+                            // Text label for Pilihan Mahasiswa Lain
+                            Text(
+                                text = "Pilihan Mahasiswa Lain",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(4.dp)
                             )
                         }
                     }
-                    item {
-                        // Text label for Pilihan Mahasiswa Lain
-                        Text(
-                            text = "Pilihan Mahasiswa Lain",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        )
-                    }
                     // Rest of the items in the LazyColumn
                     items(pilihanList) { pilihan ->
-                        PilihanCard(pilihan = pilihan, onItemClick = onPilihanClick)
+                        PilihanCard(
+                            pilihan = pilihan,
+                            onItemClick = {onPilihanClick(it.id)})
                     }
                 }
 
@@ -261,7 +266,10 @@ fun PilihanContent(
 }
 
 @Composable
-fun PilihanCard(pilihan: PilihanNested, onItemClick: (PilihanNested) -> Unit) {
+fun PilihanCard(
+    pilihan: PilihanNested,
+    onItemClick: (PilihanNested) -> Unit
+) {
     val mahasiswaState by pilihan.mahasiswa.collectAsState(
         initial = Mahasiswa(
             0,
@@ -458,6 +466,7 @@ fun PilihanPreview() {
                 ipk = 3.9f,
                 hasil = null
             ),
+            role = "ADMIN",
         )
     }
 }
@@ -496,7 +505,7 @@ private fun createDummyPilihanList(): List<PilihanNested> {
 }
 
 @Composable
-private fun createDummyMahasiswa(): Flow<Mahasiswa> {
+fun createDummyMahasiswa(): Flow<Mahasiswa> {
     // Create a dummy Mahasiswa Flow
     return flow {
         emit(
@@ -513,7 +522,7 @@ private fun createDummyMahasiswa(): Flow<Mahasiswa> {
 }
 
 @Composable
-private fun createDummyFormasi(): Flow<Formasi> {
+fun createDummyFormasi(): Flow<Formasi> {
     // Create a dummy Formasi Flow
     return flow {
         emit(

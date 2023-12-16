@@ -75,7 +75,7 @@ class PilihanViewModel(
                     val pilihan3 = formasiStore.formasiById(pilihanSaya.pilihan3 ?: 0)
                     val pilihanSistem = formasiStore.formasiById(pilihanSaya.pilihanSistem ?: 0)
                     PilihanViewState(
-                        role = userRepository.role,
+                        role = userRepository.role?:"",
                         pilihanList = mappedPilihanList,
                         pilihanSaya = PilihanNested(pilihanSaya.id,mahasiswa,pilihan1,pilihan2,pilihan3,pilihanSistem,pilihanSaya.indeksPilihan1,pilihanSaya.indeksPilihan2,pilihanSaya.indeksPilihan3,pilihanSaya.ipk,pilihanSaya.hasil),
                         refreshing = refreshing,
@@ -83,7 +83,7 @@ class PilihanViewModel(
                     )
                 }?: run{
                 PilihanViewState(
-                    role = userRepository.role,
+                    role = userRepository.role?:"",
                     pilihanList = mappedPilihanList,
                     pilihanSaya = null,
                     refreshing = refreshing,
@@ -122,7 +122,7 @@ class PilihanViewModel(
 }
 
 data class PilihanViewState(
-    val role: String? = null,
+    val role: String = "",
     val pilihanList: List<PilihanNested> = emptyList(),
     val pilihanSaya: PilihanNested? = null,
     val refreshing: Boolean = false,

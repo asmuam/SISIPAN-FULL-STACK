@@ -1,11 +1,9 @@
-package com.polstat.sisipan.ui.formasi
+package com.polstat.sisipan.ui.pilihan
 
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,14 +40,13 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -75,8 +72,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.polstat.sisipan.R
+import com.polstat.sisipan.api.PilihanRequest
+import com.polstat.sisipan.data.Formasi
 import com.polstat.sisipan.data.Provinsi
-import com.polstat.sisipan.ui.provDummy
+import com.polstat.sisipan.ui.formasiDummy
+import com.polstat.sisipan.ui.pilihan.AddPilihanViewModel
+import com.polstat.sisipan.ui.pilihan.AddPilihanViewState
 import com.polstat.sisipan.ui.theme.MinContrastOfPrimaryVsSurface
 import com.polstat.sisipan.util.DynamicThemePrimaryColorsFromImage
 import com.polstat.sisipan.util.contrastAgainst
@@ -84,51 +85,49 @@ import com.polstat.sisipan.util.rememberDominantColorState
 import com.polstat.sisipan.util.verticalGradientScrim
 import kotlinx.coroutines.launch
 
-
 @Composable
 @Preview
-fun AddFormasiContentPreview() {
-    AddFormasiContent(
-        openDrawer = {},
-        isRefreshing = false,
-        onAccount = {},
-        role = "Admin",
-        navigateBack = {},
-        onNavigateUp = {},
-        canNavigateBack = true,
-        addFormasiViewState = AddFormasiViewState(
-            refreshing = false,
+fun previewAddPilihan(
+) {
+    Surface(Modifier.fillMaxSize()) {
+        AddPilihanContent(
+            openDrawer = {},
+            isRefreshing = false,
+            onAccount = {},
             role = "Admin",
-            provinsiList = provDummy + listOf(
-                Provinsi(
-                    id = 0,
-                    kodeProvinsi = "",
-                    namaProvinsi = "K/L/D/I"
-                )
+            navigateBack = {},
+            canNavigateBack = true,
+            onNavigateUp = {},
+            addPilihanViewState =
+            AddPilihanViewState(
+                role = "",
+                formasiDummy,
+                pilihanUiState = PilihanUiState(),
+                refreshing = false,
+                errorMessage = null
             ),
-            formasiUiState = FormasiUiState(formasiDetails = FormasiDetails())
-        ),
-        onFormasiValueChange = {},
-        onSaveClick = {}
-    )
+            onPilihanValueChange = {},
+            onSaveClick = {},
+        )
+    }
 }
 
 @Composable
-fun AddFormasi(
+fun AddPilihan(
     openDrawer: () -> Unit,
     onAccount: () -> Unit,
     navigateBack: () -> Unit,
     canNavigateBack: Boolean = true,
     onNavigateUp: () -> Unit,
-    viewModel: AddFormasiViewModel = viewModel(),
+    viewModel: AddPilihanViewModel = viewModel(),
 
     ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
 
-    Log.i("DATA", "AddFormasi: ${viewState.formasiUiState.formasiDetails}")
+    Log.i("DATA", "AddPilihan: ${viewState.pilihanUiState.pilihanDetails}")
     Surface(Modifier.fillMaxSize()) {
-        AddFormasiContent(
+        AddPilihanContent(
             openDrawer,
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
@@ -137,15 +136,15 @@ fun AddFormasi(
             navigateBack = navigateBack,
             onNavigateUp = onNavigateUp,
             canNavigateBack = canNavigateBack,
-            addFormasiViewState = viewState,
-            onFormasiValueChange = viewModel::updateUiState,
+            addPilihanViewState = viewState,
+            onPilihanValueChange = viewModel::updateUiState,
             onSaveClick = {
                 // Note: If the user rotates the screen very fast, the operation may get cancelled
                 // and the book may not be saved in the Database. This is because when config
                 // change occurs, the Activity will be recreated and the rememberCoroutineScope will
                 // be cancelled - since the scope is bound to composition.
                 coroutineScope.launch {
-                    viewModel.saveFormasi()
+                    viewModel.savePilihan()
                     navigateBack()
                 }
             },
@@ -154,7 +153,7 @@ fun AddFormasi(
 }
 
 @Composable
-fun AddFormasiContent(
+fun AddPilihanContent(
     openDrawer: () -> Unit,
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
@@ -163,8 +162,8 @@ fun AddFormasiContent(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     canNavigateBack: Boolean,
-    addFormasiViewState: AddFormasiViewState,
-    onFormasiValueChange: (FormasiDetails) -> Unit,
+    addPilihanViewState: AddPilihanViewState,
+    onPilihanValueChange: (PilihanRequest) -> Unit,
     onSaveClick: () -> Unit,
 ) {
     val surfaceColor = MaterialTheme.colors.surface
@@ -198,12 +197,12 @@ fun AddFormasiContent(
                             .windowInsetsTopHeight(WindowInsets.statusBars)
                     )
 
-                    AddFormasiAppBar(
+                    AddPilihanAppBar(
                         openDrawer,
                         backgroundColor = appBarColor,
                         modifier = Modifier.fillMaxWidth(),
                         onAccount,
-                        title = stringResource(R.string.add_formasi),
+                        title = stringResource(R.string.add_pilihan),
                         canNavigateBack = canNavigateBack,
                         navigateUp = onNavigateUp
                     )
@@ -224,15 +223,15 @@ fun AddFormasiContent(
                     // Konten utama dengan fungsi DynamicThemePrimaryColorsFromImage
                     DynamicThemePrimaryColorsFromImage(dominantColorState) {
                         // Konten lainnya seperti LazyColumn dan lainnya
-                        FormasiInputForm(
-                            provinsiList = addFormasiViewState.provinsiList,
-                            formasiDetails = addFormasiViewState.formasiUiState.formasiDetails,
-                            onValueChange = onFormasiValueChange,
+                        PilihanInputForm(
+                            formasiList = addPilihanViewState.formasiList,
+                            pilihanDetails = addPilihanViewState.pilihanUiState.pilihanDetails,
+                            onValueChange = onPilihanValueChange,
                             modifier = Modifier.fillMaxWidth()
                         )
                         Button(
                             onClick = onSaveClick,
-                            enabled = addFormasiViewState.formasiUiState.isEntryValid,
+                            enabled = addPilihanViewState.pilihanUiState.isEntryValid,
                             shape = androidx.compose.material3.MaterialTheme.shapes.small,
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -246,136 +245,85 @@ fun AddFormasiContent(
 
 }
 
+
 @Composable
-fun FormasiInputForm(
-    provinsiList: List<Provinsi>,
-    formasiDetails: FormasiDetails,
+fun PilihanInputForm(
+    formasiList: List<Formasi>,
+    pilihanDetails: PilihanRequest,
+    onValueChange: (PilihanRequest) -> Unit = {},
+    enabled: Boolean = true,
     modifier: Modifier = Modifier,
-    onValueChange: (FormasiDetails) -> Unit = {},
-    enabled: Boolean = true
 ) {
     // State untuk menyimpan item yang dipilih
-    var selectedProvinsi by remember { mutableStateOf<Provinsi?>(null) }
+    var selectedFormasi1 by remember { mutableStateOf<Formasi?>(null) }
+    var selectedFormasi2 by remember { mutableStateOf<Formasi?>(null) }
+    var selectedFormasi3 by remember { mutableStateOf<Formasi?>(null) }
+
     // Callback untuk mengubah item yang dipilih
-    val onProvinsiSelected: (Provinsi) -> Unit = { provinsi ->
-        selectedProvinsi = provinsi
-        // Jika perlu, panggil callback untuk memberi tahu ViewModel bahwa item dipilih
-        onValueChange(formasiDetails.copy(provinsiId = provinsi.id))
+    val onFormasi1Selected: (Formasi) -> Unit = { formasi ->
+        selectedFormasi1 = formasi
+        onValueChange(pilihanDetails.copy(pilihan1 = formasi.id))
     }
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        OutlinedTextField(
-            value = formasiDetails.kodeSatker,
-            onValueChange = { onValueChange(formasiDetails.copy(kodeSatker = it)) },
-            label = { Text(stringResource(R.string.kode_satker_req)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
+    val onFormasi2Selected: (Formasi) -> Unit = { formasi ->
+        selectedFormasi2 = formasi
+        onValueChange(pilihanDetails.copy(pilihan2 = formasi.id))
+    }
+    val onFormasi3Selected: (Formasi) -> Unit = { formasi ->
+        selectedFormasi3 = formasi
+        onValueChange(pilihanDetails.copy(pilihan3 = formasi.id))
+    }
+
+    CustomDropdown(
+        items = formasiList,
+        selectedItem = selectedFormasi1?.namaSatuanKerja.orEmpty(),
+        onItemSelected = onFormasi1Selected,
+        label = "Pilihan 1*"
+    )
+    CustomDropdown(
+        items = formasiList,
+        selectedItem = selectedFormasi2?.namaSatuanKerja.orEmpty(),
+        onItemSelected = onFormasi2Selected,
+        label = "Pilihan 2*"
+    )
+    CustomDropdown(
+        items = formasiList,
+        selectedItem = selectedFormasi3?.namaSatuanKerja.orEmpty(),
+        onItemSelected = onFormasi3Selected,
+        label = "Pilihan 3*"
+    )
+
+    if (enabled) {
+        Text(
+            text = stringResource(R.string.required_fields),
+            modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_medium))
         )
-        OutlinedTextField(
-            value = formasiDetails.namaSatuanKerja,
-            onValueChange = { onValueChange(formasiDetails.copy(namaSatuanKerja = it)) },
-            label = { Text(stringResource(R.string.nama_satker_req)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
-        )
-        // Composable Dropdown
-        CustomDropdown(
-            items = listOf(
-                Provinsi(
-                    id = null,
-                    kodeProvinsi = "",
-                    namaProvinsi = "K/L/D/I"
-                )
-            ) + provinsiList,
-            selectedItem = selectedProvinsi?.namaProvinsi.orEmpty(),
-            onItemSelected = onProvinsiSelected
-        )
-        OutlinedTextField(
-            value = formasiDetails.kuotaKs,
-            onValueChange = { onValueChange(formasiDetails.copy(kuotaKs = it)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = { Text(stringResource(R.string.kuota_ks_req)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
-        )
-        OutlinedTextField(
-            value = formasiDetails.kuotaSt,
-            onValueChange = { onValueChange(formasiDetails.copy(kuotaSt = it)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = { Text(stringResource(R.string.kuota_st_req)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
-        )
-        OutlinedTextField(
-            value = formasiDetails.kuotaD3,
-            onValueChange = { onValueChange(formasiDetails.copy(kuotaD3 = it)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = { Text(stringResource(R.string.kuota_d3_req)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
-        )
-        if (enabled) {
-            Text(
-                text = stringResource(R.string.required_fields),
-                modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_medium))
-            )
-        }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CustomDropdown(
-    items: List<Provinsi>,
+    items: List<Formasi>,
     selectedItem: String,
-    onItemSelected: (Provinsi) -> Unit
+    onItemSelected: (Formasi) -> Unit,
+    label: String,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var inputValue by remember { mutableStateOf(selectedItem) }
     var mTextFieldSize by remember { mutableStateOf(Size.Zero) }
 
+    // Inisialisasi inputValue menggunakan selectedItem
+    LaunchedEffect(selectedItem) {
+        inputValue = selectedItem
+    }
     // Up Icon when expanded and down icon when collapsed
     val icon = if (expanded)
         Icons.Filled.KeyboardArrowUp
     else
         Icons.Filled.KeyboardArrowDown
 
-    Column {
+    Column() {
         Row(
             modifier = Modifier.fillMaxWidth()
                 .clickable { expanded = !expanded },
@@ -395,7 +343,7 @@ fun CustomDropdown(
                 keyboardOptions = KeyboardOptions.Default.copy(
                     capitalization = KeyboardCapitalization.Sentences,
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.None
+                    imeAction = ImeAction.Done
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -404,7 +352,7 @@ fun CustomDropdown(
                         // the DropDown the same width
                         mTextFieldSize = coordinates.size.toSize()
                     },
-                label = { Text("Provinsi/K/L/D/I*") },
+                label = { Text(label) },
                 trailingIcon = {
                     Icon(icon, "contentDescription")
                 },
@@ -423,7 +371,7 @@ fun CustomDropdown(
                     onClick = {
                         onItemSelected(item)
                         expanded = false
-                        inputValue = item.namaProvinsi
+                        inputValue = item.namaSatuanKerja
                     }
                 ) {
                     Row(
@@ -433,7 +381,7 @@ fun CustomDropdown(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = if (item.id?.toInt() == 0) "Pilih Provinsi" else item.namaProvinsi,
+                            text = if (item.id?.toInt() == 0) "Pilih Provinsi" else item.namaSatuanKerja,
                             fontWeight = if (item.id?.toInt() == 0) FontWeight.Bold else FontWeight.Normal,
                             color = if (item.id?.toInt() == 0) Color.Gray else Color.Black
                         )
@@ -444,8 +392,9 @@ fun CustomDropdown(
     }
 }
 
+
 @Composable
-fun AddFormasiAppBar(
+fun AddPilihanAppBar(
     openDrawer: () -> Unit,
     backgroundColor: Color,
     modifier: Modifier = Modifier,

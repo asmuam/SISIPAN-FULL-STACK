@@ -97,6 +97,8 @@
     <string name="required_fields">*required fields</string>
     <string name="mahasiswa_title">Mahasiswa</string>
     <string name="pilihan_title">Pilihan</string>
+    <string name="add_pilihan">Pilih Formasi</string>
+    <string name="edit_pilihan">Edit Pilihan Formasi</string>
 
 
 </resources>

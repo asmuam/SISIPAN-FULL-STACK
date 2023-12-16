@@ -12,6 +12,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 
@@ -96,8 +97,12 @@ interface PilihanService {
     suspend fun getAll(): ApiResponse<List<Pilihan>>
 
     @Headers("Content-Type: application/json")
-    @POST("pilihan")
-    suspend fun pilih(@Body request: PilihanRequest): ApiResponse<Pilihan>
+    @POST("pilihan/{id}")
+    suspend fun pilih(@Path ("id") id:Long, @Body request: PilihanRequest): ApiResponse<Pilihan>
+
+    @Headers("Content-Type: application/json")
+    @PUT("pilihan/{id}")
+    suspend fun ubah(@Path ("id") id:Long, @Body request: PilihanRequest): ApiResponse<Pilihan>
 
 }
 

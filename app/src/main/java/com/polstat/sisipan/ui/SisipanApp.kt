@@ -35,15 +35,19 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import androidx.window.layout.DisplayFeature
 import com.polstat.sisipan.R
 import com.polstat.sisipan.ui.formasi.AddFormasi
 import com.polstat.sisipan.ui.formasi.Formasi
 import com.polstat.sisipan.ui.home.Home
 import com.polstat.sisipan.ui.mahasiswa.Mahasiswa
+import com.polstat.sisipan.ui.pilihan.AddPilihan
+import com.polstat.sisipan.ui.pilihan.EditPilihan
 import com.polstat.sisipan.ui.pilihan.Pilihan
 import com.polstat.sisipan.ui.profile.Profile
 import com.polstat.sisipan.ui.signinsignup.SignInRoute
@@ -109,6 +113,12 @@ fun SisipanApp(
                                 onAccount ={
                                     navController.navigate("profil")
                                 },
+                                onAddPilihan ={
+                                    navController.navigate("addPilihan")
+                                },
+                                onEditPilihan ={
+                                    navController.navigate("${Screen.PilihanEdit.route}/${it}")
+                                },
                             )
                         }
                         composable(Screen.Formasi.route) { backStackEntry ->
@@ -132,6 +142,32 @@ fun SisipanApp(
                         }
                         composable(Screen.Pilihan.route) { backStackEntry ->
                             Pilihan(
+                                openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
+                                onAccount = {
+                                    navController.navigate("profil")
+                                },
+                                navigateToEditPilihan ={
+                                    navController.navigate("${Screen.PilihanEdit.route}/${it}")
+                                },
+                            )
+                        }
+                        composable(Screen.PilihanEdit.routeWithArgs,
+                            arguments = listOf(navArgument(Screen.PilihanEdit.pilihanIdArg){
+                                type = NavType.IntType
+                            })
+                        ) { backStackEntry ->
+                            EditPilihan(
+                                openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
+                                navigateBack = { navController.popBackStack() },
+                                onNavigateUp = { navController.navigateUp() },onAccount = {
+                                    navController.navigate("profil")
+                                },
+                            )
+                        }
+                        composable(Screen.AddPilihan.route) {
+                            AddPilihan(
+                                navigateBack = { navController.popBackStack() },
+                                onNavigateUp = { navController.navigateUp() },
                                 openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
                                 onAccount = {
                                     navController.navigate("profil")

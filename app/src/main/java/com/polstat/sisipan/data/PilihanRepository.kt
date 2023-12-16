@@ -1,6 +1,7 @@
 package com.polstat.sisipan.data
 
 import android.util.Log
+import com.polstat.sisipan.api.PilihanRequest
 import com.polstat.sisipan.api.PilihanService
 import com.polstat.sisipan.data.room.TransactionRunner
 import kotlinx.coroutines.CoroutineDispatcher
@@ -35,6 +36,43 @@ class PilihanRepository(
         }
     }
 
+    suspend fun insertPilihan(id:Long,pilihan: PilihanRequest) {
+        // Lakukan operasi penyimpanan menggunakan service atau store, sesuai kebutuhan
+        // Misalnya, jika Anda memiliki service untuk menyimpan data ke server:
+        try {
+            val response = pilihanService.pilih(id,pilihan)
+            if (response.httpStatusCode==200) {
+                // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
+                refreshPilihan(force = true)
+            } else {
+                // Handle kesalahan jika diperlukan
+                Log.e("PILIHANREPO", "Failed to insert pilihan. Response: ${response.message}")
+            }
+        } catch (e: Exception) {
+            // Handle exception jika terjadi kesalahan dalam komunikasi dengan server
+            Log.e("PILIHANREPO", "Error inserting pilihan", e)
+        }
+    }
+
+    suspend fun ubahPilihan(id:Long,pilihan: PilihanRequest) {
+        // Lakukan operasi penyimpanan menggunakan service atau store, sesuai kebutuhan
+        // Misalnya, jika Anda memiliki service untuk menyimpan data ke server:
+        try {
+            Log.e("TAG", "call api: ${id} : ${pilihan}")
+            val response = pilihanService.ubah(id,pilihan)
+            Log.e("TAG", "resp api: ${response}")
+            if (response.httpStatusCode==200) {
+                // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
+                refreshPilihan(force = true)
+            } else {
+                // Handle kesalahan jika diperlukan
+                Log.e("PILIHANREPOResponse", "Failed to insert pilihan. Response: ${response.message}")
+            }
+        } catch (e: Exception) {
+            // Handle exception jika terjadi kesalahan dalam komunikasi dengan server
+            Log.e("PILIHANREPO", "Error inserting pilihan", e)
+        }
+    }
     // Metode lain sesuai kebutuhan
 }
 

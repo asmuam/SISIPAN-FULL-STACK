@@ -46,6 +46,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -65,7 +66,10 @@ import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -78,7 +82,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.sisipan.R
+import com.polstat.sisipan.data.Formasi
+import com.polstat.sisipan.data.PilihanNested
 import com.polstat.sisipan.data.UserRepository
+import com.polstat.sisipan.ui.pilihan.createDummyFormasi
+import com.polstat.sisipan.ui.pilihan.createDummyMahasiswa
 import com.polstat.sisipan.ui.theme.MinContrastOfPrimaryVsSurface
 import com.polstat.sisipan.util.DynamicThemePrimaryColorsFromImage
 import com.polstat.sisipan.util.contrastAgainst
@@ -93,8 +101,13 @@ fun Home(
     openDrawer: () -> Unit,
     viewModel: HomeViewModel = viewModel(),
     onAccount: () -> Unit,
+    onAddPilihan: () -> Unit,
+    onEditPilihan: (Long) -> Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
+    LaunchedEffect(viewState){
+        viewModel.refresh(true)
+    }
     Surface(Modifier.fillMaxSize()) {
         Log.i(
             "AccessHome",
@@ -109,6 +122,10 @@ fun Home(
             viewState = viewState,
             doRefresh = { viewModel.refresh(force = true) },
             doPenempatan = { },
+            onAddPilihan = { onAddPilihan() },
+            onEditPilihan = { onEditPilihan(it.id) },
+            memilih = viewState.memilih,
+            pilihanSaya = viewState.pilihanSaya,
         )
     }
 }
@@ -167,8 +184,13 @@ fun HomeContent(
     viewState: HomeViewState,
     doRefresh: () -> Unit,
     doPenempatan: () -> Unit,
+    onAddPilihan: () -> Unit,
+    onEditPilihan: (PilihanNested) -> Unit,
+    memilih: Boolean,
+    pilihanSaya: PilihanNested?,
 ) {
     val state = rememberPullRefreshState(isRefreshing, doRefresh)
+
     Box(
         modifier = Modifier
     ) {
@@ -317,38 +339,107 @@ fun HomeContent(
                                 color = Color.Black
                             )
                             Spacer(modifier = Modifier.height(8.dp))
-
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(60.dp)
-                                    .clickable { /* Handle click event */ }
-                                    .background(MaterialTheme.colorScheme.surface),
-                                shape = RoundedCornerShape(8.dp), // Customize the corner radius
-                                elevation = cardElevation(4.dp) // Add elevation for a shadow effect
-                            ) {
-                                Row(
+                            if (memilih && pilihanSaya!=null) {
+                                Card(
                                     modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                                        .fillMaxWidth()
+                                        .height(60.dp)
+                                        .clickable { onEditPilihan(pilihanSaya) },
+                                    shape = RoundedCornerShape(8.dp), // Customize the corner radius
+                                    elevation = cardElevation(4.dp), // Add elevation for a shadow effect
+                                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary)
                                 ) {
-                                    // You can customize the icon and text based on your design
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_jetnews),
-                                        contentDescription = null,
-                                        tint = Color.White,
-                                        modifier = Modifier.size(40.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(16.dp))
-                                    Text(
-                                        text = "MEMILIH SEKARANG",
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.White
-                                    )
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(16.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        // You can customize the icon and text based on your design
+                                        Icon(
+                                            painter = painterResource(R.drawable.ic_jetnews),
+                                            contentDescription = null,
+                                            tint = Color.White,
+                                            modifier = Modifier.size(40.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(16.dp))
+                                        Text(
+                                            text = "Ubah Pilihan",
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White
+                                        )
+                                    }
                                 }
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "PILIHAN SAAT INI:",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Card {
+                                    Column {
+                                        // Menggunakan Safe collectAsState untuk Formasi
+                                        if (pilihanSaya != null) {
+                                            val pilihan1State by rememberUpdatedState(
+                                                newValue = pilihanSaya.pilihan1.collectAsState(
+                                                    initial = Formasi(0, 0, "", "", 0, 0, 0)
+                                                ).value
+                                            )
+                                            val pilihan2State by rememberUpdatedState(
+                                                newValue = pilihanSaya.pilihan2.collectAsState(
+                                                    initial = Formasi(0, 0, "", "", 0, 0, 0)
+                                                ).value
+                                            )
+                                            val pilihan3State by rememberUpdatedState(
+                                                newValue = pilihanSaya.pilihan3.collectAsState(
+                                                    initial = Formasi(0, 0, "", "", 0, 0, 0)
+                                                ).value
+                                            )
+
+                                            PreviewPilihanState(pilihanState = pilihan1State)
+                                            PreviewPilihanState(pilihanState = pilihan2State)
+                                            PreviewPilihanState(pilihanState = pilihan3State)
+                                        }
+                                    }
+                                }
+                            } else {
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(60.dp)
+                                        .clickable { onAddPilihan() },
+                                    shape = RoundedCornerShape(8.dp), // Customize the corner radius
+                                    elevation = cardElevation(4.dp), // Add elevation for a shadow effect
+                                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(16.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        // You can customize the icon and text based on your design
+                                        Icon(
+                                            painter = painterResource(R.drawable.ic_jetnews),
+                                            contentDescription = null,
+                                            tint = Color.White,
+                                            modifier = Modifier.size(40.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(16.dp))
+                                        Text(
+                                            text = "MEMILIH SEKARANG",
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White
+                                        )
+                                    }
+                                }
+
                             }
+
                         }
                         PullRefreshIndicator(
                             refreshing = isRefreshing,
@@ -362,7 +453,17 @@ fun HomeContent(
         }
     }
 }
-
+@Composable
+fun PreviewPilihanState(pilihanState: Formasi) {
+    Text(
+        text = pilihanState.namaSatuanKerja,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.Black,
+        modifier = Modifier.padding(4.dp)
+    )
+    Divider(color = Color.White, thickness = 2.dp)
+}
 @Composable
 fun getCurrentTimestamp(): String {
     val currentDateTime = LocalDateTime.now()
@@ -382,6 +483,10 @@ fun HomeAdminPreview() {
                 viewState = HomeViewState(role = "ADMIN", mahasiswaMemilih = 2, jmlhMhs = 40),
                 doRefresh = {},
                 doPenempatan = { },
+                onAddPilihan = {},
+                onEditPilihan = {},
+                memilih = false,
+                pilihanSaya = null
             )
         }
     }
@@ -396,7 +501,7 @@ fun HomeAdminPreviewPreview() {
 }
 
 @Composable
-fun HomeMahasiswaPreview() {
+fun HomeMahasiswaPreview(memilih: Boolean, pilihanSaya:PilihanNested?) {
     MaterialTheme {
         Surface(Modifier.fillMaxSize()) {
             HomeContent(
@@ -407,15 +512,41 @@ fun HomeMahasiswaPreview() {
                 viewState = HomeViewState(role = "MAHASISWA", mahasiswaMemilih = 21, jmlhMhs = 44),
                 doRefresh = {},
                 doPenempatan = { },
+                onAddPilihan = {},
+                onEditPilihan = {},
+                memilih = memilih,
+                pilihanSaya = pilihanSaya
             )
         }
     }
 }
 
-@Preview(name = "Home Preview - MAHASISWA")
+@Preview(name = "Belum memilih", group = "Mahasiswa")
 @Composable
 fun HomeMahasiswaPreviewPreview() {
     MaterialTheme {
-        HomeMahasiswaPreview()
+        HomeMahasiswaPreview(false,null)
     }
 }
+
+@Preview(name = "Sudah memilih", group = "Mahasiswa")
+@Composable
+fun HomeMahasiswaDarkPreview() {
+    val pilihanSaya = PilihanNested(
+        id = 1,
+        mahasiswa = createDummyMahasiswa(),
+        pilihan1 = createDummyFormasi(),
+        pilihan2 = createDummyFormasi(),
+        pilihan3 = createDummyFormasi(),
+        pilihanSistem = createDummyFormasi(),
+        indeksPilihan1 = 3.5f,
+        indeksPilihan2 = 4.0f,
+        indeksPilihan3 = 3.8f,
+        ipk = 3.9f,
+        hasil = "Accepted"
+    )
+    MaterialTheme {
+        HomeMahasiswaPreview(true,pilihanSaya)
+    }
+}
+

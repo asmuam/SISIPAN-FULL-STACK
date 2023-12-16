@@ -22,8 +22,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
 import com.polstat.sisipan.Graph.pilihanStore
+import com.polstat.sisipan.data.FormasiStore
 import com.polstat.sisipan.data.MahasiswaRepository
 import com.polstat.sisipan.data.MahasiswaStore
+import com.polstat.sisipan.data.Pilihan
+import com.polstat.sisipan.data.PilihanNested
 import com.polstat.sisipan.data.PilihanRepository
 import com.polstat.sisipan.data.PilihanStore
 import com.polstat.sisipan.data.ProvinsiRepository
@@ -41,29 +44,67 @@ class HomeViewModel(
     private val mahasiswaStore: MahasiswaStore = Graph.mahasiswaStore,
     private val provinsiRepository: ProvinsiRepository = Graph.provinsiRepository,
     private val mahasiswaRepository: MahasiswaRepository = Graph.mahasiswaRepository,
+    private val formasiStore: FormasiStore = Graph.formasiStore,
 ) : ViewModel() {
 
-    // Holds our view state which the UI collects via [state]
     private val _state = MutableStateFlow(HomeViewState())
-
     private val refreshing = MutableStateFlow(false)
 
     val state: StateFlow<HomeViewState>
         get() = _state
 
     init {
+        observeRefresh()
         refresh(force = false)
+    }
+
+    private fun observeRefresh() {
         viewModelScope.launch {
             combine(
                 refreshing
             ) { refreshingValue  ->
-                HomeViewState(
-                    role = userRepository.role,
-                    mahasiswaMemilih = pilihanStore.count(),
-                    jmlhMhs = mahasiswaStore.count(),
-                    refreshing = refreshingValue.get(0) ,
-                    errorMessage = null /* TODO */
-                )
+                val idmhs = userRepository.idMhs
+                if (idmhs!=null) {
+                    val pilihan = pilihanStore.pilihanByMhs(idmhs)
+                    val memilih = true
+                    val mahasiswa = mahasiswaStore.getMahasiswa(pilihan.mahasiswa)
+                    val pilihan1 = formasiStore.formasiById(pilihan.pilihan1 ?: 0)
+                    val pilihan2 = formasiStore.formasiById(pilihan.pilihan2 ?: 0)
+                    val pilihan3 = formasiStore.formasiById(pilihan.pilihan3 ?: 0)
+                    val pilihanSistem = formasiStore.formasiById(pilihan.pilihanSistem ?: 0)
+                    val pilihanSaya = PilihanNested(
+                        id = pilihan.id,
+                        mahasiswa = mahasiswa,
+                        pilihan1 = pilihan1,
+                        pilihan2 = pilihan2,
+                        pilihan3 = pilihan3,
+                        pilihanSistem = pilihanSistem,
+                        indeksPilihan1 = pilihan.indeksPilihan1,
+                        indeksPilihan2 = pilihan.indeksPilihan2,
+                        indeksPilihan3 = pilihan.indeksPilihan3,
+                        ipk = pilihan.ipk,
+                        hasil = pilihan.hasil
+                    )
+                    HomeViewState(
+                        role = userRepository.role,
+                        pilihanSaya = pilihanSaya,
+                        mahasiswaMemilih = pilihanStore.count(),
+                        jmlhMhs = mahasiswaStore.count(),
+                        memilih = memilih,
+                        refreshing = refreshingValue.get(0) ,
+                        errorMessage = null /* TODO */
+                    )
+                } else{
+                    HomeViewState(
+                        role = userRepository.role,
+                        mahasiswaMemilih = pilihanStore.count(),
+                        jmlhMhs = mahasiswaStore.count(),
+                        memilih = false,
+                        refreshing = refreshingValue.get(0) ,
+                        errorMessage = null /* TODO */
+                    )
+                }
+
             }.catch { throwable ->
                 // TODO: emit a UI error here. For now, we'll just rethrow
                 throw throwable
@@ -73,6 +114,8 @@ class HomeViewModel(
             }
         }
     }
+
+
 
     private fun doRefresh(force: Boolean) {
         viewModelScope.launch {
@@ -96,8 +139,10 @@ class HomeViewModel(
 
 data class HomeViewState(
     val role: String? = null,
+    val pilihanSaya: PilihanNested? = null,
     val mahasiswaMemilih: Int = 0,
     val jmlhMhs: Int = 0,
+    val memilih: Boolean = false,
     val refreshing: Boolean = false,
     val errorMessage: String? = null
 )

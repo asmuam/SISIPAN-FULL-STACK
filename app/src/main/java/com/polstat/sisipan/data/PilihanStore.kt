@@ -28,4 +28,7 @@ class PilihanStore(
     suspend fun pilihanByMhs(id:Long): Pilihan{
         return pilihanDao.pilihanByMhs(id)
     }
+    suspend fun getById(id:Long): Pilihan{
+        return pilihanDao.findById(id)
+    }
 }
