@@ -16,6 +16,7 @@
 
 package com.polstat.sisipan.ui.mahasiswa
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -83,6 +84,7 @@ import com.polstat.sisipan.util.contrastAgainst
 import com.polstat.sisipan.util.rememberDominantColorState
 import com.polstat.sisipan.util.verticalGradientScrim
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun Mahasiswa(
@@ -121,6 +123,7 @@ fun MahasiswaAppBar(
                             .padding(start = 4.dp)
                             .heightIn(max = 24.dp)
                             .align(Alignment.CenterVertically)
+                            .clickable { openDrawer() }
                     )
                     Image(
                         painter = painterResource(R.drawable.logo),
@@ -233,7 +236,7 @@ fun MahasiswaCard(userData: MahasiswaCollection) {
         Column {
             NameAndNIM(userData)
             MahasiswaProperty("Program Studi", userData.prodi)
-            MahasiswaProperty("Asal Daerah", userData.provinsi)
+            MahasiswaProperty("Asal Daerah", userData.provinsi.namaProvinsi)
             MahasiswaProperty("IPK", userData.ipk.toString())
         }
     }

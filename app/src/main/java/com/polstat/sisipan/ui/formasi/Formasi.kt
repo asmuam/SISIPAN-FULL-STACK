@@ -74,6 +74,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.sisipan.R
@@ -93,7 +94,7 @@ fun FormasiPrev() {
     FormasiContent(
         openDrawer = {},
         formasiBukaList = formasiDummy.subList(1, 5),
-        formasiTutupList = emptyList<Formasi>(),
+        formasiTutupList = formasiDummy.subList(6, 8),
         onFormasiClick = { /* Handle formasi item click */ },
         isRefreshing = false, // Set to true if you want to preview the refreshing state
         modifier = Modifier.fillMaxSize(),
@@ -146,6 +147,7 @@ fun FormasiAppBar(
                         .padding(start = 4.dp)
                         .heightIn(max = 24.dp)
                         .align(Alignment.CenterVertically)
+                        .clickable { openDrawer() }
                 )
                 Image(
                     painter = painterResource(R.drawable.logo),
@@ -277,8 +279,22 @@ fun FormasiContent(
                                 )
                                 .pullRefresh(state = state)
                         ) {
-                            items(formasiBukaList) { formasi ->
+                            // Text label for "Formasi Yang Buka"
+                            item {
+                                Text(
+                                    text = "Formasi Yang Buka",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp,
+                                    color = Color.Black,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(4.dp)
+                                )
                                 Spacer(modifier = Modifier.height(4.dp))
+                            }
+
+                            // Items for "Formasi Yang Buka"
+                            items(formasiBukaList) { formasi ->
                                 FormasiCard(
                                     formasi = formasi,
                                     onItemClick = onFormasiClick,
@@ -286,25 +302,42 @@ fun FormasiContent(
                                 Spacer(modifier = Modifier.height(4.dp))
                             }
 
-                            // Divider untuk memberikan garis pemisah
+                            // Divider
                             item {
                                 Divider(
-                                    color = Color.Black, // Warna garis pemisah
-                                    thickness = 3.dp, // Ketebalan garis pemisah
+                                    color = Color.Black,
+                                    thickness = 3.dp,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 8.dp) // Sesuaikan padding garis pemisah sesuai kebutuhan
+                                        .padding(vertical = 8.dp)
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                             }
 
+                            // Text label for "Formasi Tutup"
+                            item {
+                                Text(
+                                    text = "Formasi Tutup",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp,
+                                    color = Color.Black,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(4.dp)
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+
+                            // Items for "Formasi Tutup"
                             items(formasiTutupList) { formasi ->
                                 FormasiCard(
                                     formasi = formasi,
                                     onItemClick = onFormasiClick,
                                 )
+                                Spacer(modifier = Modifier.height(4.dp))
                             }
                         }
+
                     }
                 }
             }

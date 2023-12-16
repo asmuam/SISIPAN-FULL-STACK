@@ -25,4 +25,7 @@ class PilihanStore(
     suspend fun daftarPilihan(): Flow<List<Pilihan>>{
         return pilihanDao.daftarPilihan()
     }
+    suspend fun pilihanByMhs(id:Long): Pilihan{
+        return pilihanDao.pilihanByMhs(id)
+    }
 }

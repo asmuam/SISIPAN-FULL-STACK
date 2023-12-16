@@ -1,5 +1,6 @@
 package com.polstat.sisipan.ui.pilihan
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,7 +25,9 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -51,12 +54,16 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.sisipan.R
@@ -87,7 +94,8 @@ fun Pilihan(
             modifier = Modifier.fillMaxSize(),
             onAccount,
             doRefresh = { viewModel.refresh(force = true) },
-            )
+            pilihanSaya = viewState.pilihanSaya,
+        )
     }
 }
 
@@ -96,7 +104,7 @@ fun PilihanAppBar(
     openDrawer: () -> Unit,
     backgroundColor: Color,
     modifier: Modifier = Modifier,
-    onAccount: ()-> Unit,
+    onAccount: () -> Unit,
 ) {
     TopAppBar(
         title = {
@@ -108,6 +116,7 @@ fun PilihanAppBar(
                         .padding(start = 4.dp)
                         .heightIn(max = 24.dp)
                         .align(Alignment.CenterVertically)
+                        .clickable { openDrawer() }
                 )
                 Image(
                     painter = painterResource(R.drawable.logo),
@@ -150,8 +159,9 @@ fun PilihanContent(
     onPilihanClick: (PilihanNested) -> Unit,
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
-    onAccount: ()-> Unit,
-    doRefresh: ()-> Unit,
+    onAccount: () -> Unit,
+    doRefresh: () -> Unit,
+    pilihanSaya: PilihanNested?,
 ) {
     val state = rememberPullRefreshState(isRefreshing, doRefresh)
 
@@ -198,14 +208,48 @@ fun PilihanContent(
                     modifier = Modifier.fillMaxWidth(),
                     onAccount,
                 )
-                LazyColumn (
-                    modifier = Modifier
-                        .pullRefresh(state)
-                ){
+                LazyColumn(
+                    modifier = Modifier.pullRefresh(state)
+                ) {
+                    item {
+                        // Text label for Pilihan Saya
+                        Text(
+                            text = "Pilihan Anda",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                        )
+                        // PilihanSaya card
+                        if (pilihanSaya != null) {
+                            PilihanCard(pilihan = pilihanSaya, onItemClick = onPilihanClick)
+                            Divider(
+                                color = Color.Black,
+                                thickness = 3.dp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                            )
+                        }
+                    }
+                    item {
+                        // Text label for Pilihan Mahasiswa Lain
+                        Text(
+                            text = "Pilihan Mahasiswa Lain",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                        )
+                    }
+                    // Rest of the items in the LazyColumn
                     items(pilihanList) { pilihan ->
                         PilihanCard(pilihan = pilihan, onItemClick = onPilihanClick)
                     }
                 }
+
             }
         }
         PullRefreshIndicator(
@@ -228,6 +272,10 @@ fun PilihanCard(pilihan: PilihanNested, onItemClick: (PilihanNested) -> Unit) {
             0f
         )
     ) // Default Mahasiswa
+    val mahasiswaName = mahasiswaState?.name.orEmpty()
+    val mahasiswaNim = mahasiswaState?.nim.orEmpty()
+    val mahasiswaProdi = mahasiswaState?.prodi.orEmpty()
+    val hasil = pilihan.hasil
 
     // Menggunakan Safe collectAsState untuk Formasi
     val pilihan1State by rememberUpdatedState(
@@ -293,7 +341,7 @@ fun PilihanCard(pilihan: PilihanNested, onItemClick: (PilihanNested) -> Unit) {
                     .weight(1f)
             ) {
                 Text(
-                    text = mahasiswaState.name,
+                    text = mahasiswaName,
                     style = MaterialTheme.typography.h6,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colors.onSurface
@@ -303,16 +351,37 @@ fun PilihanCard(pilihan: PilihanNested, onItemClick: (PilihanNested) -> Unit) {
 
                 // Tambahkan informasi lainnya seperti Nim dan Prodi
                 Text(
-                    text = "NIM: ${mahasiswaState.nim}",
+                    text = "NIM: ${mahasiswaNim}",
                     style = MaterialTheme.typography.body2,
                     color = Color.Gray
                 )
 
                 Text(
-                    text = "Prodi: ${mahasiswaState.prodi}",
+                    text = "Prodi: ${mahasiswaProdi}",
                     style = MaterialTheme.typography.body2,
                     color = Color.Gray
                 )
+                // Kotak warna merah jika hasil null, atau kotak warna hijau jika hasil tidak null
+                val backgroundColor = if (hasil == null) Color.Red else Color.Green
+                val textToShow = hasil ?: "Belum Diproses"
+                Box(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .background(backgroundColor)
+                ) {
+                    Text(
+                        text = textToShow,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    )
+                }
+
+
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -339,32 +408,34 @@ fun PilihanCard(pilihan: PilihanNested, onItemClick: (PilihanNested) -> Unit) {
         }
     }
 }
-    @Composable
-    fun PilihanPriorityItem(label: String, value: Formasi) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.caption,
-                color = Color.Gray
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = value.namaSatuanKerja,
-                style = MaterialTheme.typography.body2,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colors.onSurface
-            )
-        }
+
+@Composable
+fun PilihanPriorityItem(label: String, value: Formasi?) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.caption,
+            color = Color.Gray
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        // Check if value is not null before accessing its properties
+        Text(
+            text = value?.namaSatuanKerja.orEmpty(),
+            style = MaterialTheme.typography.body2,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colors.onSurface
+        )
     }
+}
 
 
 @Preview
 @Composable
 fun PilihanPreview() {
     val dummy = createDummyPilihanList()
-    val dummyPilihanList = remember {dummy}
+    val dummyPilihanList = remember { dummy }
 
     Surface(Modifier.fillMaxSize()) {
         PilihanContent(
@@ -373,7 +444,20 @@ fun PilihanPreview() {
             onPilihanClick = {},
             isRefreshing = false,
             onAccount = {},
-            doRefresh = {}
+            doRefresh = {},
+            pilihanSaya = PilihanNested(
+                id = 1,
+                mahasiswa = createDummyMahasiswa(),
+                pilihan1 = createDummyFormasi(),
+                pilihan2 = createDummyFormasi(),
+                pilihan3 = createDummyFormasi(),
+                pilihanSistem = createDummyFormasi(),
+                indeksPilihan1 = 3.5f,
+                indeksPilihan2 = 4.0f,
+                indeksPilihan3 = 3.8f,
+                ipk = 3.9f,
+                hasil = null
+            ),
         )
     }
 }
@@ -405,7 +489,7 @@ private fun createDummyPilihanList(): List<PilihanNested> {
             indeksPilihan2 = 4.0f,
             indeksPilihan3 = 3.8f,
             ipk = 3.9f,
-            hasil = "Accepted"
+            hasil = null
         ),
         // Add more dummy data as needed
     )
@@ -420,7 +504,7 @@ private fun createDummyMahasiswa(): Flow<Mahasiswa> {
                 nim = "123456",
                 name = "John Doe",
                 prodi = "Computer Science",
-                provinsiId = 1,
+                provinsi = 1,
                 ipk = 3.9f
             )
 

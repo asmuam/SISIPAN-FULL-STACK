@@ -68,9 +68,7 @@ class ProfileViewModel(
                 refreshing,
             ) { mahasiswaDetail, refreshing ->
                 val provinsi: Provinsi? = mahasiswaDetail?.id?.let { provinsiId ->
-                    runBlocking {
-                        provinsiStore.getById(provinsiId).firstOrNull()
-                    }
+                        provinsiStore.getById(provinsiId)
                 }
                 ProfileViewState(
                     role = userRepository.role,

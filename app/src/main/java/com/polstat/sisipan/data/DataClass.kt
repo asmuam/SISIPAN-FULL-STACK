@@ -13,7 +13,7 @@ data class Mahasiswa(
     @ColumnInfo(name = "nim") val nim: String,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "prodi") val prodi: String,
-    @ColumnInfo(name = "provinsi_id") val provinsiId: Long,
+    @ColumnInfo(name = "provinsi_id") val provinsi: Long,
     @ColumnInfo(name = "ipk") val ipk: Float
 )
 
@@ -42,11 +42,11 @@ data class Provinsi(
 @Entity(tableName = "pilihan")
 data class Pilihan(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long = 0,
-    @ColumnInfo(name = "mahasiswa_id") val mahasiswaId: Long,
-    @ColumnInfo(name = "pilihan1_id") val pilihan1Id: Long?,
-    @ColumnInfo(name = "pilihan2_id") val pilihan2Id: Long?,
-    @ColumnInfo(name = "pilihan3_id") val pilihan3Id: Long?,
-    @ColumnInfo(name = "pilihanSistem_id") val pilihanSistemId: Long?,
+    @ColumnInfo(name = "mahasiswa_id") val mahasiswa: Long,
+    @ColumnInfo(name = "pilihan1_id") val pilihan1: Long?,
+    @ColumnInfo(name = "pilihan2_id") val pilihan2: Long?,
+    @ColumnInfo(name = "pilihan3_id") val pilihan3: Long?,
+    @ColumnInfo(name = "pilihanSistem_id") val pilihanSistem: Long?,
     @ColumnInfo(name = "indeksPilihan1") val indeksPilihan1: Float,
     @ColumnInfo(name = "indeksPilihan2") val indeksPilihan2: Float,
     @ColumnInfo(name = "indeksPilihan3") val indeksPilihan3: Float,

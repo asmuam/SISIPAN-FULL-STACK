@@ -107,6 +107,7 @@ fun Home(
             onAccount,
             viewState = viewState,
             doRefresh = { viewModel.refresh(force = true) },
+            doPenempatan = {  },
         )
     }
 }
@@ -128,6 +129,7 @@ fun HomeAppBar(
                             .padding(start = 4.dp)
                             .heightIn(max = 24.dp)
                             .align(Alignment.CenterVertically)
+                            .clickable { openDrawer() }
                     )
                     Image(
                         painter = painterResource(R.drawable.logo),
@@ -164,6 +166,7 @@ fun HomeContent(
     onAccount: ()-> Unit,
     viewState: HomeViewState,
     doRefresh: ()-> Unit,
+    doPenempatan: ()-> Unit,
 ) {
     val state = rememberPullRefreshState(isRefreshing, doRefresh)
     Box(
@@ -241,11 +244,6 @@ fun HomeContent(
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
-                                Text(
-                                    text = "Last Updated: ${getCurrentTimestamp()}",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
-                                )
                             }
 
                             // Content
@@ -263,7 +261,8 @@ fun HomeContent(
                                     .fillMaxWidth()
                                     .height(120.dp)
                                     .padding(16.dp)
-                                    .background(MaterialTheme.colorScheme.background), // Customize the background color
+                                    .background(MaterialTheme.colorScheme.background)
+                                    .clickable { doPenempatan() }, // Customize the background color
                                 shape = RoundedCornerShape(8.dp),
                                 colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary),// Customize the corner radius
                                 elevation = cardElevation(4.dp) // Add elevation for a shadow effect
@@ -289,6 +288,11 @@ fun HomeContent(
                                     )
                                 }
                             }
+                            Text(
+                                text = "Last Updated: ${getCurrentTimestamp()}",
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
                         }
                     }
                 }
@@ -369,8 +373,9 @@ fun HomeAdminPreview() {
             modifier = Modifier.fillMaxSize(),
             onAccount = {},
             viewState = HomeViewState(role = "ADMIN", mahasiswaMemilih = 2, jmlhMhs =40),
-            doRefresh = {}
-        )
+            doRefresh = {},
+            doPenempatan = {  },
+            )
     }
     }
 }
@@ -393,8 +398,9 @@ fun HomeMahasiswaPreview() {
             modifier = Modifier.fillMaxSize(),
             onAccount = {},
             viewState = HomeViewState(role = "MAHASISWA", mahasiswaMemilih = 21, jmlhMhs =44),
-            doRefresh = {}
-        )
+            doRefresh = {},
+            doPenempatan = {  },
+            )
     }
     }
 }

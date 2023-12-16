@@ -238,7 +238,7 @@ fun ProfileContent(
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
 
-                profil?.let {
+                if(profil!=null) {
                     NameAndEmail(profil,email)
 
                     ProfileProperty(stringResource(R.string.nama_mahasiswa), profil.name)
@@ -249,7 +249,21 @@ fun ProfileContent(
                         stringResource(R.string.prov_mahasiswa),
                         provinsi?.namaProvinsi ?: "Not Available"
                     )
-                }
+                }else{
+                    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Text(
+                            text = "ADMIN",
+                            modifier = modifier,
+                            style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
+                        )
+                        Email(
+                            email,
+                            modifier = Modifier
+                                .padding(bottom = 20.dp)
+                                .baselineHeight(24.dp)
+                        )
+                    }
+            }
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
@@ -327,7 +341,7 @@ fun ProfileContentPreview() {
         nim = "123456789",
         prodi = "Computer Science",
         ipk = 3.4f,
-        provinsiId = 2,
+        provinsi = 2,
     )
 
     SisipanTheme {

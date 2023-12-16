@@ -15,4 +15,6 @@ abstract class PilihanDao : BaseDao<Pilihan> {
 
     @Query("SELECT * FROM pilihan")
     abstract fun daftarPilihan(): Flow<List<Pilihan>>
+    @Query("SELECT * FROM pilihan WHERE mahasiswa_id=:id")
+    abstract suspend fun pilihanByMhs(id:Long): Pilihan
 }

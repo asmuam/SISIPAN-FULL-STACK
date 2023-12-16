@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
+import com.polstat.sisipan.data.FormasiRepository
 import com.polstat.sisipan.data.FormasiStore
 import com.polstat.sisipan.data.MahasiswaStore
 import com.polstat.sisipan.data.Pilihan
@@ -23,6 +24,7 @@ class PilihanViewModel(
     private val pilihanStore: PilihanStore = Graph.pilihanStore,
     private val mahasiswaStore: MahasiswaStore = Graph.mahasiswaStore,
     private val formasiStore: FormasiStore = Graph.formasiStore,
+    private val formasiRepository: FormasiRepository=Graph.formasiRepository,
 ) : ViewModel() {
 
     // Holds our view state which the UI collects via [state]
@@ -43,11 +45,11 @@ class PilihanViewModel(
             ) { pilihanList, refreshing ->
                 // Map PilihanList to PilihanNested
                 val mappedPilihanList = pilihanList.map { pilihan ->
-                    val mahasiswa = mahasiswaStore.getMahasiswa(pilihan.mahasiswaId)
-                    val pilihan1 = formasiStore.formasiById(pilihan.pilihan1Id ?: 0)
-                    val pilihan2 = formasiStore.formasiById(pilihan.pilihan2Id ?: 0)
-                    val pilihan3 = formasiStore.formasiById(pilihan.pilihan3Id ?: 0)
-                    val pilihanSistem = formasiStore.formasiById(pilihan.pilihanSistemId ?: 0)
+                    val mahasiswa = mahasiswaStore.getMahasiswa(pilihan.mahasiswa)
+                    val pilihan1 = formasiStore.formasiById(pilihan.pilihan1 ?: 0)
+                    val pilihan2 = formasiStore.formasiById(pilihan.pilihan2 ?: 0)
+                    val pilihan3 = formasiStore.formasiById(pilihan.pilihan3 ?: 0)
+                    val pilihanSistem = formasiStore.formasiById(pilihan.pilihanSistem ?: 0)
 
                     PilihanNested(
                         id = pilihan.id,
@@ -63,13 +65,31 @@ class PilihanViewModel(
                         hasil = pilihan.hasil
                     )
                 }
-
+                Log.i("PILIHAN", "${mappedPilihanList}: ")
+                val pilihanSaya = pilihanStore.pilihanByMhs(UserRepository.idMhs?:0)
+                Log.i("PILIHANSAYA", "${pilihanSaya}: ")
+                pilihanSaya?.run {
+                    val mahasiswa = mahasiswaStore.getMahasiswa(pilihanSaya.mahasiswa)
+                    val pilihan1 = formasiStore.formasiById(pilihanSaya.pilihan1 ?: 0)
+                    val pilihan2 = formasiStore.formasiById(pilihanSaya.pilihan2 ?: 0)
+                    val pilihan3 = formasiStore.formasiById(pilihanSaya.pilihan3 ?: 0)
+                    val pilihanSistem = formasiStore.formasiById(pilihanSaya.pilihanSistem ?: 0)
+                    PilihanViewState(
+                        role = userRepository.role,
+                        pilihanList = mappedPilihanList,
+                        pilihanSaya = PilihanNested(pilihanSaya.id,mahasiswa,pilihan1,pilihan2,pilihan3,pilihanSistem,pilihanSaya.indeksPilihan1,pilihanSaya.indeksPilihan2,pilihanSaya.indeksPilihan3,pilihanSaya.ipk,pilihanSaya.hasil),
+                        refreshing = refreshing,
+                        errorMessage = null /* TODO */
+                    )
+                }?: run{
                 PilihanViewState(
                     role = userRepository.role,
                     pilihanList = mappedPilihanList,
+                    pilihanSaya = null,
                     refreshing = refreshing,
                     errorMessage = null /* TODO */
                 )
+                }
             }.catch { throwable ->
                 // TODO: emit a UI error here. For now, we'll just rethrow
                 throw throwable
@@ -87,6 +107,7 @@ class PilihanViewModel(
             try {
                 refreshing.value = true
                 pilihanRepository.refreshPilihan(force)
+                formasiRepository.refreshFormasi(force)
                 // Handle the response
             } catch (e: Exception) {
                 // Handle the error
@@ -103,6 +124,7 @@ class PilihanViewModel(
 data class PilihanViewState(
     val role: String? = null,
     val pilihanList: List<PilihanNested> = emptyList(),
+    val pilihanSaya: PilihanNested? = null,
     val refreshing: Boolean = false,
     val errorMessage: String? = null
 )

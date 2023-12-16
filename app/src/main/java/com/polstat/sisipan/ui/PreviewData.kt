@@ -105,16 +105,13 @@ fun createDummyMhs(): List<MahasiswaCollection> {
 }
 
 @Composable
-private fun createDummyProvinsi(): Flow<Provinsi> {
+private fun createDummyProvinsi(): Provinsi {
     // Create a dummy Provinsi Flow
-    return flow {
-        emit(
-            Provinsi(
-                kodeProvinsi = "XYZ",
-                namaProvinsi = "Dummy Provinsi"
-            )
-        )
-    }
+    return Provinsi(
+        id = 1,
+        kodeProvinsi = "123",
+        namaProvinsi = "zxcvb"
+    )
 }
 
 

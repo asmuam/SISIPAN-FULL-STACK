@@ -16,20 +16,16 @@
 
 package com.polstat.sisipan.ui.mahasiswa
 
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.provider.MediaStore
 import android.util.Log
-import com.polstat.sisipan.data.UserRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
 import com.polstat.sisipan.data.MahasiswaRepository
 import com.polstat.sisipan.data.MahasiswaStore
 import com.polstat.sisipan.data.Provinsi
+import com.polstat.sisipan.data.ProvinsiRepository
 import com.polstat.sisipan.data.ProvinsiStore
-import kotlinx.coroutines.flow.Flow
+import com.polstat.sisipan.data.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -39,6 +35,7 @@ import kotlinx.coroutines.launch
 class MahasiswaViewModel(
     private val userRepository: UserRepository = Graph.userRepository,
     private val mahasiswaRepository: MahasiswaRepository = Graph.mahasiswaRepository,
+    private val provinsiRepository: ProvinsiRepository = Graph.provinsiRepository,
     private val mahasiswaStore: MahasiswaStore = Graph.mahasiswaStore,
     private val provinsiStore: ProvinsiStore = Graph.provinsiStore,
 ) : ViewModel() {
@@ -57,21 +54,20 @@ class MahasiswaViewModel(
             combine(
                 mahasiswaStore.getAll(),
                 refreshing,
-            ) { mahasiswaCollection, refreshing ->
-                val mappedMahasiswaList = mahasiswaCollection.map { mhs ->
-                    val prov = provinsiStore.getById(mhs.provinsiId)
+            ) { listMahasiswa, refreshing ->
+                val mappedMahasiswaList = listMahasiswa.map { mhs ->
+                    val prov = provinsiStore.getById(mhs.provinsi)
                 MahasiswaCollection(
                     id = mhs.id,
                     nim = mhs.nim,
                     name = mhs.name,
                     prodi = mhs.prodi,
-                    provinsi = prov,
+                    provinsi = prov?: Provinsi(0L,"0000",""),
                     ipk = mhs.ipk,
                 )
                 }
                 MahasiswaViewState(
                     role = userRepository.role,
-                    email = userRepository.email,
                     mahasiswa = mappedMahasiswaList,
                     refreshing = refreshing,
                     errorMessage = null /* TODO */,
@@ -90,6 +86,7 @@ class MahasiswaViewModel(
             try {
                 refreshing.value = true
                 mahasiswaRepository.refreshMahasiswa(force)
+                provinsiRepository.refreshProvinsi(force)
                 // Handle the response
             } catch (e: Exception) {
                 // Handle the error
@@ -100,27 +97,14 @@ class MahasiswaViewModel(
         }
     }
 
-    fun editMahasiswaPhoto(context: Context) {
-        // Buka galeri atau kamera, dan tangani hasilnya di sini
-        // Misalnya, menggunakan Intent untuk membuka galeri:
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        intent.type = "image/*"
-        (context as? Activity)?.startActivityForResult(intent, REQUEST_IMAGE_PICK)
-    }
-
-    companion object {
-        const val REQUEST_IMAGE_PICK = 123
-    }
 }
 
 data class MahasiswaViewState(
     val role: String? = null,
     val refreshing: Boolean = false,
     val errorMessage: String? = null,
-    val email: String = "",
     val password: String ="",
     val mahasiswa: List<MahasiswaCollection> = emptyList(),
-    val provinsi: Provinsi? = null,
 )
 
 data class MahasiswaCollection (
@@ -128,6 +112,6 @@ data class MahasiswaCollection (
     val nim: String,
     val name: String,
     val prodi: String,
-    val provinsi: Flow<Provinsi>,
+    val provinsi: Provinsi,
     val ipk: Float,
 )
