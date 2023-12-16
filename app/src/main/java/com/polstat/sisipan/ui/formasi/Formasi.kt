@@ -16,16 +16,12 @@
 
 package com.polstat.sisipan.ui.formasi
 
-import android.util.Log
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -35,18 +31,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsEndWidth
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
@@ -60,7 +52,9 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
@@ -68,13 +62,10 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -83,13 +74,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.sisipan.R
 import com.polstat.sisipan.data.Formasi
 import com.polstat.sisipan.ui.formasiDummy
-import com.polstat.sisipan.ui.signinsignup.ErrorSnackbar
 import com.polstat.sisipan.ui.theme.MinContrastOfPrimaryVsSurface
 import com.polstat.sisipan.util.DynamicThemePrimaryColorsFromImage
 import com.polstat.sisipan.util.contrastAgainst
@@ -150,17 +139,18 @@ fun FormasiAppBar(
     TopAppBar(
         title = {
             Row {
-                Image(
-                    painter = painterResource(R.drawable.ic_sisipan_logo),
-                    contentDescription = null,
-                    modifier = Modifier.clickable { openDrawer() }
-                )
                 Icon(
-                    painter = painterResource(R.drawable.ic_text_logo),
+                    imageVector = Icons.Default.Menu,
                     contentDescription = stringResource(R.string.app_name),
                     modifier = Modifier
                         .padding(start = 4.dp)
                         .heightIn(max = 24.dp)
+                        .align(Alignment.CenterVertically)
+                )
+                Image(
+                    painter = painterResource(R.drawable.logo),
+                    contentDescription = null,
+                    modifier = Modifier.clickable { openDrawer() }
                 )
             }
         },
@@ -218,8 +208,6 @@ fun FormasiContent(
             .windowInsetsPadding(
                 WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
             )
-            .pullRefresh(state = state)
-            .verticalScroll(rememberScrollState())
     )
     {
         Scaffold(
@@ -279,14 +267,23 @@ fun FormasiContent(
                     DynamicThemePrimaryColorsFromImage(dominantColorState) {
                         // Konten lainnya seperti LazyColumn dan lainnya
                         LazyColumn(
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier = modifier
+                                .padding(innerPadding)
+                                .fillMaxSize()
+                                .verticalGradientScrim(
+                                    color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
+                                    startYPercentage = 1f,
+                                    endYPercentage = 0f
+                                )
+                                .pullRefresh(state = state)
                         ) {
                             items(formasiBukaList) { formasi ->
+                                Spacer(modifier = Modifier.height(4.dp))
                                 FormasiCard(
                                     formasi = formasi,
                                     onItemClick = onFormasiClick,
                                 )
+                                Spacer(modifier = Modifier.height(4.dp))
                             }
 
                             // Divider untuk memberikan garis pemisah
@@ -298,6 +295,7 @@ fun FormasiContent(
                                         .fillMaxWidth()
                                         .padding(vertical = 8.dp) // Sesuaikan padding garis pemisah sesuai kebutuhan
                                 )
+                                Spacer(modifier = Modifier.height(4.dp))
                             }
 
                             items(formasiTutupList) { formasi ->
@@ -310,6 +308,11 @@ fun FormasiContent(
                     }
                 }
             }
+        )
+        PullRefreshIndicator(
+            refreshing = isRefreshing,
+            state = state,
+            modifier = Modifier.align(Alignment.TopCenter)
         )
     }
 

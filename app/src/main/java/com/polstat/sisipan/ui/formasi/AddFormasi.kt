@@ -1,13 +1,11 @@
 package com.polstat.sisipan.ui.formasi
 
 import android.util.Log
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,7 +21,6 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DropdownMenuItem
@@ -37,22 +34,16 @@ import androidx.compose.material.Surface
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,7 +51,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -75,14 +65,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.polstat.sisipan.R
-import com.polstat.sisipan.data.Formasi
 import com.polstat.sisipan.data.Provinsi
-import com.polstat.sisipan.ui.formasiDummy
 import com.polstat.sisipan.ui.provDummy
 import com.polstat.sisipan.ui.theme.MinContrastOfPrimaryVsSurface
 import com.polstat.sisipan.util.DynamicThemePrimaryColorsFromImage
@@ -91,16 +78,6 @@ import com.polstat.sisipan.util.rememberDominantColorState
 import com.polstat.sisipan.util.verticalGradientScrim
 import kotlinx.coroutines.launch
 
-@Composable
-@Preview
-fun AddFormasiPreview() {
-    AddFormasi(
-        openDrawer = {},
-        onAccount = {},
-        navigateBack = {},
-        onNavigateUp = {}
-    )
-}
 
 @Composable
 @Preview
@@ -116,7 +93,13 @@ fun AddFormasiContentPreview() {
         addFormasiViewState = AddFormasiViewState(
             refreshing = false,
             role = "Admin",
-            provinsiList = provDummy+listOf(Provinsi(id = 0, kodeProvinsi = "",namaProvinsi = "K/L/D/I")),
+            provinsiList = provDummy + listOf(
+                Provinsi(
+                    id = 0,
+                    kodeProvinsi = "",
+                    namaProvinsi = "K/L/D/I"
+                )
+            ),
             formasiUiState = FormasiUiState(formasiDetails = FormasiDetails())
         ),
         onFormasiValueChange = {},
@@ -124,135 +107,138 @@ fun AddFormasiContentPreview() {
     )
 }
 
-    @Composable
-    fun AddFormasi (
-        openDrawer: () -> Unit,
-        onAccount: () -> Unit,
-        navigateBack:()-> Unit,
-        canNavigateBack: Boolean = true,
-        onNavigateUp:()-> Unit,
-        viewModel: AddFormasiViewModel = viewModel(),
+@Composable
+fun AddFormasi(
+    openDrawer: () -> Unit,
+    onAccount: () -> Unit,
+    navigateBack: () -> Unit,
+    canNavigateBack: Boolean = true,
+    onNavigateUp: () -> Unit,
+    viewModel: AddFormasiViewModel = viewModel(),
 
-        ) {
-        val viewState by viewModel.state.collectAsStateWithLifecycle()
-        val coroutineScope = rememberCoroutineScope()
-
-        Log.i("DATA", "AddFormasi: ${viewState.formasiUiState.formasiDetails}")
-        Surface(Modifier.fillMaxSize()) {
-            AddFormasiContent(
-                openDrawer,
-                isRefreshing = viewState.refreshing,
-                modifier = Modifier.fillMaxSize(),
-                onAccount,
-                role = viewState.role,
-                navigateBack = navigateBack,
-                onNavigateUp = onNavigateUp,
-                canNavigateBack = canNavigateBack,
-                addFormasiViewState = viewState,
-                onFormasiValueChange = viewModel::updateUiState,
-                onSaveClick = {
-                    // Note: If the user rotates the screen very fast, the operation may get cancelled
-                    // and the book may not be saved in the Database. This is because when config
-                    // change occurs, the Activity will be recreated and the rememberCoroutineScope will
-                    // be cancelled - since the scope is bound to composition.
-                    coroutineScope.launch {
-                        viewModel.saveFormasi()
-                        navigateBack()
-                    }
-                },            )
-        }
-    }
-
-    @Composable
-    fun AddFormasiContent(
-        openDrawer: () -> Unit,
-        isRefreshing: Boolean,
-        modifier: Modifier = Modifier,
-        onAccount: () -> Unit,
-        role: String,
-        navigateBack:()-> Unit,
-        onNavigateUp:()-> Unit,
-        canNavigateBack:Boolean,
-        addFormasiViewState: AddFormasiViewState,
-        onFormasiValueChange: (FormasiDetails) -> Unit,
-        onSaveClick: () -> Unit,
     ) {
-        val surfaceColor = MaterialTheme.colors.surface
-        val appBarColor = surfaceColor.copy(alpha = 0.87f)
-        val dominantColorState = rememberDominantColorState { color ->
-            // We want a color which has sufficient contrast against the surface color
-            color.contrastAgainst(surfaceColor) >= MinContrastOfPrimaryVsSurface
-        }
-        Column(
-            modifier = modifier.windowInsetsPadding(
-                WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)))
-        {
-            Scaffold(
-                topBar = {
-                    Column(
-                        modifier = Modifier
+    val viewState by viewModel.state.collectAsStateWithLifecycle()
+    val coroutineScope = rememberCoroutineScope()
+
+    Log.i("DATA", "AddFormasi: ${viewState.formasiUiState.formasiDetails}")
+    Surface(Modifier.fillMaxSize()) {
+        AddFormasiContent(
+            openDrawer,
+            isRefreshing = viewState.refreshing,
+            modifier = Modifier.fillMaxSize(),
+            onAccount,
+            role = viewState.role,
+            navigateBack = navigateBack,
+            onNavigateUp = onNavigateUp,
+            canNavigateBack = canNavigateBack,
+            addFormasiViewState = viewState,
+            onFormasiValueChange = viewModel::updateUiState,
+            onSaveClick = {
+                // Note: If the user rotates the screen very fast, the operation may get cancelled
+                // and the book may not be saved in the Database. This is because when config
+                // change occurs, the Activity will be recreated and the rememberCoroutineScope will
+                // be cancelled - since the scope is bound to composition.
+                coroutineScope.launch {
+                    viewModel.saveFormasi()
+                    navigateBack()
+                }
+            },
+        )
+    }
+}
+
+@Composable
+fun AddFormasiContent(
+    openDrawer: () -> Unit,
+    isRefreshing: Boolean,
+    modifier: Modifier = Modifier,
+    onAccount: () -> Unit,
+    role: String,
+    navigateBack: () -> Unit,
+    onNavigateUp: () -> Unit,
+    canNavigateBack: Boolean,
+    addFormasiViewState: AddFormasiViewState,
+    onFormasiValueChange: (FormasiDetails) -> Unit,
+    onSaveClick: () -> Unit,
+) {
+    val surfaceColor = MaterialTheme.colors.surface
+    val appBarColor = surfaceColor.copy(alpha = 0.87f)
+    val dominantColorState = rememberDominantColorState { color ->
+        // We want a color which has sufficient contrast against the surface color
+        color.contrastAgainst(surfaceColor) >= MinContrastOfPrimaryVsSurface
+    }
+    Column(
+        modifier = modifier.windowInsetsPadding(
+            WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
+        )
+    )
+    {
+        Scaffold(
+            topBar = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalGradientScrim(
+                            color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
+                            startYPercentage = 1f,
+                            endYPercentage = 0f
+                        )
+                ) {
+                    // Draw a scrim over the status bar which matches the app bar
+                    Spacer(
+                        Modifier
+                            .background(appBarColor)
                             .fillMaxWidth()
-                            .verticalGradientScrim(
-                                color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
-                                startYPercentage = 1f,
-                                endYPercentage = 0f
-                            )
-                    ) {
-                        // Draw a scrim over the status bar which matches the app bar
-                        Spacer(
-                            Modifier
-                                .background(appBarColor)
-                                .fillMaxWidth()
-                                .windowInsetsTopHeight(WindowInsets.statusBars)
-                        )
+                            .windowInsetsTopHeight(WindowInsets.statusBars)
+                    )
 
-                        AddFormasiAppBar(
-                            openDrawer,
-                            backgroundColor = appBarColor,
-                            modifier = Modifier.fillMaxWidth(),
-                            onAccount,
-                            title = stringResource(R.string.add_formasi),
-                            canNavigateBack = canNavigateBack,
-                            navigateUp = onNavigateUp
-                        )
-                    }
-                },
+                    AddFormasiAppBar(
+                        openDrawer,
+                        backgroundColor = appBarColor,
+                        modifier = Modifier.fillMaxWidth(),
+                        onAccount,
+                        title = stringResource(R.string.add_formasi),
+                        canNavigateBack = canNavigateBack,
+                        navigateUp = onNavigateUp
+                    )
+                }
+            },
 
-                content = { innerPadding ->
-                    Column(
-                        modifier = modifier
-                            .padding(innerPadding)
-                            .fillMaxSize()
-                            .verticalGradientScrim(
-                                color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
-                                startYPercentage = 1f,
-                                endYPercentage = 0f
-                            )
-                    ) {
-                        // Konten utama dengan fungsi DynamicThemePrimaryColorsFromImage
-                        DynamicThemePrimaryColorsFromImage(dominantColorState) {
-                            // Konten lainnya seperti LazyColumn dan lainnya
-                            FormasiInputForm(
-                                provinsiList = addFormasiViewState.provinsiList,
-                                formasiDetails = addFormasiViewState.formasiUiState.formasiDetails,
-                                onValueChange = onFormasiValueChange,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Button(
-                                onClick = onSaveClick,
-                                enabled = addFormasiViewState.formasiUiState.isEntryValid,
-                                shape = androidx.compose.material3.MaterialTheme.shapes.small,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(text = stringResource(R.string.save_action))
-                            }
+            content = { innerPadding ->
+                Column(
+                    modifier = modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                        .verticalGradientScrim(
+                            color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
+                            startYPercentage = 1f,
+                            endYPercentage = 0f
+                        )
+                ) {
+                    // Konten utama dengan fungsi DynamicThemePrimaryColorsFromImage
+                    DynamicThemePrimaryColorsFromImage(dominantColorState) {
+                        // Konten lainnya seperti LazyColumn dan lainnya
+                        FormasiInputForm(
+                            provinsiList = addFormasiViewState.provinsiList,
+                            formasiDetails = addFormasiViewState.formasiUiState.formasiDetails,
+                            onValueChange = onFormasiValueChange,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Button(
+                            onClick = onSaveClick,
+                            enabled = addFormasiViewState.formasiUiState.isEntryValid,
+                            shape = androidx.compose.material3.MaterialTheme.shapes.small,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = stringResource(R.string.save_action))
                         }
                     }
                 }
-            )
-        }
-
+            }
+        )
     }
+
+}
 
 @Composable
 fun FormasiInputForm(
@@ -305,7 +291,13 @@ fun FormasiInputForm(
         )
         // Composable Dropdown
         CustomDropdown(
-            items = listOf(Provinsi(id = null, kodeProvinsi = "",namaProvinsi = "K/L/D/I")) + provinsiList,
+            items = listOf(
+                Provinsi(
+                    id = null,
+                    kodeProvinsi = "",
+                    namaProvinsi = "K/L/D/I"
+                )
+            ) + provinsiList,
             selectedItem = selectedProvinsi?.namaProvinsi.orEmpty(),
             onItemSelected = onProvinsiSelected
         )
@@ -369,50 +361,60 @@ fun CustomDropdown(
 ) {
     var expanded by remember { mutableStateOf(false) }
     var inputValue by remember { mutableStateOf(selectedItem) }
-    var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
+    var mTextFieldSize by remember { mutableStateOf(Size.Zero) }
 
-// Up Icon when expanded and down icon when collapsed
+    // Up Icon when expanded and down icon when collapsed
     val icon = if (expanded)
         Icons.Filled.KeyboardArrowUp
     else
         Icons.Filled.KeyboardArrowDown
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+    Column(
     ) {
-        OutlinedTextField(
-            value = inputValue,
-            onValueChange = {
-                inputValue = it
-                // Handle value change if needed
-            },
-            textStyle = LocalTextStyle.current.copy(color = Color.Black),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                capitalization = KeyboardCapitalization.Sentences,
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Done
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .onGloballyPositioned { coordinates ->
-                    // This value is used to assign to
-                    // the DropDown the same width
-                    mTextFieldSize = coordinates.size.toSize()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            OutlinedTextField(
+                value = inputValue,
+                onValueChange = {
+                    inputValue = it
+                    // Handle value change if needed
                 },
-            label = {Text("Provinsi/K/L/D/I")},
-            trailingIcon = {
-                Icon(icon,"contentDescription",
-                    Modifier.clickable { expanded = !expanded })
-            }
-        )
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
+                    disabledContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
+                ),
+                textStyle = LocalTextStyle.current.copy(color = Color.Black),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                ),
+                modifier = Modifier
+                    .clickable { expanded = !expanded }
+                    .fillMaxWidth()
+                    .onGloballyPositioned { coordinates ->
+                        // This value is used to assign to
+                        // the DropDown the same width
+                        mTextFieldSize = coordinates.size.toSize()
+                    },
+                label = { Text("Provinsi/K/L/D/I*") },
+                trailingIcon = {
+                    Icon(icon, "contentDescription",
+                        Modifier.clickable { expanded = !expanded })
+                }
+            )
+
+            // If you want to trigger dropdown when clicking the text field, add clickable modifier to the text field
+        }
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
-                .width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
+                .width(with(LocalDensity.current) { mTextFieldSize.width.toDp() })
         ) {
             items.forEach { item ->
                 DropdownMenuItem(
@@ -440,6 +442,7 @@ fun CustomDropdown(
     }
 }
 
+
 @Composable
 fun AddFormasiAppBar(
     openDrawer: () -> Unit,
@@ -457,34 +460,28 @@ fun AddFormasiAppBar(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (canNavigateBack) {
-                    IconButton(
-                        onClick = {
-                            if (navController.previousBackStackEntry != null) {
-                                navController.navigateUp()
-                            } else {
-                                navigateUp()
-                            }
+                IconButton(
+                    onClick = {
+                        if (navController.previousBackStackEntry != null) {
+                            navController.navigateUp()
+                        } else {
+                            navigateUp()
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.cd_back)
-                        )
                     }
-                } else {
-                    Image(
-                        painter = painterResource(R.drawable.ic_sisipan_logo),
-                        contentDescription = null,
-                        modifier = Modifier.clickable { openDrawer() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.cd_back),
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .heightIn(max = 24.dp)
+                            .align(Alignment.CenterVertically)
                     )
                 }
-                Icon(
-                    painter = painterResource(R.drawable.ic_text_logo),
-                    contentDescription = stringResource(R.string.app_name),
-                    modifier = Modifier
-                        .padding(start = 4.dp)
-                        .heightIn(max = 24.dp)
+                Image(
+                    painter = painterResource(R.drawable.logo),
+                    contentDescription = null,
+                    modifier = Modifier.clickable { openDrawer() }
                 )
             }
         },

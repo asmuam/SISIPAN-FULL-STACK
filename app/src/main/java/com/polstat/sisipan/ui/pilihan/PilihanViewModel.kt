@@ -43,7 +43,7 @@ class PilihanViewModel(
             ) { pilihanList, refreshing ->
                 // Map PilihanList to PilihanNested
                 val mappedPilihanList = pilihanList.map { pilihan ->
-                    val mahasiswa = mahasiswaStore.getMahasiwa(pilihan.mahasiswaId)
+                    val mahasiswa = mahasiswaStore.getMahasiswa(pilihan.mahasiswaId)
                     val pilihan1 = formasiStore.formasiById(pilihan.pilihan1Id ?: 0)
                     val pilihan2 = formasiStore.formasiById(pilihan.pilihan2Id ?: 0)
                     val pilihan3 = formasiStore.formasiById(pilihan.pilihan3Id ?: 0)

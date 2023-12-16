@@ -43,6 +43,7 @@ import com.polstat.sisipan.R
 import com.polstat.sisipan.ui.formasi.AddFormasi
 import com.polstat.sisipan.ui.formasi.Formasi
 import com.polstat.sisipan.ui.home.Home
+import com.polstat.sisipan.ui.mahasiswa.Mahasiswa
 import com.polstat.sisipan.ui.pilihan.Pilihan
 import com.polstat.sisipan.ui.profile.Profile
 import com.polstat.sisipan.ui.signinsignup.SignInRoute
@@ -78,8 +79,10 @@ fun SisipanApp(
                         currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route.orEmpty(),
                         navigateToHome = { navController.navigate(Screen.Home.route) },
                         navigateToFormasi = { navController.navigate(Screen.Formasi.route) },
-                        closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } },
                         navigateToWelcome = { navController.navigate(Screen.Welcome.route) },
+                        navigateToMahasiswa = { navController.navigate(Screen.Mahasiswa.route) },
+                        navigateToPilihan = { navController.navigate(Screen.Pilihan.route) },
+                        closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } },
                         deleteUser = { UserRepository.clear(appState.navController.context)
                         }
                     )
@@ -88,13 +91,13 @@ fun SisipanApp(
                 gesturesEnabled = !isExpandedScreen
             ) {
                 Row {
-                    if (isExpandedScreen) {
-                        AppNavRail(
-                            currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route.orEmpty(),
-                            navigateToHome = { navController.navigate(Screen.Home.route) },
-                            navigateToFormasi = { navController.navigate(Screen.Formasi.route) },
-                            )
-                    }
+//                    if (isExpandedScreen) {
+//                        AppNavRail(
+//                            currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route.orEmpty(),
+//                            navigateToHome = { navController.navigate(Screen.Home.route) },
+//                            navigateToFormasi = { navController.navigate(Screen.Formasi.route) },
+//                            )
+//                    }
                     NavHost(
                         navController = navController,
                         startDestination = Screen.Welcome.route
@@ -135,13 +138,22 @@ fun SisipanApp(
                                 },
                             )
                         }
+                        composable(Screen.Mahasiswa.route) { backStackEntry ->
+                            Mahasiswa(
+                                openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
+                                onAccount = {
+                                    navController.navigate("profil")
+                                },
+                            )
+                        }
                         composable(Screen.Profil.route) { backStackEntry ->
                             Profile(
                                 openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
                                 onAccount ={
                                     navController.navigate("profil")
                                 },
-                            )
+                                navigateBack = { navController.popBackStack() },
+                                )
                         }
                         composable(Screen.Welcome.route) { backStackEntry ->
                             WelcomeRoute(

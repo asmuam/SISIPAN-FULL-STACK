@@ -45,7 +45,7 @@ fun AppNavRail(
     NavigationRail(
         header = {
             Icon(
-                painterResource(R.drawable.ic_sisipan_logo),
+                painterResource(R.drawable.ic_launcher_foreground),
                 null,
                 Modifier.padding(vertical = 12.dp),
                 tint = MaterialTheme.colorScheme.primary

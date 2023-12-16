@@ -1,5 +1,6 @@
 package com.polstat.sisipan.data
 
+import android.util.Log
 import com.polstat.sisipan.data.room.MahasiswaDao
 import com.polstat.sisipan.data.room.TransactionRunner
 import kotlinx.coroutines.flow.Flow
@@ -13,27 +14,30 @@ class MahasiswaStore(
 ) {
 
     /**
-     * Add a new [Mahasiwa] to this store.
+     * Add a new [Mahasiswa] to this store.
      *
      * This automatically switches to the main thread to maintain thread consistency.
      */
-    suspend fun addMahasiwa(mahasiswa: Mahasiswa) {
+    suspend fun addMahasiswa(mahasiswa: Mahasiswa) {
         mahasiswaDao.insert(mahasiswa)
     }
 
-    suspend fun getMahasiwa(id: Long): Flow<Mahasiswa> {
+    suspend fun getMahasiswa(id: Long): Flow<Mahasiswa> {
         return mahasiswaDao.findById(id)
     }
 
     suspend fun getAll(): Flow<List<Mahasiswa>> {
         return mahasiswaDao.findAll()
     }
-    suspend fun saveMahasiwaList(mahasiswaList: List<Mahasiswa>) {
+    suspend fun saveMahasiswaList(mahasiswaList: List<Mahasiswa>) {
         // Hapus data lama di database (jika ada)
         mahasiswaDao.deleteAll()
 
         // Simpan data baru ke database
         mahasiswaDao.insertAll(mahasiswaList)
+    }
+    suspend fun count(): Int{
+        return mahasiswaDao.count()
     }
 
     suspend fun isEmpty(): Boolean = mahasiswaDao.count() == 0

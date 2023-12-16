@@ -64,7 +64,7 @@ class ProfileViewModel(
         viewModelScope.launch {
             val idMhs: Long? = userRepository.idMhs
             combine(
-                idMhs?.let { mahasiswaStore.getMahasiwa(it) } ?: flowOf(null),
+                idMhs?.let { mahasiswaStore.getMahasiswa(it) } ?: flowOf(null),
                 refreshing,
             ) { mahasiswaDetail, refreshing ->
                 val provinsi: Provinsi? = mahasiswaDetail?.id?.let { provinsiId ->
@@ -93,7 +93,7 @@ class ProfileViewModel(
         viewModelScope.launch {
             try {
                 refreshing.value = true
-                mahasiswaRepository.refreshMahasiwa(force)
+                mahasiswaRepository.refreshMahasiswa(force)
                 // Handle the response
             } catch (e: Exception) {
                 // Handle the error

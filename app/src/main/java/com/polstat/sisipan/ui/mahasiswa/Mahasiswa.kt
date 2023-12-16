@@ -30,16 +30,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -51,35 +50,39 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.sisipan.R
 import com.polstat.sisipan.data.Mahasiswa
 import com.polstat.sisipan.data.Provinsi
+import com.polstat.sisipan.ui.createDummyMhs
+import com.polstat.sisipan.ui.theme.MinContrastOfPrimaryVsSurface
 import com.polstat.sisipan.ui.theme.SisipanTheme
 import com.polstat.sisipan.util.DynamicThemePrimaryColorsFromImage
 import com.polstat.sisipan.util.baselineHeight
+import com.polstat.sisipan.util.contrastAgainst
+import com.polstat.sisipan.util.rememberDominantColorState
 import com.polstat.sisipan.util.verticalGradientScrim
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun Mahasiswa(
@@ -96,6 +99,7 @@ fun Mahasiswa(
             modifier = Modifier.fillMaxSize(),
             onAccount,
             doRefresh = { viewModel.refresh(force = true) },
+            mahasiswaList = viewState.mahasiswa,
             )
     }
 }
@@ -110,17 +114,18 @@ fun MahasiswaAppBar(
     TopAppBar(
         title = {
                 Row {
-                    Image(
-                        painter = painterResource(R.drawable.ic_sisipan_logo),
-                        contentDescription = null,
-                        modifier = Modifier.clickable { openDrawer() }
-                    )
                     Icon(
-                        painter = painterResource(R.drawable.ic_text_logo),
+                        imageVector = Icons.Default.Menu,
                         contentDescription = stringResource(R.string.app_name),
                         modifier = Modifier
                             .padding(start = 4.dp)
                             .heightIn(max = 24.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+                    Image(
+                        painter = painterResource(R.drawable.logo),
+                        contentDescription = null,
+                        modifier = Modifier.clickable { openDrawer() }
                     )
                 }
         },
@@ -157,45 +162,59 @@ fun MahasiswaContent(
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
     onAccount: () -> Unit,
-    doRefresh: ()-> Unit,
-    ) {
+    doRefresh: () -> Unit,
+    mahasiswaList:List<MahasiswaCollection>,
+) {
     val state = rememberPullRefreshState(isRefreshing, doRefresh)
 
     Box(
-        modifier = modifier.windowInsetsPadding(
-            WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
-        )
-            .pullRefresh(state = state)
-            .verticalScroll(rememberScrollState())
+        modifier = modifier
+            .windowInsetsPadding(
+                WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
+            )
+            .windowInsetsPadding(
+                WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
+            )
     ) {
         // Scrim dan AppBar
-        DynamicThemePrimaryColorsFromImage {
-            Column(
-                modifier = Modifier
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalGradientScrim(
+                    color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
+                    startYPercentage = 1f,
+                    endYPercentage = 0f
+                )
+        ) {
+            // Draw a scrim over the status bar which matches the app bar
+            Spacer(
+                Modifier
+                    .background(MaterialTheme.colors.surface.copy(alpha = 0.87f))
                     .fillMaxWidth()
-                    .verticalGradientScrim(
-                        color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
-                        startYPercentage = 1f,
-                        endYPercentage = 0f
-                    )
-            ) {
-                // Draw a scrim over the status bar which matches the app bar
-                Spacer(
-                    Modifier
-                        .background(MaterialTheme.colors.surface.copy(alpha = 0.87f))
-                        .fillMaxWidth()
-                        .windowInsetsTopHeight(WindowInsets.statusBars)
-                )
+                    .windowInsetsTopHeight(WindowInsets.statusBars)
+            )
 
-                // AppBar dengan tombol navigasi dan ikon pengaturan
-                MahasiswaAppBar(
-                    openDrawer,
-                    backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.87f),
-                    modifier = Modifier.fillMaxWidth(),
-                    onAccount,
-                )
+            // AppBar dengan tombol navigasi dan ikon pengaturan
+            MahasiswaAppBar(
+                openDrawer,
+                backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.87f),
+                modifier = Modifier.fillMaxWidth(),
+                onAccount,
+            )
+
+            // LazyColumn dengan MahasiswaCard
+            LazyColumn(
+                modifier = Modifier
+                    .pullRefresh(state = state)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                items(mahasiswaList) { mahasiswa ->
+                    MahasiswaCard(mahasiswa)
+                }
             }
         }
+
+        // PullRefreshIndicator
         PullRefreshIndicator(
             refreshing = isRefreshing,
             state = state,
@@ -205,48 +224,105 @@ fun MahasiswaContent(
 }
 
 @Composable
-fun MahasiswaProperty(label: String, value: String, isLink: Boolean = false) {
-    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
-        Divider()
-        androidx.compose.material3.Text(
-            text = label,
-            modifier = Modifier.baselineHeight(24.dp),
-            style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
-            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        val style = if (isLink) {
-            androidx.compose.material3.MaterialTheme.typography.bodyLarge.copy(color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
-        } else {
-            androidx.compose.material3.MaterialTheme.typography.bodyLarge
+fun MahasiswaCard(userData: MahasiswaCollection) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+    ) {
+        Column {
+            NameAndNIM(userData)
+            MahasiswaProperty("Program Studi", userData.prodi)
+            MahasiswaProperty("Asal Daerah", userData.provinsi)
+            MahasiswaProperty("IPK", userData.ipk.toString())
         }
-        androidx.compose.material3.Text(
-            text = value.takeIf { it.isNotBlank() } ?: "Not Available",
-            modifier = Modifier.baselineHeight(24.dp),
-            style = style
-        )
     }
 }
 @Composable
-private fun NameAndEmail(
-    userData: Mahasiswa,
-    email:String,
-) {
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-        Name(
-            userData,
-            modifier = Modifier.baselineHeight(32.dp)
-        )
-        Email(
-            email,
+fun MahasiswaProperty(label: String, value: Any, isLink: Boolean = false) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp, 2.dp)
+    ) {
+        // Label
+        Text(
+            text = "$label:",
+            style = MaterialTheme.typography.body1,
+            color = MaterialTheme.colors.onSurface,
             modifier = Modifier
-                .padding(bottom = 20.dp)
-                .baselineHeight(24.dp)
+                .weight(1f)
+                .align(Alignment.CenterVertically)
         )
+
+        // Value
+        when (value) {
+            is String -> {
+                Text(
+                    text = value.takeIf { it.isNotBlank() } ?: "Not Available",
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterVertically)
+                )
+            }
+            is Flow<*> -> {
+                val flowValue by value.collectAsState(initial = null)
+                when (flowValue) {
+                    is Provinsi -> {
+                        Text(
+                            text = (flowValue as Provinsi).namaProvinsi,
+                            style = MaterialTheme.typography.body2,
+                            modifier = Modifier
+                                .weight(1f)
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+                    else -> {
+                        Text(
+                            text = "Not Available",
+                            style = MaterialTheme.typography.body2,
+                            modifier = Modifier
+                                .weight(1f)
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+                }
+            }
+            else -> {
+                Text(
+                    text = "Not Available",
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterVertically)
+                )
+            }
+        }
     }
 }
 
+
 @Composable
-private fun Name(userData: Mahasiswa, modifier: Modifier = Modifier) {
+private fun NameAndNIM(
+    userData: MahasiswaCollection,
+) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Name(userData)
+        Divider(
+            color = Color.Black,
+            thickness = 3.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 1.dp)
+        )
+        NIM(userData, modifier = Modifier.padding(bottom = 4.dp))
+    }
+
+}
+
+@Composable
+private fun Name(userData: MahasiswaCollection, modifier: Modifier = Modifier) {
     Text(
         text = userData.name,
         modifier = modifier,
@@ -255,9 +331,9 @@ private fun Name(userData: Mahasiswa, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun Email(email: String, modifier: Modifier = Modifier) {
+private fun NIM(userData: MahasiswaCollection, modifier: Modifier = Modifier) {
     Text(
-        text = email,
+        text = userData.nim,
         modifier = modifier,
         style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
         color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
@@ -266,21 +342,14 @@ private fun Email(email: String, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun MahasiswaContentPreview() {
-    val fakeMahasiswa = Mahasiswa(
-        name = "John Doe",
-        nim = "123456789",
-        prodi = "Computer Science",
-        ipk = 3.4f,
-        provinsiId = 2,
-    )
+    val dummy = createDummyMhs()
+    val dummyMhsList = remember {dummy}
 
-    SisipanTheme {
-        MahasiswaContent(
-            openDrawer = {},
-            isRefreshing = false,
-            modifier = Modifier.fillMaxSize(),
-            onAccount = {},
-            doRefresh = {  },
-            )
-    }
+    MahasiswaContent(
+        openDrawer = {},
+        isRefreshing = false,
+        onAccount = {},
+        doRefresh = {},
+        mahasiswaList = dummyMhsList,
+    )
 }

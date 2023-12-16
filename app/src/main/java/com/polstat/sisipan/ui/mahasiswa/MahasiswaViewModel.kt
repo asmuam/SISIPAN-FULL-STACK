@@ -58,7 +58,7 @@ class MahasiswaViewModel(
                 mahasiswaStore.getAll(),
                 refreshing,
             ) { mahasiswaCollection, refreshing ->
-                val mappedMahasiwaList = mahasiswaCollection.map { mhs ->
+                val mappedMahasiswaList = mahasiswaCollection.map { mhs ->
                     val prov = provinsiStore.getById(mhs.provinsiId)
                 MahasiswaCollection(
                     id = mhs.id,
@@ -72,7 +72,7 @@ class MahasiswaViewModel(
                 MahasiswaViewState(
                     role = userRepository.role,
                     email = userRepository.email,
-                    mahasiswa = mappedMahasiwaList,
+                    mahasiswa = mappedMahasiswaList,
                     refreshing = refreshing,
                     errorMessage = null /* TODO */,
                 )
@@ -89,7 +89,7 @@ class MahasiswaViewModel(
         viewModelScope.launch {
             try {
                 refreshing.value = true
-                mahasiswaRepository.refreshMahasiwa(force)
+                mahasiswaRepository.refreshMahasiswa(force)
                 // Handle the response
             } catch (e: Exception) {
                 // Handle the error

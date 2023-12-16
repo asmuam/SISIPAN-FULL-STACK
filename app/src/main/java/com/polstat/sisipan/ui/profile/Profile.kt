@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.shape.CircleShape
@@ -48,6 +49,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Divider
@@ -80,6 +83,7 @@ fun Profile(
     openDrawer: () -> Unit,
     viewModel: ProfileViewModel = viewModel(),
     onAccount: ()-> Unit,
+    navigateBack:()-> Unit,
     ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -96,6 +100,7 @@ fun Profile(
             onEditProfilePhoto = {
                 viewModel.editProfilePhoto(context)
             },
+            navigateBack =navigateBack,
         )
     }
 }
@@ -106,43 +111,31 @@ fun ProfileAppBar(
     backgroundColor: Color,
     modifier: Modifier = Modifier,
     onAccount: ()-> Unit,
+    navigateBack:()-> Unit,
     ) {
     TopAppBar(
         title = {
                 Row {
-                    Image(
-                        painter = painterResource(R.drawable.ic_sisipan_logo),
-                        contentDescription = null,
-                        modifier = Modifier.clickable { openDrawer() }
-                    )
                     Icon(
-                        painter = painterResource(R.drawable.ic_text_logo),
+                        imageVector = Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.app_name),
                         modifier = Modifier
                             .padding(start = 4.dp)
                             .heightIn(max = 24.dp)
+                            .clickable {navigateBack()}
+                            .align(Alignment.CenterVertically)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Image(
+                        painter = painterResource(R.drawable.logo),
+                        contentDescription = null,
+                        modifier = Modifier.clickable { openDrawer() }
                     )
                 }
         },
         backgroundColor = backgroundColor,
         actions = {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                IconButton(
-                    onClick = { /* TODO: Open search */ }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Search,
-                        contentDescription = stringResource(R.string.cd_search)
-                    )
-                }
-                IconButton(
-                    onClick = { onAccount }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = stringResource(R.string.cd_account)
-                    )
-                }
             }
         },
         modifier = modifier
@@ -160,8 +153,9 @@ fun ProfileContent(
     email: String,
     provinsi: Provinsi?,
     onAccount: () -> Unit,
-    onEditProfilePhoto: () -> Unit
-) {
+    onEditProfilePhoto: () -> Unit,
+    navigateBack:()-> Unit,
+    ) {
     Column(
         modifier = modifier.windowInsetsPadding(
             WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
@@ -192,6 +186,7 @@ fun ProfileContent(
                     backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.87f),
                     modifier = Modifier.fillMaxWidth(),
                     onAccount,
+                    navigateBack=navigateBack,
                 )
             }
         }
@@ -344,7 +339,8 @@ fun ProfileContentPreview() {
             email = "john.doe@example.com",
             onAccount = {},
             onEditProfilePhoto = {},
-            provinsi = Provinsi(1,"12","jkk")
+            provinsi = Provinsi(1,"12","jkk"),
+            navigateBack ={},
         )
     }
 }

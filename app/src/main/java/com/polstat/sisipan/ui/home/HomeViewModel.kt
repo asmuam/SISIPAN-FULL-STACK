@@ -22,6 +22,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
 import com.polstat.sisipan.Graph.pilihanStore
+import com.polstat.sisipan.data.MahasiswaRepository
+import com.polstat.sisipan.data.MahasiswaStore
 import com.polstat.sisipan.data.PilihanRepository
 import com.polstat.sisipan.data.PilihanStore
 import com.polstat.sisipan.data.ProvinsiRepository
@@ -36,7 +38,9 @@ class HomeViewModel(
     private val userRepository: UserRepository = Graph.userRepository,
     private val pilihanRepository: PilihanRepository = Graph.pilihanRepository,
     private val pilihanStore: PilihanStore = Graph.pilihanStore,
+    private val mahasiswaStore: MahasiswaStore = Graph.mahasiswaStore,
     private val provinsiRepository: ProvinsiRepository = Graph.provinsiRepository,
+    private val mahasiswaRepository: MahasiswaRepository = Graph.mahasiswaRepository,
 ) : ViewModel() {
 
     // Holds our view state which the UI collects via [state]
@@ -56,6 +60,7 @@ class HomeViewModel(
                 HomeViewState(
                     role = userRepository.role,
                     mahasiswaMemilih = pilihanStore.count(),
+                    jmlhMhs = mahasiswaStore.count(),
                     refreshing = refreshingValue.get(0) ,
                     errorMessage = null /* TODO */
                 )
@@ -74,7 +79,8 @@ class HomeViewModel(
             runCatching {
                 refreshing.value = true
                 pilihanRepository.refreshPilihan(force)
-                provinsiRepository.refreshrovinsi(force)
+                provinsiRepository.refreshProvinsi(force)
+                mahasiswaRepository.refreshMahasiswa(force)
             }
             // TODO: handle result and show any errors
 
@@ -91,6 +97,7 @@ class HomeViewModel(
 data class HomeViewState(
     val role: String? = null,
     val mahasiswaMemilih: Int = 0,
+    val jmlhMhs: Int = 0,
     val refreshing: Boolean = false,
     val errorMessage: String? = null
 )

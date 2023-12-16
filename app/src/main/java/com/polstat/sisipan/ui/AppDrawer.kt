@@ -21,11 +21,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Apartment
+import androidx.compose.material.icons.filled.BookmarkAdd
+import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -50,12 +55,14 @@ fun AppDrawer(
     navigateToHome: () -> Unit,
     navigateToFormasi: () -> Unit,
     navigateToWelcome: () -> Unit,
+    navigateToMahasiswa: () -> Unit,
+    navigateToPilihan: () -> Unit,
     closeDrawer: () -> Unit,
     deleteUser: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ModalDrawerSheet(modifier) {
-        JetNewsLogo(
+        SisipanLogo(
             modifier = Modifier.padding(horizontal = 28.dp, vertical = 24.dp)
         )
         NavigationDrawerItem(
@@ -68,9 +75,25 @@ fun AppDrawer(
         Spacer(Modifier.height(8.dp))
         NavigationDrawerItem(
             label = { Text(stringResource(id = R.string.formasi_title)) },
-            icon = { Icon(Icons.Filled.Groups, null) },
+            icon = { Icon(Icons.Filled.Apartment, null) },
             selected = currentRoute == Screen.Formasi.route,
             onClick = { navigateToFormasi(); closeDrawer() },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+        )
+        Spacer(Modifier.height(8.dp))
+        NavigationDrawerItem(
+            label = { Text(stringResource(id = R.string.mahasiswa_title)) },
+            icon = { Icon(Icons.Filled.Groups, null) },
+            selected = currentRoute == Screen.Mahasiswa.route,
+            onClick = { navigateToMahasiswa(); closeDrawer() },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+        )
+        Spacer(Modifier.height(8.dp))
+        NavigationDrawerItem(
+            label = { Text(stringResource(id = R.string.pilihan_title)) },
+            icon = { Icon(Icons.Filled.BookmarkAdd, null) },
+            selected = currentRoute == Screen.Pilihan.route,
+            onClick = { navigateToPilihan(); closeDrawer() },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         Spacer(Modifier.height(8.dp))
@@ -90,12 +113,12 @@ fun AppDrawer(
 
 
 @Composable
-private fun JetNewsLogo(modifier: Modifier = Modifier) {
+private fun SisipanLogo(modifier: Modifier = Modifier) {
     Row(modifier = modifier) {
         Icon(
-            painterResource(R.drawable.ic_sisipan_logo),
+            imageVector = Icons.Filled.Dashboard,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary
+            modifier = Modifier.size(24.dp),
         )
         Spacer(Modifier.width(8.dp))
         Text(text = "SISIPAN")
@@ -112,6 +135,8 @@ fun PreviewAppDrawer() {
             navigateToHome = {},
             navigateToFormasi = {},
             navigateToWelcome = {},
+            navigateToMahasiswa = {},
+            navigateToPilihan = {},
             deleteUser = {},
             closeDrawer = { }
         )

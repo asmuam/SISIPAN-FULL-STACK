@@ -18,18 +18,16 @@ class MahasiswaRepository(
 
     private val scope = CoroutineScope(mainDispatcher)
 
-    suspend fun refreshMahasiwa(force: Boolean) {
+    suspend fun refreshMahasiswa(force: Boolean) {
         if (refreshingJob?.isActive == true) {
             refreshingJob?.join()
         } else if (force || mahasiswaStore.isEmpty()) {
             refreshingJob = scope.launch {
                 transactionRunner {
-                    Log.e("repomhs", "cek")
                     // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
-                        Log.e("repomhs", "ambil")
                         val mahasiswaList = mahasiswaService.getAll().data
                         mahasiswaList?.let {
-                            mahasiswaStore.saveMahasiwaList(it)
+                            mahasiswaStore.saveMahasiswaList(it)
                     }
                 }
 

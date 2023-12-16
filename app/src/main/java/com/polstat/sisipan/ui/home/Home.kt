@@ -21,7 +21,9 @@ package com.polstat.sisipan.ui.home
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,11 +36,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
@@ -50,10 +55,15 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -63,7 +73,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.sisipan.R
@@ -73,6 +86,9 @@ import com.polstat.sisipan.util.DynamicThemePrimaryColorsFromImage
 import com.polstat.sisipan.util.contrastAgainst
 import com.polstat.sisipan.util.rememberDominantColorState
 import com.polstat.sisipan.util.verticalGradientScrim
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 
 @Composable
 fun Home(
@@ -105,31 +121,24 @@ fun HomeAppBar(
     TopAppBar(
         title = {
                 Row {
-                    Image(
-                        painter = painterResource(R.drawable.ic_sisipan_logo),
-                        contentDescription = null,
-                        modifier = Modifier.clickable { openDrawer() }
-                    )
                     Icon(
-                        painter = painterResource(R.drawable.ic_text_logo),
+                        imageVector = Icons.Default.Menu,
                         contentDescription = stringResource(R.string.app_name),
                         modifier = Modifier
                             .padding(start = 4.dp)
                             .heightIn(max = 24.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+                    Image(
+                        painter = painterResource(R.drawable.logo),
+                        contentDescription = null,
+                        modifier = Modifier.clickable { openDrawer() }
                     )
                 }
         },
         backgroundColor = backgroundColor,
         actions = {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                IconButton(
-                    onClick = { /* TODO: Open search */ }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Search,
-                        contentDescription = stringResource(R.string.cd_search)
-                    )
-                }
                 IconButton(
                     onClick = { onAccount() }
                 ) {
@@ -146,6 +155,7 @@ fun HomeAppBar(
 
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeContent(
     openDrawer: () -> Unit,
@@ -205,28 +215,133 @@ fun HomeContent(
             }
             when (viewState.role) {
                 "ADMIN" -> {
-                    Box(modifier = Modifier) {
-                        Column {
-                            Text(text = "INI HOME UNTUK ADMIN")
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(text = "Mahasiswa yang telah memilih : ${viewState.mahasiswaMemilih}")
-                        }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(16.dp)
+                            .border(2.dp, Color.Gray, shape = RoundedCornerShape(16.dp))
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        ) {
+                            // Header with timestamp
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "INI HOME UNTUK ADMIN",
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "Last Updated: ${getCurrentTimestamp()}",
+                                    fontSize = 12.sp,
+                                    color = Color.Gray
+                                )
+                            }
 
+                            // Content
+                            Text(
+                                text = "Mahasiswa yang telah memilih : ${viewState.mahasiswaMemilih}/${viewState.jmlhMhs}",
+                                fontSize = 18.sp,
+                                color = Color.Black
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Additional creative content
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(120.dp)
+                                    .padding(16.dp)
+                                    .background(MaterialTheme.colorScheme.background), // Customize the background color
+                                shape = RoundedCornerShape(8.dp),
+                                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary),// Customize the corner radius
+                                elevation = cardElevation(4.dp) // Add elevation for a shadow effect
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_launcher_foreground),
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(40.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Text(
+                                        text = "Lakukan Penempatan",
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
 
                 "MAHASISWA" -> {
-                    Box(modifier = Modifier) {
-                        Column {
-                            Text(text = "INI HOME UNTUK MAHASISWA")
-                            Spacer(modifier = Modifier.height(8.dp))
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        ) {
                             Text(
-                                text = "MEMILIH SEKARANG",
-                                modifier = Modifier.clickable { /* Handle click event */ }
+                                text = "INI HOME UNTUK MAHASISWA",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
                             )
-                        }
+                            Spacer(modifier = Modifier.height(8.dp))
 
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(60.dp)
+                                    .clickable { /* Handle click event */ }
+                                    .background(MaterialTheme.colorScheme.surface),
+                                shape = RoundedCornerShape(8.dp), // Customize the corner radius
+                                elevation = cardElevation(4.dp) // Add elevation for a shadow effect
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    // You can customize the icon and text based on your design
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_launcher_foreground),
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(40.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Text(
+                                        text = "MEMILIH SEKARANG",
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
+                            }
+                        }
                     }
+
                 }
             }
         }
@@ -236,6 +351,58 @@ fun HomeContent(
             modifier = Modifier.align(Alignment.TopCenter)
         )
     }
-
 }
 
+@Composable
+fun getCurrentTimestamp(): String {
+    val currentDateTime = LocalDateTime.now()
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    return currentDateTime.format(formatter)
+}
+@Composable
+fun HomeAdminPreview() {
+    MaterialTheme {
+        Surface(Modifier.fillMaxSize()) {
+        HomeContent(
+            openDrawer = {},
+            isRefreshing = false,
+            modifier = Modifier.fillMaxSize(),
+            onAccount = {},
+            viewState = HomeViewState(role = "ADMIN", mahasiswaMemilih = 2, jmlhMhs =40),
+            doRefresh = {}
+        )
+    }
+    }
+}
+
+@Preview(name = "Home Preview - ADMIN")
+@Composable
+fun HomeAdminPreviewPreview() {
+    MaterialTheme {
+        HomeAdminPreview()
+    }
+}
+
+@Composable
+fun HomeMahasiswaPreview() {
+    MaterialTheme {
+        Surface(Modifier.fillMaxSize()) {
+        HomeContent(
+            openDrawer = {},
+            isRefreshing = false,
+            modifier = Modifier.fillMaxSize(),
+            onAccount = {},
+            viewState = HomeViewState(role = "MAHASISWA", mahasiswaMemilih = 21, jmlhMhs =44),
+            doRefresh = {}
+        )
+    }
+    }
+}
+
+@Preview(name = "Home Preview - MAHASISWA")
+@Composable
+fun HomeMahasiswaPreviewPreview() {
+    MaterialTheme {
+        HomeMahasiswaPreview()
+    }
+}

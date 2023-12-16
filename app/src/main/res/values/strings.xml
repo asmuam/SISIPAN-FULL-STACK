@@ -56,8 +56,7 @@
     <string name="cd_not_following">Not following</string>
     <string name="home_title">Home</string>
 
-    //signin
-    <string name="app_tagline">Better surveys with Jetpack Compose</string>
+    <string name="app_tagline">Penempatan yang Transparan dengan Aplikasi SISIPAN </string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm password</string>
@@ -96,6 +95,8 @@
     <string name="kuota_st_req">Kuota Prodi D4 Statistik*</string>
     <string name="kuota_d3_req">Kuota Prodi D3 Statistik*</string>
     <string name="required_fields">*required fields</string>
+    <string name="mahasiswa_title">Mahasiswa</string>
+    <string name="pilihan_title">Pilihan</string>
 
 
 </resources>

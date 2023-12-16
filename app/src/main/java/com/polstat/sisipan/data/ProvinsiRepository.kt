@@ -20,7 +20,7 @@ class ProvinsiRepository(
 
     private val scope = CoroutineScope(mainDispatcher)
 
-    suspend fun refreshrovinsi(force: Boolean) {
+    suspend fun refreshProvinsi(force: Boolean) {
         if (refreshingJob?.isActive == true) {
             refreshingJob?.join()
         } else if (force || provinsiStore.isEmpty()) {
