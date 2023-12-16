@@ -55,9 +55,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -275,7 +273,7 @@ fun HomeContent(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
-                                        painter = painterResource(R.drawable.ic_launcher_foreground),
+                                        painter = painterResource(R.drawable.ic_jetnews),
                                         contentDescription = null,
                                         tint = Color.White,
                                         modifier = Modifier.size(40.dp)
@@ -337,7 +335,7 @@ fun HomeContent(
                                 ) {
                                     // You can customize the icon and text based on your design
                                     Icon(
-                                        painter = painterResource(R.drawable.ic_launcher_foreground),
+                                        painter = painterResource(R.drawable.ic_jetnews),
                                         contentDescription = null,
                                         tint = Color.White,
                                         modifier = Modifier.size(40.dp)
