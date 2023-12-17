@@ -5,6 +5,7 @@ import com.polstat.sisipan.data.Mahasiswa
 import com.polstat.sisipan.data.Pilihan
 import com.polstat.sisipan.data.Provinsi
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
@@ -33,6 +34,9 @@ interface FormasiService {
     @Headers("Content-Type: application/json")
     @PUT("formasi/{id}")
     suspend fun ubah(@Path ("id") id:Long, @Body request: Formasi): ApiResponse<Formasi>
+    @Headers("Content-Type: application/json")
+    @DELETE("formasi/{id}")
+    suspend fun delete(@Path ("id") id:Long): ApiResponse<String>
 }
 
 interface ProvinsiService {
@@ -73,5 +77,9 @@ interface MahasiswaService {
     @Headers("Content-Type: application/json")
     @GET("mahasiswa/{id}")
     suspend fun getById(@Path("id") id: Long): ApiResponse<Mahasiswa>
+
+    @Headers("Content-Type: application/json")
+    @POST("mahasiswa")
+    suspend fun insert(@Body request: Mahasiswa): ApiResponse<Mahasiswa>
 
 }

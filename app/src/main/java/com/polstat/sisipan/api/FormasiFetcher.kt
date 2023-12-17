@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.Objects
 
 class FormasiFetcher(
     private val okHttpClient: OkHttpClient,
@@ -37,6 +38,12 @@ class FormasiFetcher(
     override suspend fun ubah(id: Long, request: Formasi): ApiResponse<Formasi> {
         return withContext(ioDispatcher) {
             formasiService.ubah(id, request)
+        }
+    }
+
+    override suspend fun delete(id: Long): ApiResponse<String> {
+        return withContext(ioDispatcher) {
+            formasiService.delete(id)
         }
     }
 }

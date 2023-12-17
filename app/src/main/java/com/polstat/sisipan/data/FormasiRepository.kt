@@ -53,7 +53,10 @@ class FormasiRepository(
                 refreshFormasi(force = true)
             } else {
                 // Handle kesalahan jika diperlukan
-                Log.e("FormasiRepository", "Failed to insert formasi. Response: ${response.message}")
+                Log.e(
+                    "FormasiRepository",
+                    "Failed to insert formasi. Response: ${response.message}"
+                )
             }
         } catch (e: Exception) {
             // Handle exception jika terjadi kesalahan dalam komunikasi dengan server
@@ -72,11 +75,35 @@ class FormasiRepository(
                 refreshFormasi(force = true)
             } else {
                 // Handle kesalahan jika diperlukan
-                Log.e("PILIHANREPOResponse", "Failed to insert pilihan. Response: ${response.message}")
+                Log.e(
+                    "PILIHANREPOResponse",
+                    "Failed to insert pilihan. Response: ${response.message}"
+                )
             }
         } catch (e: Exception) {
             // Handle exception jika terjadi kesalahan dalam komunikasi dengan server atau operasi penyimpanan
             Log.e("PILIHANREPO", "Error inserting pilihan", e)
+        }
+    }
+
+    fun deleteFormasi(id: Long) {
+        scope.launch {
+            try {
+                val response = formasiService.delete(id)
+                if (response.httpStatusCode == 200) {
+                    // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
+                    refreshFormasi(force = true)
+                } else {
+                    // Handle kesalahan jika diperlukan
+                    Log.e(
+                        "FormasiRepository",
+                        "Failed to delete formasi. Response: ${response.message}"
+                    )
+                }
+            } catch (e: Exception) {
+                // Handle exception jika terjadi kesalahan dalam komunikasi dengan server
+                Log.e("FormasiRepository", "Error inserting formasi", e)
+            }
         }
     }
 }

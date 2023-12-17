@@ -1,5 +1,6 @@
 package com.polstat.sisipan.api
 
+import com.polstat.sisipan.data.Formasi
 import com.polstat.sisipan.data.Mahasiswa
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -31,6 +32,12 @@ class MahasiswaFetcher(
     override suspend fun getById(id: Long): ApiResponse<Mahasiswa> {
         return withContext(ioDispatcher) {
             mahasiswaService.getById(id)
+        }
+    }
+
+    override suspend fun insert(request: Mahasiswa): ApiResponse<Mahasiswa> {
+        return withContext(ioDispatcher) {
+            mahasiswaService.insert(request)
         }
     }
 }

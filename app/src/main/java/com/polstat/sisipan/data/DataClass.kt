@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.coroutines.flow.Flow
-import java.util.Date
 
 // Kotlin data class for Mahasiswa entity
 @Entity(tableName = "mahasiswa")
@@ -68,3 +67,10 @@ data class PilihanNested(
     val ipk: Float,
     val hasil: String?
 )
+enum class Prodi(val id: String?, val label: String) {
+    D4_KS("1", "DIV-Komputasi Statistik"),
+    D4_ST("2", "DIV-Statistika"),
+    D3_ST("3", "DIII-Statistik")
+}
+
+val prodiList = listOf(Prodi.D4_KS, Prodi.D4_ST, Prodi.D3_ST)

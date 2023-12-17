@@ -16,11 +16,11 @@
 
 package com.polstat.sisipan.ui.formasi
 
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -53,6 +53,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -81,6 +82,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.sisipan.R
 import com.polstat.sisipan.data.Formasi
+import com.polstat.sisipan.data.UserRepository.role
 import com.polstat.sisipan.ui.formasiDummy
 import com.polstat.sisipan.ui.theme.MinContrastOfPrimaryVsSurface
 import com.polstat.sisipan.util.DynamicThemePrimaryColorsFromImage
@@ -104,6 +106,7 @@ fun FormasiPrev() {
         role = "ADMIN", // Provide a dummy role for the preview
         navigateToAddFormasi = {},
         doRefresh = {  },
+        deleteFormasi = {},
         )
 }
 
@@ -132,7 +135,8 @@ fun Formasi(
                 role = viewState.role,
                 navigateToAddFormasi = navigateToAddFormasi,
                 doRefresh = { viewModel.refresh(force = true) },
-            )
+                deleteFormasi = {viewModel.deleteFormasi(it.id)},
+                )
         }
         if(viewState.role=="MAHASISWA"){
             FormasiContent(
@@ -146,7 +150,8 @@ fun Formasi(
                 role = viewState.role,
                 navigateToAddFormasi = navigateToAddFormasi,
                 doRefresh = { viewModel.refresh(force = true) },
-            )
+                deleteFormasi = {},
+                )
         }
     }
 }
@@ -215,7 +220,8 @@ fun FormasiContent(
     role: String,
     navigateToAddFormasi: () -> Unit,
     doRefresh: () -> Unit,
-) {
+    deleteFormasi : (Formasi) -> Unit,
+    ) {
     val state = rememberPullRefreshState(isRefreshing, doRefresh)
     val surfaceColor = MaterialTheme.colors.surface
     val appBarColor = surfaceColor.copy(alpha = 0.87f)
@@ -319,6 +325,7 @@ fun FormasiContent(
                                 FormasiCard(
                                     formasi = formasi,
                                     onItemClick = {onFormasiClick(formasi)},
+                                    deleteFormasi = {deleteFormasi(it)},
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                             }
@@ -354,7 +361,8 @@ fun FormasiContent(
                                 FormasiCard(
                                     formasi = formasi,
                                     onItemClick = {onFormasiClick(formasi)},
-                                )
+                                    deleteFormasi = {deleteFormasi(it)},
+                                    )
                                 Spacer(modifier = Modifier.height(4.dp))
                             }
                         }
@@ -377,6 +385,7 @@ fun FormasiContent(
 fun FormasiCard(
     formasi: Formasi,
     onItemClick: (Formasi) -> Unit,
+    deleteFormasi:(Formasi) -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -388,31 +397,48 @@ fun FormasiCard(
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            Text(text = formasi.namaSatuanKerja, style = MaterialTheme.typography.h6)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Kuota St: ")
-                    }
-                    append("${formasi.kuotaSt}")
-                    append("   ")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Informasi formasi
+                Column {
+                    Text(text = formasi.namaSatuanKerja, style = MaterialTheme.typography.h6)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("Kuota St: ")
+                            }
+                            append("${formasi.kuotaSt}")
+                            append("   ")
 
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Kuota Ks: ")
-                    }
-                    append("${formasi.kuotaKs}")
-                    append("   ")
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("Kuota Ks: ")
+                            }
+                            append("${formasi.kuotaKs}")
+                            append("   ")
 
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Kuota D3: ")
-                    }
-                    append("${formasi.kuotaD3}")
-                },
-                style = MaterialTheme.typography.body2,
-                color = MaterialTheme.colors.onSurface
-            )
-            // Tambahkan informasi lainnya sesuai kebutuhan
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("Kuota D3: ")
+                            }
+                            append("${formasi.kuotaD3}")
+                        },
+                        style = MaterialTheme.typography.body2,
+                        color = MaterialTheme.colors.onSurface
+                    )
+                }
+
+                // Icon delete
+                if (role!="MAHASISWA") {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = Color.Red,
+                        modifier = Modifier.clickable { deleteFormasi(formasi) }
+                    )
+                }
+            }
         }
     }
 }

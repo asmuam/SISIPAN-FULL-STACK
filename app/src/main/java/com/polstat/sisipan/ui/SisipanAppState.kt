@@ -45,6 +45,7 @@ sealed class Screen(val route: String) {
 
     }
     object Mahasiswa : Screen("mahasiswa")
+    object AddMahasiswa : Screen("addMahasiswa")
     object Pilihan : Screen("pilihan")
     object AddPilihan : Screen("addPilihan")
     object PilihanEdit : Screen("editpilihan"){

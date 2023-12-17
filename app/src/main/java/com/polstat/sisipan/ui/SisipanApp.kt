@@ -198,7 +198,8 @@ fun SisipanApp(
                                 onAccount = {
                                     navController.navigate("profil")
                                 },
-                            )
+                                navigateToAddMahasiswa = {navController.navigate("addMahasiswa")},
+                                )
                         }
                         composable(Screen.Profil.route) { backStackEntry ->
                             Profile(

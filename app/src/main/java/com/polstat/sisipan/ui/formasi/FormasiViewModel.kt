@@ -46,14 +46,13 @@ class FormasiViewModel(
 
     init {
         viewModelScope.launch {
-            Log.d("FormasiViewModel", "Start collecting data...")
+            refresh(force = false)
 
             combine(
                 formasiStore.formasiBuka(),
                 formasiStore.formasiTutup(),
                 refreshing
             ) { formasiBukaList, formasiTutupList, refreshing ->
-                Log.d("FormasiViewModel", "Data collected - formasiBukaList size: ${formasiBukaList.size}, formasiTutupList size: ${formasiTutupList.size}, refreshing: $refreshing")
 
                 FormasiViewState(
                     role = userRepository.role ?: "",
@@ -70,21 +69,34 @@ class FormasiViewModel(
                 _state.value = it
             }
         }
-
-        Log.d("FormasiViewModel", "Calling refresh...")
-        refresh(force = false)
     }
 
     fun refresh(force: Boolean) {
         viewModelScope.launch {
             try {
-                Log.d("FormasiViewModel", "Refreshing data...")
                 refreshing.value = true
                 formasiRepository.refreshFormasi(force)
                 Log.d("FormasiViewModel", "Data refreshed successfully")
                 // Handle the response
             } catch (e: Exception) {
                 Log.e("FormasiViewModel", "Error refreshing formasi", e)
+                // Handle the error
+            } finally {
+                refreshing.value = false
+            }
+        }
+    }
+    fun deleteFormasi(id: Long) {
+        viewModelScope.launch {
+            try {
+                refreshing.value = true
+                formasiRepository.deleteFormasi(id)
+                // Jangan lupa untuk mereset nilai refreshing setelah berhasil menghapus formasi
+                refreshing.value = false
+                // Refresh view state setelah menghapus formasi
+                refresh(false)
+            } catch (e: Exception) {
+                Log.e("FormasiViewModel", "Error deleting formasi", e)
                 // Handle the error
             } finally {
                 refreshing.value = false

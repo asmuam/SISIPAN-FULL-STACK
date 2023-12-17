@@ -17,6 +17,7 @@
 package com.polstat.sisipan.ui.mahasiswa
 
 import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -51,6 +52,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -58,6 +60,8 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -75,6 +79,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.sisipan.R
 import com.polstat.sisipan.data.Mahasiswa
 import com.polstat.sisipan.data.Provinsi
+import com.polstat.sisipan.data.UserRepository.role
 import com.polstat.sisipan.ui.createDummyMhs
 import com.polstat.sisipan.ui.theme.MinContrastOfPrimaryVsSurface
 import com.polstat.sisipan.ui.theme.SisipanTheme
@@ -91,6 +96,7 @@ fun Mahasiswa(
     openDrawer: () -> Unit,
     viewModel: MahasiswaViewModel = viewModel(),
     onAccount: ()-> Unit,
+    navigateToAddMahasiswa: () -> Unit,
     ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
 
@@ -102,6 +108,7 @@ fun Mahasiswa(
             onAccount,
             doRefresh = { viewModel.refresh(force = true) },
             mahasiswaList = viewState.mahasiswa,
+            navigateToAddMahasiswa =navigateToAddMahasiswa,
             )
     }
 }
@@ -167,9 +174,15 @@ fun MahasiswaContent(
     onAccount: () -> Unit,
     doRefresh: () -> Unit,
     mahasiswaList:List<MahasiswaCollection>,
-) {
+    navigateToAddMahasiswa: () -> Unit,
+    ) {
     val state = rememberPullRefreshState(isRefreshing, doRefresh)
-
+    val surfaceColor = MaterialTheme.colors.surface
+    val appBarColor = surfaceColor.copy(alpha = 0.87f)
+    val dominantColorState = rememberDominantColorState { color ->
+        // We want a color which has sufficient contrast against the surface color
+        color.contrastAgainst(surfaceColor) >= MinContrastOfPrimaryVsSurface
+    }
     Box(
         modifier = modifier
             .windowInsetsPadding(
@@ -179,44 +192,76 @@ fun MahasiswaContent(
                 WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
             )
     ) {
-        // Scrim dan AppBar
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalGradientScrim(
-                    color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
-                    startYPercentage = 1f,
-                    endYPercentage = 0f
-                )
-        ) {
-            // Draw a scrim over the status bar which matches the app bar
-            Spacer(
-                Modifier
-                    .background(MaterialTheme.colors.surface.copy(alpha = 0.87f))
-                    .fillMaxWidth()
-                    .windowInsetsTopHeight(WindowInsets.statusBars)
-            )
+        Scaffold (
+            topBar = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalGradientScrim(
+                            color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
+                            startYPercentage = 1f,
+                            endYPercentage = 0f
+                        )
+                ) {
+                    // Draw a scrim over the status bar which matches the app bar
+                    Spacer(
+                        Modifier
+                            .background(MaterialTheme.colors.surface.copy(alpha = 0.87f))
+                            .fillMaxWidth()
+                            .windowInsetsTopHeight(WindowInsets.statusBars)
+                    )
 
-            // AppBar dengan tombol navigasi dan ikon pengaturan
-            MahasiswaAppBar(
-                openDrawer,
-                backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.87f),
-                modifier = Modifier.fillMaxWidth(),
-                onAccount,
-            )
-
-            // LazyColumn dengan MahasiswaCard
-            LazyColumn(
-                modifier = Modifier
-                    .pullRefresh(state = state)
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            ) {
-                items(mahasiswaList) { mahasiswa ->
-                    MahasiswaCard(mahasiswa)
+                    // AppBar dengan tombol navigasi dan ikon pengaturan
+                    MahasiswaAppBar(
+                        openDrawer,
+                        backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.87f),
+                        modifier = Modifier.fillMaxWidth(),
+                        onAccount,
+                    )
+                }
+            },
+            floatingActionButton = {
+                if (role.equals("ADMIN", ignoreCase = true)) {
+                FloatingActionButton(
+                    onClick = {
+                        navigateToAddMahasiswa()
+                    },
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .animateContentSize()
+                        .background(Color.Transparent)
+                ) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add Formasi")
                 }
             }
-        }
-
+            },
+            content = { innerPadding ->
+                // Scrim dan AppBar
+                Column(
+                    modifier = modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                        .verticalGradientScrim(
+                            color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
+                            startYPercentage = 1f,
+                            endYPercentage = 0f
+                        )
+                ) {
+                    DynamicThemePrimaryColorsFromImage(dominantColorState) {
+                        // LazyColumn dengan MahasiswaCard
+                        LazyColumn(
+                            modifier = Modifier
+                                .pullRefresh(state = state)
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            items(mahasiswaList) { mahasiswa ->
+                                MahasiswaCard(mahasiswa)
+                            }
+                        }
+                    }
+                }
+            }
+        )
         // PullRefreshIndicator
         PullRefreshIndicator(
             refreshing = isRefreshing,
@@ -354,5 +399,6 @@ fun MahasiswaContentPreview() {
         onAccount = {},
         doRefresh = {},
         mahasiswaList = dummyMhsList,
-    )
+        navigateToAddMahasiswa = {},
+        )
 }
