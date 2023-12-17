@@ -88,7 +88,6 @@ class EditFormasiViewModel(
 
 data class EditFormasiViewState(
     val role: String = "",
-    val formasiData: Formasi = Formasi(0L,0L,"","",0,0,0),
     val provinsiList: List<Provinsi> = emptyList(),
     val formasiUiState: FormasiUiState = FormasiUiState(),
     val refreshing: Boolean = false,

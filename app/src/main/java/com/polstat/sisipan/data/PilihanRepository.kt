@@ -29,6 +29,7 @@ class PilihanRepository(
                     transactionRunner {
                         // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
                         val pilihanList = pilihanService.getAll().data
+                        Log.i("TAG", "refreshPilihan: ${pilihanList}")
                         pilihanList?.let {
                             pilihanStore.savePilihanList(it)
                         }

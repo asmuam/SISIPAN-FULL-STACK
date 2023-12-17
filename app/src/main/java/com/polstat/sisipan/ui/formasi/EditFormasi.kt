@@ -169,6 +169,9 @@ fun EditFormasiContent(
                     // Konten utama dengan fungsi DynamicThemePrimaryColorsFromImage
                     DynamicThemePrimaryColorsFromImage(dominantColorState) {
                         // Konten lainnya seperti LazyColumn dan lainnya
+                        Log.i("TAG", "formasiData: ${editFormasiViewState.formasiUiState.formasiDetails}")
+                        Log.i("TAG", "formasiData: ${editFormasiViewState.formasiUiState.formasiDetails}")
+
                         EditFormasiInputForm(
                             provinsiList = editFormasiViewState.provinsiList,
                             formasiData = editFormasiViewState.formasiUiState.formasiDetails,
@@ -203,14 +206,16 @@ fun EditFormasiInputForm(
     var selectedProvinsi by remember { mutableStateOf<Provinsi?>(null) }
     // Callback untuk mengubah item yang dipilih
     val provinsiDefault = formasiData.provinsiId
+    val selectedItem: String = provinsiList.find { it.id == provinsiDefault }?.namaProvinsi ?: "K/L/D/I"
     val onProvinsiSelected: (Provinsi) -> Unit = { provinsi ->
         selectedProvinsi = provinsi
         // Jika perlu, panggil callback untuk memberi tahu ViewModel bahwa item dipilih
         onValueChange(formasiData.copy(provinsiId = provinsi.id))
     }
-    val selectedItem: String = provinsiList.find { it.id == provinsiDefault }?.namaProvinsi ?: "K/L/D/I"
+    Log.i("TAG", "provinsiDefault: ${provinsiDefault}")
+    Log.i("TAG", "selectedprovinsi: ${selectedProvinsi}")
+    Log.i("TAG", "selecteditem: ${selectedItem}")
 
-    Log.i("TAG", "provinsi: ${selectedProvinsi}")
 
     Column(
         modifier = modifier

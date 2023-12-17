@@ -211,6 +211,9 @@ fun EditPilihanContent(
                     // Konten utama dengan fungsi DynamicThemePrimaryColorsFromImage
                     DynamicThemePrimaryColorsFromImage(dominantColorState) {
                         // Konten lainnya seperti LazyColumn dan lainnya
+                        Log.i("TAG", "pilihanSaya: ${editPilihanViewState.pilihanSaya}")
+                        Log.i("TAG", "pilihanDetails: ${editPilihanViewState.pilihanUiState.pilihanDetails}")
+
                         EditPilihanInputForm(
                             pilihanSaya =editPilihanViewState.pilihanSaya,
                             formasiList = editPilihanViewState.formasiList,
@@ -218,9 +221,6 @@ fun EditPilihanContent(
                             onValueChange = onPilihanValueChange,
                             modifier = Modifier.fillMaxWidth()
                         )
-                        Log.i("TAG", "edit UI state: ${editPilihanViewState.pilihanSaya}")
-                        Log.i("TAG", "UI state: ${editPilihanViewState.pilihanUiState.pilihanDetails}")
-                        Log.i("TAG", "UI valid button: ${editPilihanViewState.pilihanUiState.isEntryValid}")
                         Button(
                             onClick = onSaveClick,
                             enabled = editPilihanViewState.pilihanUiState.isEntryValid,
@@ -268,6 +268,8 @@ fun EditPilihanInputForm(
         selectedFormasi3 = formasi
         onValueChange(pilihanDetails.copy(pilihan3 = formasi.id))
     }
+    Log.i("TAG", "selectedformasi: ${selectedFormasi1}")
+    Log.i("TAG", "namaSatuanKerjaPilihan1: ${namaSatuanKerjaPilihan1}")
 
     CustomDropdown(
         items = formasiList,

@@ -120,18 +120,34 @@ fun Formasi(
         viewModel.refresh(true)
     }
     Surface(Modifier.fillMaxSize()) {
-        FormasiContent(
-            openDrawer,
-            formasiBukaList = viewState.formasiBukaList,
-            formasiTutupList = viewState.formasiTutupList,
-            onFormasiClick = { onEditFormasi(it.id) },
-            isRefreshing = viewState.refreshing,
-            modifier = Modifier.fillMaxSize(),
-            onAccount,
-            role = viewState.role,
-            navigateToAddFormasi = navigateToAddFormasi,
-            doRefresh = { viewModel.refresh(force = true) },
-        )
+        if(viewState.role=="ADMIN"){
+            FormasiContent(
+                openDrawer,
+                formasiBukaList = viewState.formasiBukaList,
+                formasiTutupList = viewState.formasiTutupList,
+                onFormasiClick = { onEditFormasi(it.id) },
+                isRefreshing = viewState.refreshing,
+                modifier = Modifier.fillMaxSize(),
+                onAccount,
+                role = viewState.role,
+                navigateToAddFormasi = navigateToAddFormasi,
+                doRefresh = { viewModel.refresh(force = true) },
+            )
+        }
+        if(viewState.role=="MAHASISWA"){
+            FormasiContent(
+                openDrawer,
+                formasiBukaList = viewState.formasiBukaList,
+                formasiTutupList = viewState.formasiTutupList,
+                onFormasiClick = { },
+                isRefreshing = viewState.refreshing,
+                modifier = Modifier.fillMaxSize(),
+                onAccount,
+                role = viewState.role,
+                navigateToAddFormasi = navigateToAddFormasi,
+                doRefresh = { viewModel.refresh(force = true) },
+            )
+        }
     }
 }
 

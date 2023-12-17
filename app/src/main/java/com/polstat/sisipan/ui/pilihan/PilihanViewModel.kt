@@ -65,9 +65,8 @@ class PilihanViewModel(
                         hasil = pilihan.hasil
                     )
                 }
-                Log.i("PILIHAN", "${mappedPilihanList}: ")
                 val pilihanSaya = pilihanStore.pilihanByMhs(UserRepository.idMhs?:0)
-                Log.i("PILIHANSAYA", "${pilihanSaya}: ")
+                val filteredPilihanList = mappedPilihanList.filter { it.id != pilihanSaya?.id }
                 pilihanSaya?.run {
                     val mahasiswa = mahasiswaStore.getMahasiswa(pilihanSaya.mahasiswa)
                     val pilihan1 = formasiStore.formasiById(pilihanSaya.pilihan1 ?: 0)
@@ -76,7 +75,7 @@ class PilihanViewModel(
                     val pilihanSistem = formasiStore.formasiById(pilihanSaya.pilihanSistem ?: 0)
                     PilihanViewState(
                         role = userRepository.role?:"",
-                        pilihanList = mappedPilihanList,
+                        pilihanList = filteredPilihanList,
                         pilihanSaya = PilihanNested(pilihanSaya.id,mahasiswa,pilihan1,pilihan2,pilihan3,pilihanSistem,pilihanSaya.indeksPilihan1,pilihanSaya.indeksPilihan2,pilihanSaya.indeksPilihan3,pilihanSaya.ipk,pilihanSaya.hasil),
                         refreshing = refreshing,
                         errorMessage = null /* TODO */

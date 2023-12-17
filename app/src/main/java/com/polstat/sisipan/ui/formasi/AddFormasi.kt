@@ -50,6 +50,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -365,10 +366,18 @@ fun CustomDropdown(
     selectedItem: String,
     onItemSelected: (Provinsi) -> Unit
 ) {
+    Log.i("TAG", "selectedItem: ${selectedItem}")
     var expanded by remember { mutableStateOf(false) }
     var inputValue by remember { mutableStateOf(selectedItem) }
     var mTextFieldSize by remember { mutableStateOf(Size.Zero) }
+    Log.i("TAG", "inputValue: ${inputValue}")
 
+    // Inisialisasi inputValue menggunakan selectedItem
+    LaunchedEffect(selectedItem) {
+        inputValue = selectedItem
+        Log.i("TAG", "inputValueLaunch: ${inputValue}")
+
+    }
     // Up Icon when expanded and down icon when collapsed
     val icon = if (expanded)
         Icons.Filled.KeyboardArrowUp

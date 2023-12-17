@@ -19,11 +19,18 @@ package com.polstat.sisipan
 import android.content.Context
 import android.util.Log
 import androidx.room.Room
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.polstat.sisipan.api.ApiClient
+import com.polstat.sisipan.api.AuthFetcher
 import com.polstat.sisipan.api.AuthService
+import com.polstat.sisipan.api.FormasiFetcher
 import com.polstat.sisipan.api.FormasiService
+import com.polstat.sisipan.api.MahasiswaFetcher
 import com.polstat.sisipan.api.MahasiswaService
+import com.polstat.sisipan.api.PilihanFetcher
 import com.polstat.sisipan.api.PilihanService
+import com.polstat.sisipan.api.ProvinsiFetcher
 import com.polstat.sisipan.api.ProvinsiService
 import com.polstat.sisipan.data.FormasiRepository
 import com.polstat.sisipan.data.FormasiStore
@@ -49,6 +56,13 @@ import java.io.File
  * For a real app, you would use something like Hilt/Dagger instead.
  */
 object Graph {
+
+    private const val BASE_URL = "http://10.0.2.2:8080/"
+
+    private val gson: Gson = GsonBuilder()
+        .setLenient()
+        .create()
+
     lateinit var okHttpClient: OkHttpClient
 
     lateinit var database: SisipanDatabase
@@ -64,18 +78,42 @@ object Graph {
     private val ioDispatcher: CoroutineDispatcher
         get() = Dispatchers.IO
 
-    val authService: AuthService
-        get() = ApiClient.authService
 
-    val formasiService: FormasiService
-        get() = ApiClient.formasiService
-
-    val provinsiService: ProvinsiService
-        get() = ApiClient.provinsiService
-    val mahasiswaService: MahasiswaService
-        get() = ApiClient.mahasiswaService
-    val pilihanService: PilihanService
-        get() = ApiClient.pilihanService
+    private val mahasiswaService by lazy {
+        MahasiswaFetcher(
+            okHttpClient = okHttpClient,
+            ioDispatcher = ioDispatcher,
+            url = BASE_URL
+        )
+    }
+    private val provinsiService by lazy {
+        ProvinsiFetcher(
+            okHttpClient = okHttpClient,
+            ioDispatcher = ioDispatcher,
+            url = BASE_URL
+        )
+    }
+    private val formasiService by lazy {
+        FormasiFetcher(
+            okHttpClient = okHttpClient,
+            ioDispatcher = ioDispatcher,
+            url = BASE_URL
+        )
+    }
+    val authService by lazy {
+        AuthFetcher(
+            okHttpClient = okHttpClient,
+            ioDispatcher = ioDispatcher,
+            url = BASE_URL
+        )
+    }
+    private val pilihanService by lazy {
+        PilihanFetcher(
+            okHttpClient = okHttpClient,
+            ioDispatcher = ioDispatcher,
+            url = BASE_URL
+        )
+    }
     lateinit var userRepository: UserRepository
         private set
     private var isDatabaseInitialized = false
