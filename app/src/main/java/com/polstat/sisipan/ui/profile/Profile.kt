@@ -72,7 +72,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.sisipan.R
 import com.polstat.sisipan.data.Mahasiswa
+import com.polstat.sisipan.data.Prodi
 import com.polstat.sisipan.data.Provinsi
+import com.polstat.sisipan.data.UserRepository.role
 import com.polstat.sisipan.ui.theme.SisipanTheme
 import com.polstat.sisipan.util.DynamicThemePrimaryColorsFromImage
 import com.polstat.sisipan.util.baselineHeight
@@ -82,9 +84,9 @@ import com.polstat.sisipan.util.verticalGradientScrim
 fun Profile(
     openDrawer: () -> Unit,
     viewModel: ProfileViewModel = viewModel(),
-    onAccount: ()-> Unit,
-    navigateBack:()-> Unit,
-    ) {
+    onAccount: () -> Unit,
+    navigateBack: () -> Unit,
+) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
@@ -95,12 +97,12 @@ fun Profile(
             modifier = Modifier.fillMaxSize(),
             profil = viewState.mahasiswa,
             email = viewState.email,
-            provinsi =viewState.provinsi,
+            provinsi = viewState.provinsi,
             onAccount,
             onEditProfilePhoto = {
                 viewModel.editProfilePhoto(context)
             },
-            navigateBack =navigateBack,
+            navigateBack = navigateBack,
         )
     }
 }
@@ -110,28 +112,28 @@ fun ProfileAppBar(
     openDrawer: () -> Unit,
     backgroundColor: Color,
     modifier: Modifier = Modifier,
-    onAccount: ()-> Unit,
-    navigateBack:()-> Unit,
-    ) {
+    onAccount: () -> Unit,
+    navigateBack: () -> Unit,
+) {
     TopAppBar(
         title = {
-                Row {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.app_name),
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .heightIn(max = 24.dp)
-                            .clickable {navigateBack()}
-                            .align(Alignment.CenterVertically)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Image(
-                        painter = painterResource(R.drawable.logo),
-                        contentDescription = null,
-                        modifier = Modifier.clickable { openDrawer() }
-                    )
-                }
+            Row {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = stringResource(R.string.app_name),
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                        .heightIn(max = 24.dp)
+                        .clickable { navigateBack() }
+                        .align(Alignment.CenterVertically)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Image(
+                    painter = painterResource(R.drawable.logo),
+                    contentDescription = null,
+                    modifier = Modifier.clickable { openDrawer() }
+                )
+            }
         },
         backgroundColor = backgroundColor,
         actions = {
@@ -154,8 +156,8 @@ fun ProfileContent(
     provinsi: Provinsi?,
     onAccount: () -> Unit,
     onEditProfilePhoto: () -> Unit,
-    navigateBack:()-> Unit,
-    ) {
+    navigateBack: () -> Unit,
+) {
     Column(
         modifier = modifier.windowInsetsPadding(
             WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
@@ -186,7 +188,7 @@ fun ProfileContent(
                     backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.87f),
                     modifier = Modifier.fillMaxWidth(),
                     onAccount,
-                    navigateBack=navigateBack,
+                    navigateBack = navigateBack,
                 )
             }
         }
@@ -219,7 +221,10 @@ fun ProfileContent(
                     .background(Color.Blue)
                     .zIndex(2f) // Menempatkan ikon di atas gambar profil
                     .clickable { onEditProfilePhoto() } // Tambahkan fungsi klik untuk ikon kamera
-                    .graphicsLayer(scaleY = 0.5f, scaleX = 0.5f) // Sesuaikan nilai scale sesuai keinginan Anda
+                    .graphicsLayer(
+                        scaleY = 0.5f,
+                        scaleX = 0.5f
+                    ) // Sesuaikan nilai scale sesuai keinginan Anda
             )
         }
 
@@ -237,34 +242,46 @@ fun ProfileContent(
                     .fillMaxWidth()
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
-
-                if(profil!=null) {
-                    NameAndEmail(profil,email)
-
+                if (profil != null) {
+                    NameAndEmail(userData =profil,email )
                     ProfileProperty(stringResource(R.string.nama_mahasiswa), profil.name)
                     ProfileProperty(stringResource(R.string.nim_mahasiswa), profil.nim)
-                    ProfileProperty(stringResource(R.string.prodi_mahasiswa), profil.prodi)
+                    ProfileProperty(stringResource(R.string.prodi_mahasiswa), Prodi.values().find { it.name == profil.prodi }?.label.orEmpty())
                     ProfileProperty(stringResource(R.string.ipk_mahasiswa), (profil.ipk).toString())
                     ProfileProperty(
                         stringResource(R.string.prov_mahasiswa),
                         provinsi?.namaProvinsi ?: "Not Available"
                     )
-                }else{
+                } else {
                     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        Text(
-                            text = "ADMIN",
-                            modifier = modifier,
-                            style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
-                        )
-                        Email(
-                            email,
-                            modifier = Modifier
-                                .padding(bottom = 20.dp)
-                                .baselineHeight(24.dp)
-                        )
+                        if(role=="MAHASISWA"){
+                            Email(
+                                email,
+                                modifier = Modifier
+                                    .padding(bottom = 20.dp)
+                                    .baselineHeight(24.dp)
+                            )
+                            Text(
+                                text = "Data Mahasiswa Tidak Tersedia",
+                                modifier = modifier,
+                                style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
+                            )
+                        }
+                        if (role=="ADMIN"){
+                            Email(
+                                email,
+                                modifier = Modifier
+                                    .padding(bottom = 20.dp)
+                                    .baselineHeight(24.dp)
+                            )
+                            Text(
+                                text = "ADMIN",
+                                modifier = modifier,
+                                style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
+                            )
+                        }
                     }
-            }
-                Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
 
@@ -296,10 +313,11 @@ fun ProfileProperty(label: String, value: String, isLink: Boolean = false) {
         )
     }
 }
+
 @Composable
 private fun NameAndEmail(
     userData: Mahasiswa,
-    email:String,
+    email: String,
 ) {
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Name(
@@ -333,6 +351,7 @@ private fun Email(email: String, modifier: Modifier = Modifier) {
         color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
     )
 }
+
 @Preview
 @Composable
 fun ProfileContentPreview() {
@@ -349,12 +368,12 @@ fun ProfileContentPreview() {
             openDrawer = {},
             isRefreshing = false,
             modifier = Modifier.fillMaxSize(),
-            profil = fakeMahasiswa,
+            profil = null,
             email = "john.doe@example.com",
             onAccount = {},
             onEditProfilePhoto = {},
-            provinsi = Provinsi(1,"12","jkk"),
-            navigateBack ={},
+            provinsi = Provinsi(1, "12", "jkk"),
+            navigateBack = {},
         )
     }
 }

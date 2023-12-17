@@ -9,6 +9,7 @@ import com.polstat.sisipan.data.Formasi
 import com.polstat.sisipan.data.FormasiRepository
 import com.polstat.sisipan.data.FormasiStore
 import com.polstat.sisipan.data.Provinsi
+import com.polstat.sisipan.data.ProvinsiRepository
 import com.polstat.sisipan.data.ProvinsiStore
 import com.polstat.sisipan.data.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,7 @@ import kotlinx.coroutines.launch
 class AddFormasiViewModel(
     private val userRepository: UserRepository = Graph.userRepository,
     private val formasiRepository: FormasiRepository = Graph.formasiRepository,
-    private val formasiStore: FormasiStore = Graph.formasiStore,
+    private val provinsiRepository: ProvinsiRepository = Graph.provinsiRepository,
     private val provinsiStore: ProvinsiStore = Graph.provinsiStore
 ) : ViewModel() {
     private val _state = MutableStateFlow(AddFormasiViewState())
@@ -30,12 +31,8 @@ class AddFormasiViewModel(
     val state: StateFlow<AddFormasiViewState>
         get() = _state
 
-    fun onProvinsiSelected(selectedProvinsi: Provinsi) {
-        // Do something when a provinsi is selected, if needed
-    }
 
     fun updateUiState(formasiDetails: FormasiDetails) {
-        Log.i("DETAILS?", "updateUiState:${formasiDetails} ")
 
         _state.value = _state.value.copy(
             formasiUiState = _state.value.formasiUiState.copy(
@@ -43,12 +40,11 @@ class AddFormasiViewModel(
                 isEntryValid = validateInput(formasiDetails)
             )
         )
-        Log.i("DATA?", "updateUiState:${state.value.formasiUiState.formasiDetails} ")
-        Log.i("VALID?", "updateUiState:${state.value.formasiUiState.isEntryValid} ")
     }
 
     init {
         viewModelScope.launch {
+            refresh(false)
             combine(
                 provinsiStore.getAll(),
                 refreshing,
@@ -68,16 +64,40 @@ class AddFormasiViewModel(
         }
     }
 
+    fun refresh(force: Boolean) {
+        viewModelScope.launch {
+            try {
+                refreshing.value = true
+                provinsiRepository.refreshProvinsi(force)
+                // Handle the response
+            } catch (e: Exception) {
+                Log.e("FormasiViewModel", "Error refreshing prov", e)
+                // Handle the error
+            } finally {
+                refreshing.value = false
+            }
+        }
+    }
 
     private fun validateInput(uiState: FormasiDetails = state.value.formasiUiState.formasiDetails): Boolean {
         return with(uiState) {
-            provinsiId != 0L && kodeSatker.isNotBlank() && namaSatuanKerja.isNotBlank()
+            provinsiId != 0L && kodeSatker.isNotBlank() && namaSatuanKerja.isNotBlank() && kuotaKs.isNotBlank()&& kuotaSt.isNotBlank()&& kuotaD3.isNotBlank()
         }
     }
 
     suspend fun saveFormasi() {
         if (validateInput()) {
-            formasiRepository.insertFormasi(state.value.formasiUiState.formasiDetails.toFormasi())
+            viewModelScope.launch {
+                try {
+                    formasiRepository.insertFormasi(state.value.formasiUiState.formasiDetails.toFormasi())
+                } catch (
+                    e:Exception
+                ){
+
+                }
+                refresh(true)
+            }
+
         }
     }
 }

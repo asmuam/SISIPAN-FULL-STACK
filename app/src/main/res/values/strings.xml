@@ -103,6 +103,7 @@
     <string name="edit_formasi">Edit Formasi</string>
     <string name="add_mahasiswa">Tambah Mahasiswa</string>
     <string name="name">Nama</string>
+    <string name="ipk_req">Indeks Prestai Kumulatif*</string>
 
 
 </resources>

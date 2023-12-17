@@ -8,6 +8,7 @@ import com.polstat.sisipan.data.Mahasiswa
 import com.polstat.sisipan.data.MahasiswaRepository
 import com.polstat.sisipan.data.MahasiswaStore
 import com.polstat.sisipan.data.Provinsi
+import com.polstat.sisipan.data.ProvinsiRepository
 import com.polstat.sisipan.data.ProvinsiStore
 import com.polstat.sisipan.data.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,7 @@ import kotlinx.coroutines.launch
 class AddMahasiswaViewModel(
     private val userRepository: UserRepository = Graph.userRepository,
     private val mahasiswaRepository: MahasiswaRepository = Graph.mahasiswaRepository,
-    private val mahasiswaStore: MahasiswaStore = Graph.mahasiswaStore,
+    private val provinsiRepository: ProvinsiRepository = Graph.provinsiRepository,
     private val provinsiStore: ProvinsiStore = Graph.provinsiStore
 ) : ViewModel() {
     private val _state = MutableStateFlow(AddMahasiswaViewState())
@@ -29,9 +30,6 @@ class AddMahasiswaViewModel(
     val state: StateFlow<AddMahasiswaViewState>
         get() = _state
 
-    fun onProvinsiSelected(selectedProvinsi: Provinsi) {
-        // Do something when a provinsi is selected, if needed
-    }
 
     fun updateUiState(mahasiswaDetails: MahasiswaDetails) {
         Log.i("DETAILS?", "updateUiState:${mahasiswaDetails} ")
@@ -42,8 +40,6 @@ class AddMahasiswaViewModel(
                 isEntryValid = validateInput(mahasiswaDetails)
             )
         )
-        Log.i("DATA?", "updateUiState:${state.value.mahasiswaUiState.mahasiswaDetails} ")
-        Log.i("VALID?", "updateUiState:${state.value.mahasiswaUiState.isEntryValid} ")
     }
 
     init {
@@ -65,8 +61,23 @@ class AddMahasiswaViewModel(
                 _state.value = it
             }
         }
+        refresh(false)
     }
 
+    fun refresh(force: Boolean) {
+        viewModelScope.launch {
+            try {
+                refreshing.value = true
+                provinsiRepository.refreshProvinsi(force)
+                mahasiswaRepository.refreshMahasiswa(force)
+            } catch (e: Exception) {
+                // Handle the error
+                Log.e("MhsViewModel", "Error refreshing MHS", e)
+            } finally {
+                refreshing.value = false
+            }
+        }
+    }
 
     private fun validateInput(uiState: MahasiswaDetails = state.value.mahasiswaUiState.mahasiswaDetails): Boolean {
         return with(uiState) {
@@ -77,6 +88,7 @@ class AddMahasiswaViewModel(
     suspend fun saveMahasiswa() {
         if (validateInput()) {
             mahasiswaRepository.insertMahasiswa(state.value.mahasiswaUiState.mahasiswaDetails.toMahasiswa())
+            refresh(true)
         }
     }
 }
@@ -96,29 +108,29 @@ data class MahasiswaUiState(
 
 data class MahasiswaDetails(
     val id: Long = 0,
-    val nim: String="",
-    val name: String="",
-    val prodi: String="",
+    val nim: String = "",
+    val name: String = "",
+    val prodi: String = "",
     val provinsi: Long = 0,
-    val ipk: String="",
+    val ipk: String = "",
 )
 
 fun MahasiswaDetails.toMahasiswa(): Mahasiswa = Mahasiswa(
     id = id,
     provinsi = provinsi,
-    nim=nim,
-    name=name,
-    prodi=prodi,
-    ipk= ipk.toFloat()
+    nim = nim,
+    name = name,
+    prodi = prodi,
+    ipk = ipk.toFloat()
 )
 
 fun Mahasiswa.toMahasiswaDetails(): MahasiswaDetails = MahasiswaDetails(
     id = id,
     provinsi = provinsi,
-    nim=nim,
-    name=name,
-    prodi=prodi,
-    ipk=ipk.toString(),
+    nim = nim,
+    name = name,
+    prodi = prodi,
+    ipk = ipk.toString(),
 )
 
 fun Mahasiswa.toMahasiswaUiState(isEntryValid: Boolean = false): MahasiswaUiState =

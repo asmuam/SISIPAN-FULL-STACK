@@ -49,28 +49,28 @@ class MahasiswaViewModel(
         get() = _state
 
     init {
-        refresh(force = false)
         viewModelScope.launch {
+            refresh(force = false)
             combine(
                 mahasiswaStore.getAll(),
                 refreshing,
             ) { listMahasiswa, refreshing ->
                 val mappedMahasiswaList = listMahasiswa.map { mhs ->
                     val prov = provinsiStore.getById(mhs.provinsi)
-                MahasiswaCollection(
-                    id = mhs.id,
-                    nim = mhs.nim,
-                    name = mhs.name,
-                    prodi = mhs.prodi,
-                    provinsi = prov?: Provinsi(0L,"0000",""),
-                    ipk = mhs.ipk,
-                )
+                    MahasiswaCollection(
+                        id = mhs.id,
+                        nim = mhs.nim,
+                        name = mhs.name,
+                        prodi = mhs.prodi,
+                        provinsi = prov ?: Provinsi(0L, "0000", ""),
+                        ipk = mhs.ipk,
+                    )
                 }
                 MahasiswaViewState(
                     role = userRepository.role,
                     mahasiswa = mappedMahasiswaList,
                     refreshing = refreshing,
-                    errorMessage = null /* TODO */,
+                    errorMessage = null, /* TODO */
                 )
             }.catch { throwable ->
                 // TODO: emit a UI error here. For now, we'll just rethrow
@@ -97,17 +97,25 @@ class MahasiswaViewModel(
         }
     }
 
+    fun deleteMahasiswa(id: Long) {
+        viewModelScope.launch {
+            refreshing.value = true
+            mahasiswaRepository.delete(id)
+        }
+        refresh(true)
+        refreshing.value = false
+    }
 }
 
 data class MahasiswaViewState(
     val role: String? = null,
     val refreshing: Boolean = false,
     val errorMessage: String? = null,
-    val password: String ="",
+    val password: String = "",
     val mahasiswa: List<MahasiswaCollection> = emptyList(),
 )
 
-data class MahasiswaCollection (
+data class MahasiswaCollection(
     val id: Long,
     val nim: String,
     val name: String,

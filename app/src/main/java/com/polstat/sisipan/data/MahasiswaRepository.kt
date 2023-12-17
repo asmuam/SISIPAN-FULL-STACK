@@ -48,7 +48,7 @@ class MahasiswaRepository(
             val response = mahasiswaService.insert(mhs)
             if (response.httpStatusCode == 200) {
                 // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
-                refreshMahasiswa(force = true)
+                refreshMahasiswa(force = false)
             } else {
                 // Handle kesalahan jika diperlukan
                 Log.e("FormasiRepository", "Failed to insert formasi. Response: ${response.message}")
@@ -59,5 +59,25 @@ class MahasiswaRepository(
         }
     }
 
+    fun delete(id: Long) {
+        scope.launch {
+            try {
+                val response = mahasiswaService.delete(id)
+                if (response.httpStatusCode == 200) {
+                    // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
+                    refreshMahasiswa(force = false)
+                } else {
+                    // Handle kesalahan jika diperlukan
+                    Log.e(
+                        "FormasiRepository",
+                        "Failed to delete formasi. Response: ${response.message}"
+                    )
+                }
+            } catch (e: Exception) {
+                // Handle exception jika terjadi kesalahan dalam komunikasi dengan server
+                Log.e("FormasiRepository", "Error inserting formasi", e)
+            }
+        }
+    }
     // Metode lain sesuai kebutuhan
 }

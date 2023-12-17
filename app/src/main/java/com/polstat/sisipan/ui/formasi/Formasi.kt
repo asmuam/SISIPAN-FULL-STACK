@@ -119,7 +119,7 @@ fun Formasi(
     onEditFormasi: (Long) -> Unit,
     ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
-    LaunchedEffect(viewState){
+    LaunchedEffect(viewModel){
         viewModel.refresh(true)
     }
     Surface(Modifier.fillMaxSize()) {
@@ -149,7 +149,7 @@ fun Formasi(
                 onAccount,
                 role = viewState.role,
                 navigateToAddFormasi = navigateToAddFormasi,
-                doRefresh = { viewModel.refresh(force = true) },
+                doRefresh = { viewModel.refresh(force = false) },
                 deleteFormasi = {},
                 )
         }

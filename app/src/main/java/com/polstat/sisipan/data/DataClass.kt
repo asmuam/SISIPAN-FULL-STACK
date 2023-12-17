@@ -74,3 +74,6 @@ enum class Prodi(val id: String?, val label: String) {
 }
 
 val prodiList = listOf(Prodi.D4_KS, Prodi.D4_ST, Prodi.D3_ST)
+
+fun String.toProdiEnum(): Prodi? =
+    Prodi.values().find { it.label == this }

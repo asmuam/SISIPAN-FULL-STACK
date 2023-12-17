@@ -40,4 +40,9 @@ class MahasiswaFetcher(
             mahasiswaService.insert(request)
         }
     }
+
+    override suspend fun delete(id: Long): ApiResponse<String> {
+        return withContext(ioDispatcher) {
+            mahasiswaService.delete(id)
+        }    }
 }

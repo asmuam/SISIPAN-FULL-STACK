@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.Flow
 abstract class FormasiDao : BaseDao<Formasi> {
     @Query("SELECT * FROM formasi WHERE kuotaSt > 0 OR kuotaKs > 0 OR kuotaD3 > 0")
     abstract fun formasiBuka(): Flow<List<Formasi>>
+    @Query("SELECT * FROM formasi ")
+    abstract fun findAll(): Flow<List<Formasi>>
     @Query("SELECT * FROM formasi WHERE kuotaSt = 0 AND kuotaKs = 0 AND kuotaD3 = 0")
     abstract fun formasiTutup(): Flow<List<Formasi>>
 

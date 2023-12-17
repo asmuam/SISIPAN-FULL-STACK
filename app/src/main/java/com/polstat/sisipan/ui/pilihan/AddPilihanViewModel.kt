@@ -65,6 +65,7 @@ class AddPilihanViewModel(
                 _state.value = it
             }
         }
+        refresh(false)
     }
 
     fun refresh(force: Boolean) {
@@ -92,7 +93,12 @@ class AddPilihanViewModel(
     suspend fun savePilihan() {
         val id = userRepository.idMhs
         if (validateInput() && id!=null) {
-            pilihanRepository.insertPilihan(id ,state.value.pilihanUiState.pilihanDetails)
+            viewModelScope.launch {
+                refreshing.value = true
+                pilihanRepository.insertPilihan(id ,state.value.pilihanUiState.pilihanDetails)
+            }
+            refresh(true)
+            refreshing.value = false
         }
     }
 }

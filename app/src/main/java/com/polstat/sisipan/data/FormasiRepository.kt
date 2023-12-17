@@ -50,7 +50,7 @@ class FormasiRepository(
             val response = formasiService.insert(formasi)
             if (response.httpStatusCode == 200) {
                 // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
-                refreshFormasi(force = true)
+                refreshFormasi(force = false)
             } else {
                 // Handle kesalahan jika diperlukan
                 Log.e(
@@ -72,7 +72,7 @@ class FormasiRepository(
             val response = formasiService.ubah(id, formasi)
             if (response.httpStatusCode == 200) {
                 // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
-                refreshFormasi(force = true)
+                refreshFormasi(force = false)
             } else {
                 // Handle kesalahan jika diperlukan
                 Log.e(
@@ -92,7 +92,7 @@ class FormasiRepository(
                 val response = formasiService.delete(id)
                 if (response.httpStatusCode == 200) {
                     // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
-                    refreshFormasi(force = true)
+                    refreshFormasi(force = false)
                 } else {
                     // Handle kesalahan jika diperlukan
                     Log.e(

@@ -11,6 +11,7 @@ import com.polstat.sisipan.data.Mahasiswa
 import com.polstat.sisipan.data.MahasiswaStore
 import com.polstat.sisipan.data.FormasiRepository
 import com.polstat.sisipan.data.Provinsi
+import com.polstat.sisipan.data.ProvinsiRepository
 import com.polstat.sisipan.data.ProvinsiStore
 import com.polstat.sisipan.data.UserRepository
 import com.polstat.sisipan.ui.Screen
@@ -28,7 +29,9 @@ class EditFormasiViewModel(
     private val formasiRepository: FormasiRepository = Graph.formasiRepository,
     private val formasiStore: FormasiStore = Graph.formasiStore,
     private val provinsiStore: ProvinsiStore = Graph.provinsiStore,
-) : ViewModel() {
+    private val provinsiRepository: ProvinsiRepository = Graph.provinsiRepository,
+
+    ) : ViewModel() {
     private val _state = MutableStateFlow(EditFormasiViewState())
     private val formasiId: Long = checkNotNull(savedStateHandle[Screen.EditFormasi.formasiIdArg])
     private val refreshing = MutableStateFlow(true)
@@ -47,6 +50,7 @@ class EditFormasiViewModel(
 
     init {
         viewModelScope.launch {
+            refresh(false)
             val formasiData = formasiStore.findFormasiById(formasiId)
             combine(
                 provinsiStore.getAll(),
@@ -78,10 +82,32 @@ class EditFormasiViewModel(
 
     suspend fun saveFormasi() {
         if (validateInput()) {
-            formasiRepository.ubahFormasi(
-                state.value.formasiUiState.formasiDetails.id,
-                state.value.formasiUiState.formasiDetails.toFormasi()
-            )
+            viewModelScope.launch {
+                try {
+                    formasiRepository.ubahFormasi(
+                        state.value.formasiUiState.formasiDetails.id,
+                        state.value.formasiUiState.formasiDetails.toFormasi()
+                    )
+                } catch (e:Exception){
+
+                }
+                refresh(true)
+            }
+
+        }
+    }
+    fun refresh(force: Boolean) {
+        viewModelScope.launch {
+            try {
+                refreshing.value = true
+                provinsiRepository.refreshProvinsi(force)
+                // Handle the response
+            } catch (e: Exception) {
+                Log.e("FormasiViewModel", "Error refreshing prov", e)
+                // Handle the error
+            } finally {
+                refreshing.value = false
+            }
         }
     }
 }

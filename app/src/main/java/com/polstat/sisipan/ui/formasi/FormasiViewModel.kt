@@ -24,6 +24,7 @@ import com.polstat.sisipan.Graph
 import com.polstat.sisipan.data.Formasi
 import com.polstat.sisipan.data.FormasiRepository
 import com.polstat.sisipan.data.FormasiStore
+import com.polstat.sisipan.data.ProvinsiRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -33,8 +34,9 @@ import kotlinx.coroutines.launch
 class FormasiViewModel(
     private val userRepository: UserRepository = Graph.userRepository,
     private val formasiRepository: FormasiRepository = Graph.formasiRepository,
-    private val formasiStore: FormasiStore = Graph.formasiStore
-) : ViewModel() {
+    private val formasiStore: FormasiStore = Graph.formasiStore,
+    private val provinsiRepository: ProvinsiRepository = Graph.provinsiRepository,
+): ViewModel() {
 
     // Holds our view state which the UI collects via [state]
     private val _state = MutableStateFlow(FormasiViewState())
@@ -42,22 +44,24 @@ class FormasiViewModel(
     private val refreshing = MutableStateFlow(true)
 
     val state: StateFlow<FormasiViewState>
-        get() = _state
+    get() = _state
 
     init {
         viewModelScope.launch {
             refresh(force = false)
-
             combine(
-                formasiStore.formasiBuka(),
-                formasiStore.formasiTutup(),
+                formasiStore.getAll(),
                 refreshing
-            ) { formasiBukaList, formasiTutupList, refreshing ->
+            ) { formasiList, refreshing ->
 
                 FormasiViewState(
                     role = userRepository.role ?: "",
-                    formasiBukaList = formasiBukaList,
-                    formasiTutupList = formasiTutupList,
+                    formasiBukaList = formasiList.filter { formasi ->
+                        formasi.kuotaSt > 0 || formasi.kuotaKs > 0 || formasi.kuotaD3 > 0
+                    },
+                    formasiTutupList = formasiList.filter { formasi ->
+                        formasi.kuotaSt == 0 && formasi.kuotaKs == 0 && formasi.kuotaD3 == 0
+                    },
                     refreshing = refreshing,
                     errorMessage = null /* TODO */
                 )
@@ -76,7 +80,7 @@ class FormasiViewModel(
             try {
                 refreshing.value = true
                 formasiRepository.refreshFormasi(force)
-                Log.d("FormasiViewModel", "Data refreshed successfully")
+                provinsiRepository.refreshProvinsi(force)
                 // Handle the response
             } catch (e: Exception) {
                 Log.e("FormasiViewModel", "Error refreshing formasi", e)
@@ -86,22 +90,14 @@ class FormasiViewModel(
             }
         }
     }
+
     fun deleteFormasi(id: Long) {
         viewModelScope.launch {
-            try {
-                refreshing.value = true
-                formasiRepository.deleteFormasi(id)
-                // Jangan lupa untuk mereset nilai refreshing setelah berhasil menghapus formasi
-                refreshing.value = false
-                // Refresh view state setelah menghapus formasi
-                refresh(false)
-            } catch (e: Exception) {
-                Log.e("FormasiViewModel", "Error deleting formasi", e)
-                // Handle the error
-            } finally {
-                refreshing.value = false
-            }
+            refreshing.value = true
+            formasiRepository.deleteFormasi(id)
         }
+        refresh(true)
+        refreshing.value = false
     }
 }
 

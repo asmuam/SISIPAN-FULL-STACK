@@ -20,6 +20,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
+import com.polstat.sisipan.data.FormasiRepository
 import com.polstat.sisipan.data.FormasiStore
 import com.polstat.sisipan.data.MahasiswaRepository
 import com.polstat.sisipan.data.MahasiswaStore
@@ -37,6 +38,7 @@ import kotlinx.coroutines.launch
 class HomeViewModel(
     private val userRepository: UserRepository = Graph.userRepository,
     private val pilihanRepository: PilihanRepository = Graph.pilihanRepository,
+    private val formasiRepository: FormasiRepository = Graph.formasiRepository,
     private val pilihanStore: PilihanStore = Graph.pilihanStore,
     private val mahasiswaStore: MahasiswaStore = Graph.mahasiswaStore,
     private val provinsiRepository: ProvinsiRepository = Graph.provinsiRepository,
@@ -51,25 +53,19 @@ class HomeViewModel(
         get() = _state
 
     init {
-        Log.i("TAGHomebefore", "DATABASE init ${Graph.isDatabaseInitialized()}")
-        Log.i("TAGHomebefore", "DATABASE open ${Graph.isDatabaseOpen()}")
         observeRefresh()
         refresh(force = false)
-        Log.i("TAGHomeafter", "DATABASE init ${Graph.isDatabaseInitialized()}")
-        Log.i("TAGHomeafter", "DATABASE open ${Graph.isDatabaseOpen()}")
     }
 
     private fun observeRefresh() {
-        doRefresh(true)
         viewModelScope.launch {
             combine(
-                refreshing
-            ) { refreshingValue ->
+                refreshing,
+                pilihanStore.daftarPilihan()
+            ) { refreshingValue, daftarPilihan ->
                 val idmhs = userRepository.idMhs
                 val pilihan = idmhs?.let { pilihanStore.pilihanByMhs(it) }
                 val memilih = pilihan != null
-                Log.i("TAG", "memilih:${memilih} ")
-                Log.i("TAG", "memilih:${pilihan} ")
                 val pilihanSaya = pilihan?.let {
                     val mahasiswa = mahasiswaStore.getMahasiswa(it.mahasiswa)
                     val pilihan1 = formasiStore.formasiById(it.pilihan1 ?: 0)
@@ -99,7 +95,7 @@ class HomeViewModel(
                         mahasiswaMemilih = pilihanStore.count(),
                         jmlhMhs = mahasiswaStore.count(),
                         memilih = memilih,
-                        refreshing = refreshingValue.get(0),
+                        refreshing = refreshingValue,
                         errorMessage = null /* TODO */
                     )
                 } else {
@@ -108,7 +104,7 @@ class HomeViewModel(
                         mahasiswaMemilih = pilihanStore.count(),
                         jmlhMhs = mahasiswaStore.count(),
                         memilih = false,
-                        refreshing = refreshingValue.get(0),
+                        refreshing = refreshingValue,
                         errorMessage = null /* TODO */
                     )
                 }
@@ -121,6 +117,7 @@ class HomeViewModel(
                 _state.value = it
             }
         }
+        doRefresh(false)
     }
 
 
@@ -131,9 +128,9 @@ class HomeViewModel(
                 pilihanRepository.refreshPilihan(force)
                 provinsiRepository.refreshProvinsi(force)
                 mahasiswaRepository.refreshMahasiswa(force)
+                formasiRepository.refreshFormasi(force)
             }
             // TODO: handle result and show any errors
-
             refreshing.value = false
         }
     }
@@ -143,11 +140,11 @@ class HomeViewModel(
     }
 
     fun penempatan() {
-        Log.i("TAG", "penempatan: DO")
         viewModelScope.launch {
-            Log.i("TAG", "start penempatan: DO")
+            refreshing.value = true
             pilihanRepository.doPenempatan()
-            Log.i("TAG", "finish penempatan: DO")
+            refreshing.value = false
+
         }
     }
 

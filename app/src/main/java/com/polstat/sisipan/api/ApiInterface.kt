@@ -82,4 +82,8 @@ interface MahasiswaService {
     @POST("mahasiswa")
     suspend fun insert(@Body request: Mahasiswa): ApiResponse<Mahasiswa>
 
+    @Headers("Content-Type: application/json")
+    @DELETE("mahasiswa/{id}")
+    suspend fun delete(@Path ("id") id:Long): ApiResponse<String>
+
 }

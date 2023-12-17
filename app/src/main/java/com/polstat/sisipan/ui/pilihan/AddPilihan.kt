@@ -124,7 +124,9 @@ fun AddPilihan(
     ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
-
+    LaunchedEffect(viewModel){
+        viewModel.refresh(true)
+    }
     Log.i("DATA", "AddPilihan: ${viewState.pilihanUiState.pilihanDetails}")
     Surface(Modifier.fillMaxSize()) {
         AddPilihanContent(

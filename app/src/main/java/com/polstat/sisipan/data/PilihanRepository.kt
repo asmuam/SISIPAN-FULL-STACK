@@ -50,7 +50,7 @@ class PilihanRepository(
             val response = pilihanService.pilih(id, pilihan)
             if (response.httpStatusCode == 200) {
                 // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
-                refreshPilihan(force = true)
+                refreshPilihan(force = false)
             } else {
                 // Handle kesalahan jika diperlukan
                 Log.e("PILIHANREPO", "Failed to insert pilihan. Response: ${response.message}")
@@ -70,7 +70,7 @@ class PilihanRepository(
             Log.e("TAG", "resp api: $response")
             if (response.httpStatusCode == 200) {
                 // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
-                refreshPilihan(force = true)
+                refreshPilihan(force = false)
             } else {
                 // Handle kesalahan jika diperlukan
                 Log.e("PILIHANREPOResponse", "Failed to insert pilihan. Response: ${response.message}")
@@ -87,7 +87,7 @@ class PilihanRepository(
             Log.e("TAG", "resp api: $response")
             if (response.httpStatusCode == 200) {
                 // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
-                refreshPilihan(force = true)
+                refreshPilihan(force = false)
             } else {
                 // Handle kesalahan jika diperlukan
                 Log.e("PILIHANREPOResponse", "Failed to insert pilihan. Response: ${response.message}")

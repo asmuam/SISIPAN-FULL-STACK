@@ -46,6 +46,7 @@ import com.polstat.sisipan.ui.formasi.AddFormasi
 import com.polstat.sisipan.ui.formasi.EditFormasi
 import com.polstat.sisipan.ui.formasi.Formasi
 import com.polstat.sisipan.ui.home.Home
+import com.polstat.sisipan.ui.mahasiswa.AddMahasiswa
 import com.polstat.sisipan.ui.mahasiswa.Mahasiswa
 import com.polstat.sisipan.ui.pilihan.AddPilihan
 import com.polstat.sisipan.ui.pilihan.EditPilihan
@@ -200,6 +201,16 @@ fun SisipanApp(
                                 },
                                 navigateToAddMahasiswa = {navController.navigate("addMahasiswa")},
                                 )
+                        }
+                        composable(Screen.AddMahasiswa.route) { backStackEntry ->
+                            AddMahasiswa(
+                                openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
+                                onAccount = {
+                                    navController.navigate("profil")
+                                },
+                                navigateBack = { navController.popBackStack() },
+                                onNavigateUp = { navController.navigateUp() },
+                            )
                         }
                         composable(Screen.Profil.route) { backStackEntry ->
                             Profile(

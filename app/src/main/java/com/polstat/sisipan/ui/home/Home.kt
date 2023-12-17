@@ -107,7 +107,7 @@ fun Home(
     onEditPilihan: (Long) -> Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
-    LaunchedEffect(viewState){
+    LaunchedEffect(viewModel){
         viewModel.refresh(true)
     }
     Surface(Modifier.fillMaxSize()) {

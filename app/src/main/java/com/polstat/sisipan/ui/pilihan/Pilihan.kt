@@ -46,6 +46,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -84,6 +85,9 @@ fun Pilihan(
     navigateToEditPilihan: (Long) -> Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
+    LaunchedEffect(viewModel){
+        viewModel.refresh(true)
+    }
     Surface(Modifier.fillMaxSize()) {
         PilihanContent(
             openDrawer,
@@ -92,7 +96,7 @@ fun Pilihan(
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
             onAccount,
-            doRefresh = { viewModel.refresh(force = true) },
+            doRefresh = { viewModel.refresh(force = false) },
             pilihanSaya = viewState.pilihanSaya,
             role = viewState.role,
         )
@@ -214,17 +218,17 @@ fun PilihanContent(
                 ) {
                     if (role == "MAHASISWA") {
                         item {
-                            // Text label for Pilihan Saya
-                            Text(
-                                text = "Pilihan Anda",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(4.dp)
-                            )
+
                             // PilihanSaya card
                             if (pilihanSaya != null) {
+                                Text(
+                                    text = "Pilihan Anda",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(4.dp),
+                                )
                                 PilihanCard(
                                     pilihan = pilihanSaya,
                                     onItemClick = { onPilihanClick(it.id) })
@@ -328,6 +332,20 @@ fun PilihanCard(
         ).value
     )
 
+    val pilihanSistemState by rememberUpdatedState(
+        newValue = pilihan.pilihanSistem.collectAsState(
+            initial = Formasi(
+                0,
+                0,
+                "",
+                "",
+                0,
+                0,
+                0
+            )
+        ).value
+    )
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -416,6 +434,7 @@ fun PilihanCard(
 
                 // Pilihan 3
                 PilihanPriorityItem("Pilihan 3", pilihan3State)
+                PilihanPriorityItem("Pilihan Sistem", pilihanSistemState)
             }
         }
     }

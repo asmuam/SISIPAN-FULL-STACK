@@ -121,7 +121,6 @@ fun AddMahasiswa(
     ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
-
     Log.i("DATA", "AddMahasiswa: ${viewState.mahasiswaUiState.mahasiswaDetails}")
     Surface(Modifier.fillMaxSize()) {
         AddMahasiswaContent(
@@ -251,13 +250,13 @@ fun MahasiswaInputForm(
     enabled: Boolean = true
 ) {
     var selectedProvinsi by remember { mutableStateOf<Provinsi?>(null) }
-    var selectedProdi by remember { mutableStateOf(Prodi.D4_KS.label) }
+    var selectedProdi by remember { mutableStateOf("") }
     val onProvinsiSelected: (Provinsi) -> Unit = { provinsi ->
         selectedProvinsi = provinsi
         onValueChange(mahasiswaDetails.copy(provinsi = provinsi.id?:0))
     }
     val onProdiSelected: (Prodi) -> Unit = { prodi ->
-        selectedProdi = prodi.name
+        selectedProdi = prodi.label
         // Jika perlu, panggil callback untuk memberi tahu ViewModel bahwa item dipilih
         onValueChange(mahasiswaDetails.copy(prodi = prodi.name))
     }
@@ -295,17 +294,30 @@ fun MahasiswaInputForm(
             singleLine = true
         )
         // Composable Dropdown
-        com.polstat.sisipan.ui.formasi.CustomDropdown(
+        CustomDropdown(
             items = provinsiList,
             selectedItem = selectedProvinsi?.namaProvinsi.orEmpty(),
             onItemSelected = onProvinsiSelected
         )
-        CustomDropdown(
+        CustomDropdownProdi(
             items =prodiList,
             selectedItem = selectedProdi,
             onItemSelected = onProdiSelected,
         )
-
+        OutlinedTextField(
+            value = mahasiswaDetails.ipk,
+            onValueChange = { onValueChange(mahasiswaDetails.copy(ipk = it)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            label = { Text(stringResource(R.string.ipk_req)) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
+                unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
+                disabledContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
+            singleLine = true
+        )
         if (enabled) {
             Text(
                 text = stringResource(R.string.required_fields),
@@ -317,7 +329,7 @@ fun MahasiswaInputForm(
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun CustomDropdown(
+fun CustomDropdownProdi(
     items: List<Prodi>,
     selectedItem: String,
     onItemSelected: (Prodi) -> Unit
@@ -349,9 +361,9 @@ fun CustomDropdown(
                     // Handle value change if needed
                 },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colors.secondaryVariant,
-                    unfocusedContainerColor = MaterialTheme.colors.secondaryVariant,
-                    disabledContainerColor = MaterialTheme.colors.secondaryVariant,
+                    focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
+                    disabledContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
                 ),
                 textStyle = LocalTextStyle.current.copy(color = Color.Black),
                 keyboardOptions = KeyboardOptions.Default.copy(
@@ -459,4 +471,98 @@ fun AddMahasiswaAppBar(
         },
         modifier = modifier
     )
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun CustomDropdown(
+    items: List<Provinsi>,
+    selectedItem: String,
+    onItemSelected: (Provinsi) -> Unit
+) {
+    Log.i("TAG", "selectedItem: ${selectedItem}")
+    var expanded by remember { mutableStateOf(false) }
+    var inputValue by remember { mutableStateOf(selectedItem) }
+    var mTextFieldSize by remember { mutableStateOf(Size.Zero) }
+    Log.i("TAG", "inputValue: ${inputValue}")
+
+    // Inisialisasi inputValue menggunakan selectedItem
+    LaunchedEffect(selectedItem) {
+        inputValue = selectedItem
+        Log.i("TAG", "inputValueLaunch: ${inputValue}")
+
+    }
+    // Up Icon when expanded and down icon when collapsed
+    val icon = if (expanded)
+        Icons.Filled.KeyboardArrowUp
+    else
+        Icons.Filled.KeyboardArrowDown
+
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .clickable { expanded = !expanded },
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            OutlinedTextField(
+                value = inputValue,
+                onValueChange = {
+                    // Handle value change if needed
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
+                    disabledContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
+                ),
+                textStyle = LocalTextStyle.current.copy(color = Color.Black),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.None
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned { coordinates ->
+                        // This value is used to assign to
+                        // the DropDown the same width
+                        mTextFieldSize = coordinates.size.toSize()
+                    },
+                label = { Text("Provinsi*") },
+                trailingIcon = {
+                    Icon(icon, "contentDescription")
+                },
+                enabled = false // Make the TextField read-only
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .width(with(LocalDensity.current) { mTextFieldSize.width.toDp() })
+        ) {
+            items.forEach { item ->
+                DropdownMenuItem(
+                    onClick = {
+                        onItemSelected(item)
+                        expanded = false
+                        inputValue = item.namaProvinsi
+                    }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = if (item.id?.toInt() == 0) "Pilih Provinsi" else item.namaProvinsi,
+                            fontWeight = if (item.id?.toInt() == 0) FontWeight.Bold else FontWeight.Normal,
+                            color = if (item.id?.toInt() == 0) Color.Gray else Color.Black
+                        )
+                    }
+                }
+            }
+        }
+    }
 }

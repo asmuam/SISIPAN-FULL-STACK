@@ -17,6 +17,9 @@ class FormasiStore(
     fun formasiBuka(): Flow<List<Formasi>> {
         return formasiDao.formasiBuka()
     }
+    fun getAll(): Flow<List<Formasi>> {
+        return formasiDao.findAll()
+    }
 
     fun formasiTutup(): Flow<List<Formasi>> {
         return formasiDao.formasiTutup()
