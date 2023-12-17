@@ -6,6 +6,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.polstat.sisipan.ui.formasi.EditFormasiViewModel
 import com.polstat.sisipan.ui.pilihan.EditPilihanViewModel
 
 object AppViewModelProvider {
@@ -14,6 +15,11 @@ object AppViewModelProvider {
         initializer {
             EditPilihanViewModel(
                 this.createSavedStateHandle(),
+            )
+        }
+        initializer {
+            EditFormasiViewModel(
+                this.createSavedStateHandle()
             )
         }
     }

@@ -63,6 +63,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -112,20 +113,18 @@ fun Formasi(
     viewModel: FormasiViewModel = viewModel(),
     onAccount: () -> Unit,
     navigateToAddFormasi: () -> Unit,
-) {
+    onEditFormasi: (Long) -> Unit,
+    ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
-
-    // Display some debugging information
-    Log.d("FormasiComposable", "Role: ${viewState.role}")
-    Log.d("FormasiComposable", "Buka List Size: ${viewState.formasiBukaList.size}")
-    Log.d("FormasiComposable", "Tutup List Size: ${viewState.formasiTutupList.size}")
-
+    LaunchedEffect(viewState){
+        viewModel.refresh(true)
+    }
     Surface(Modifier.fillMaxSize()) {
         FormasiContent(
             openDrawer,
             formasiBukaList = viewState.formasiBukaList,
             formasiTutupList = viewState.formasiTutupList,
-            onFormasiClick = { /* Handle formasi item click */ },
+            onFormasiClick = { onEditFormasi(it.id) },
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
             onAccount,
@@ -303,7 +302,7 @@ fun FormasiContent(
                             items(formasiBukaList) { formasi ->
                                 FormasiCard(
                                     formasi = formasi,
-                                    onItemClick = onFormasiClick,
+                                    onItemClick = {onFormasiClick(formasi)},
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                             }
@@ -338,7 +337,7 @@ fun FormasiContent(
                             items(formasiTutupList) { formasi ->
                                 FormasiCard(
                                     formasi = formasi,
-                                    onItemClick = onFormasiClick,
+                                    onItemClick = {onFormasiClick(formasi)},
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                             }

@@ -30,13 +30,6 @@ object ApiClient {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient.newBuilder().addInterceptor { chain ->
-                val original = chain.request()
-                val requestBuilder = original.newBuilder()
-                    .header("Authorization", "Bearer ${UserRepository.accessToken}")
-                val request = requestBuilder.build()
-                chain.proceed(request)
-            }.build())
             .build()
             .create(AuthService::class.java)
     }
@@ -119,7 +112,9 @@ interface FormasiService {
     @Headers("Content-Type: application/json")
     @POST("formasi")
     suspend fun insert(@Body request: Formasi): ApiResponse<Formasi>
-
+    @Headers("Content-Type: application/json")
+    @PUT("formasi/{id}")
+    suspend fun ubah(@Path ("id") id:Long, @Body request: Formasi): ApiResponse<Formasi>
 }
 
 interface ProvinsiService {

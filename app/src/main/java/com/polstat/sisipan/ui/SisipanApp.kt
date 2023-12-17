@@ -43,6 +43,7 @@ import androidx.navigation.navArgument
 import androidx.window.layout.DisplayFeature
 import com.polstat.sisipan.R
 import com.polstat.sisipan.ui.formasi.AddFormasi
+import com.polstat.sisipan.ui.formasi.EditFormasi
 import com.polstat.sisipan.ui.formasi.Formasi
 import com.polstat.sisipan.ui.home.Home
 import com.polstat.sisipan.ui.mahasiswa.Mahasiswa
@@ -127,7 +128,10 @@ fun SisipanApp(
                                 onAccount ={
                                     navController.navigate("profil")
                                 },
-                                navigateToAddFormasi = {navController.navigate("addFormasi")}
+                                navigateToAddFormasi = {navController.navigate("addFormasi")},
+                                onEditFormasi ={
+                                    navController.navigate("${Screen.EditFormasi.route}/${it}")
+                                },
                             )
                         }
                         composable(Screen.AddFormasi.route) {
@@ -135,6 +139,20 @@ fun SisipanApp(
                                 navigateBack = { navController.popBackStack() },
                                 onNavigateUp = { navController.navigateUp() },
                                 openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
+                                onAccount = {
+                                    navController.navigate("profil")
+                                },
+                            )
+                        }
+                        composable(Screen.EditFormasi.routeWithArgs,
+                            arguments = listOf(navArgument(Screen.EditFormasi.formasiIdArg){
+                                type = NavType.IntType
+                            })
+                        ) { backStackEntry ->
+                            EditFormasi(
+                                openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
+                                navigateBack = { navController.popBackStack() },
+                                onNavigateUp = { navController.navigateUp() },
                                 onAccount = {
                                     navController.navigate("profil")
                                 },

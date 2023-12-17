@@ -2,6 +2,7 @@ package com.polstat.sisipan.data
 
 import android.util.Log
 import com.polstat.sisipan.api.FormasiService
+import com.polstat.sisipan.api.PilihanRequest
 import com.polstat.sisipan.data.room.TransactionRunner
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -59,4 +60,22 @@ class FormasiRepository(
         }
     }
     // Metode lain sesuai kebutuhan
+
+    suspend fun ubahFormasi(id: Long, formasi: Formasi) {
+        // Lakukan operasi penyimpanan menggunakan service atau store, sesuai kebutuhan
+        // Misalnya, jika Anda memiliki service untuk menyimpan data ke server:
+        try {
+            val response = formasiService.ubah(id, formasi)
+            if (response.httpStatusCode == 200) {
+                // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
+                refreshFormasi(force = true)
+            } else {
+                // Handle kesalahan jika diperlukan
+                Log.e("PILIHANREPOResponse", "Failed to insert pilihan. Response: ${response.message}")
+            }
+        } catch (e: Exception) {
+            // Handle exception jika terjadi kesalahan dalam komunikasi dengan server atau operasi penyimpanan
+            Log.e("PILIHANREPO", "Error inserting pilihan", e)
+        }
+    }
 }

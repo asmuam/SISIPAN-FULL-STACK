@@ -99,6 +99,7 @@
     <string name="pilihan_title">Pilihan</string>
     <string name="add_pilihan">Pilih Formasi</string>
     <string name="edit_pilihan">Edit Pilihan Formasi</string>
+    <string name="edit_formasi">Edit Formasi</string>
 
 
 </resources>

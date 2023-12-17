@@ -26,6 +26,10 @@ class FormasiStore(
         return formasiDao.formasiById(id)
     }
 
+    suspend fun findFormasiById(id:Long): Formasi {
+        return formasiDao.findFormasiById(id)
+    }
+
     /**
      * Add a new [Formasi] to this store.
      *

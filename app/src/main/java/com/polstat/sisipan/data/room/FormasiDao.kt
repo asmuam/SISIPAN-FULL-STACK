@@ -15,6 +15,8 @@ abstract class FormasiDao : BaseDao<Formasi> {
 
     @Query("SELECT * FROM formasi WHERE id=:id")
     abstract fun formasiById(id: Long): Flow<Formasi>
+    @Query("SELECT * FROM formasi WHERE id=:id")
+    abstract suspend fun findFormasiById(id: Long): Formasi
     @Query("SELECT COUNT(*) FROM formasi")
     abstract suspend fun count(): Int
 

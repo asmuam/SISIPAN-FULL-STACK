@@ -1,5 +1,6 @@
 package com.polstat.sisipan.ui.pilihan
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -62,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.polstat.sisipan.Graph
 import com.polstat.sisipan.R
 import com.polstat.sisipan.data.Formasi
 import com.polstat.sisipan.data.Mahasiswa
@@ -79,21 +81,21 @@ fun Pilihan(
     openDrawer: () -> Unit,
     viewModel: PilihanViewModel = viewModel(),
     onAccount: () -> Unit,
-    navigateToEditPilihan:(Long)-> Unit,
+    navigateToEditPilihan: (Long) -> Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
         PilihanContent(
             openDrawer,
             pilihanList = viewState.pilihanList,
-            onPilihanClick = navigateToEditPilihan,
+            onPilihanClick = { navigateToEditPilihan(it)},
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
             onAccount,
             doRefresh = { viewModel.refresh(force = true) },
             pilihanSaya = viewState.pilihanSaya,
             role = viewState.role,
-            )
+        )
     }
 }
 
@@ -160,7 +162,7 @@ fun PilihanContent(
     onAccount: () -> Unit,
     doRefresh: () -> Unit,
     pilihanSaya: PilihanNested?,
-    role :String,
+    role: String,
 ) {
     val state = rememberPullRefreshState(isRefreshing, doRefresh)
 
@@ -210,7 +212,7 @@ fun PilihanContent(
                 LazyColumn(
                     modifier = Modifier.pullRefresh(state)
                 ) {
-                    if (role=="MAHASISWA"){
+                    if (role == "MAHASISWA") {
                         item {
                             // Text label for Pilihan Saya
                             Text(
@@ -225,7 +227,7 @@ fun PilihanContent(
                             if (pilihanSaya != null) {
                                 PilihanCard(
                                     pilihan = pilihanSaya,
-                                    onItemClick = {onPilihanClick(it.id)})
+                                    onItemClick = { onPilihanClick(it.id) })
                                 Divider(
                                     color = Color.Black,
                                     thickness = 3.dp,
@@ -251,7 +253,7 @@ fun PilihanContent(
                     items(pilihanList) { pilihan ->
                         PilihanCard(
                             pilihan = pilihan,
-                            onItemClick = {onPilihanClick(it.id)})
+                            onItemClick = {})
                     }
                 }
 

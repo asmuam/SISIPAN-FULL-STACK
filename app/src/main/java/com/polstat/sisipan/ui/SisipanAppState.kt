@@ -39,7 +39,11 @@ sealed class Screen(val route: String) {
     object Home : Screen("home")
     object Formasi : Screen("formasi")
     object AddFormasi : Screen("addFormasi")
-    object EditFormasi : Screen("editFormasi")
+    object EditFormasi : Screen("editformasi"){
+        const val formasiIdArg = "formasiId"
+        val routeWithArgs = "$route/{$formasiIdArg}"
+
+    }
     object Mahasiswa : Screen("mahasiswa")
     object Pilihan : Screen("pilihan")
     object AddPilihan : Screen("addPilihan")
