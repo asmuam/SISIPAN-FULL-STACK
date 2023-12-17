@@ -1,8 +1,6 @@
 package com.polstat.sisipan.data
 
 import android.util.Log
-import com.polstat.sisipan.Graph.provinsiService
-import com.polstat.sisipan.Graph.provinsiStore
 import com.polstat.sisipan.api.ProvinsiService
 import com.polstat.sisipan.data.room.TransactionRunner
 import kotlinx.coroutines.CoroutineDispatcher

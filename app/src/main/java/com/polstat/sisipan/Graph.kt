@@ -21,17 +21,11 @@ import android.util.Log
 import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.polstat.sisipan.api.ApiClient
 import com.polstat.sisipan.api.AuthFetcher
-import com.polstat.sisipan.api.AuthService
 import com.polstat.sisipan.api.FormasiFetcher
-import com.polstat.sisipan.api.FormasiService
 import com.polstat.sisipan.api.MahasiswaFetcher
-import com.polstat.sisipan.api.MahasiswaService
 import com.polstat.sisipan.api.PilihanFetcher
-import com.polstat.sisipan.api.PilihanService
 import com.polstat.sisipan.api.ProvinsiFetcher
-import com.polstat.sisipan.api.ProvinsiService
 import com.polstat.sisipan.data.FormasiRepository
 import com.polstat.sisipan.data.FormasiStore
 import com.polstat.sisipan.data.MahasiswaRepository
@@ -191,13 +185,6 @@ object Graph {
 
     fun provide(context: Context) {
         if (!isDatabaseInitialized) {
-            okHttpClient = OkHttpClient.Builder()
-                .cache(Cache(File(context.cacheDir, "http_cache"), (20 * 1024 * 1024).toLong()))
-                .apply {
-                    if (BuildConfig.DEBUG) eventListenerFactory(LoggingEventListener.Factory())
-                }
-                .build()
-
             database = Room.databaseBuilder(context, SisipanDatabase::class.java, "data.db")
                 // This is not recommended for normal apps, but the goal of this sample isn't to
                 // showcase all of Room.
@@ -205,6 +192,19 @@ object Graph {
                 .build()
             userRepository = UserRepository
             userRepository.initialize(context)  // Memanggil initialize di sini
+            okHttpClient = OkHttpClient.Builder()
+                .cache(Cache(File(context.cacheDir, "http_cache"), (20 * 1024 * 1024).toLong()))
+                .apply {
+                    if (BuildConfig.DEBUG) eventListenerFactory(LoggingEventListener.Factory())
+                }
+                .addInterceptor { chain ->
+                    val original = chain.request()
+                    val requestBuilder = original.newBuilder()
+                        .header("Authorization", "Bearer ${UserRepository.accessToken}")
+                    val request = requestBuilder.build()
+                    chain.proceed(request)
+                }
+                .build()
             isDatabaseInitialized = true
             Log.i("TAGraProv", "DATABASE open: ${database.isOpen}")
         }
