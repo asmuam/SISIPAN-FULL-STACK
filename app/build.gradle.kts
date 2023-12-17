@@ -20,6 +20,7 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+
 android {
     compileSdk = libs.versions.compileSdk.get().toInt()
     namespace = "com.polstat.sisipan"
