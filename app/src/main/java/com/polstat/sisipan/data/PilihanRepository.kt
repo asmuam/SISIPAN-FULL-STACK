@@ -1,6 +1,7 @@
 package com.polstat.sisipan.data
 
 import android.util.Log
+import com.polstat.sisipan.api.PilihanFetcher
 import com.polstat.sisipan.api.PilihanRequest
 import com.polstat.sisipan.api.PilihanService
 import com.polstat.sisipan.data.room.TransactionRunner
@@ -10,7 +11,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class PilihanRepository(
-    private val pilihanService: PilihanService,
+    private val pilihanService: PilihanFetcher,
     private val pilihanStore: PilihanStore,
     private val transactionRunner: TransactionRunner,
     private val mainDispatcher: CoroutineDispatcher
@@ -79,5 +80,21 @@ class PilihanRepository(
             Log.e("PILIHANREPO", "Error inserting pilihan", e)
         }
     }
-    // Metode lain sesuai kebutuhan
+
+    suspend fun doPenempatan() {
+        try {
+            val response = pilihanService.doPenempatan()
+            Log.e("TAG", "resp api: $response")
+            if (response.httpStatusCode == 200) {
+                // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
+                refreshPilihan(force = true)
+            } else {
+                // Handle kesalahan jika diperlukan
+                Log.e("PILIHANREPOResponse", "Failed to insert pilihan. Response: ${response.message}")
+            }
+        } catch (e: Exception){
+            Log.e("PILIHANREPO", "Error do penempatan", e)
+        }
+    }
+        // Metode lain sesuai kebutuhan
 }

@@ -16,12 +16,14 @@
 
 package com.polstat.sisipan.ui.signinsignup
 
+import android.util.Log
 import androidx.compose.ui.platform.LocalContext
 import com.polstat.sisipan.data.UserRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
+import com.polstat.sisipan.api.AuthFetcher
 import com.polstat.sisipan.api.AuthRequest
 import com.polstat.sisipan.api.AuthResult
 import com.polstat.sisipan.api.AuthService
@@ -31,7 +33,7 @@ import kotlinx.coroutines.launch
 
 class SignInViewModel : ViewModel() {
 
-    private val authService: AuthService = Graph.authService
+    private val authService: AuthFetcher = Graph.authService
     private val userRepository: UserRepository = Graph.userRepository
 
     private val _authResult = MutableStateFlow<AuthResult?>(null)
@@ -42,7 +44,7 @@ class SignInViewModel : ViewModel() {
             runCatching {
                 _authResult.value = null
                 val response = authService.login(AuthRequest(email, password))
-
+                Log.i("TAG", "signIn DATA: ${response.data}")
                 if (response.httpStatusCode == 200) {
                     response.data?.let { data ->
                         userRepository.setAllUserData(
@@ -54,9 +56,19 @@ class SignInViewModel : ViewModel() {
                             expiresIn = data.expiresIn ?: 0L
                         )
                         _authResult.value = AuthResult.SUCCESS
+                        Log.i(
+                            "TAG", "signIn: ${
+                                userRepository.toString()
+                            }"
+                        )
                     }
                 } else {
                     _authResult.value = AuthResult.FAILURE
+                    Log.i(
+                        "TAG", "signIn: ${
+                            userRepository.toString()
+                        }"
+                    )
                 }
             }.onFailure { e ->
                 _authResult.value = AuthResult.FAILURE

@@ -96,7 +96,6 @@ object Graph {
     }
     val authService by lazy {
         AuthFetcher(
-            okHttpClient = okHttpClient,
             ioDispatcher = ioDispatcher,
             url = BASE_URL
         )

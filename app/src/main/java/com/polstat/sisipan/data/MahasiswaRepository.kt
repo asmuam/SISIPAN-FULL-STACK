@@ -1,6 +1,7 @@
 package com.polstat.sisipan.data
 
 import android.util.Log
+import com.polstat.sisipan.api.MahasiswaFetcher
 import com.polstat.sisipan.api.MahasiswaService
 import com.polstat.sisipan.data.room.TransactionRunner
 import kotlinx.coroutines.CoroutineDispatcher
@@ -9,7 +10,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class MahasiswaRepository(
-    private val mahasiswaService: MahasiswaService,
+    private val mahasiswaService: MahasiswaFetcher,
     private val mahasiswaStore: MahasiswaStore,
     private val transactionRunner: TransactionRunner,
     private val mainDispatcher: CoroutineDispatcher

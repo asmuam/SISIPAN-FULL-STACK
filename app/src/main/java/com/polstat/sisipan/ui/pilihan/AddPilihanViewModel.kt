@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
 import com.polstat.sisipan.api.PilihanRequest
 import com.polstat.sisipan.data.Formasi
+import com.polstat.sisipan.data.FormasiRepository
 import com.polstat.sisipan.data.FormasiStore
 import com.polstat.sisipan.data.Pilihan
 import com.polstat.sisipan.data.PilihanRepository
@@ -22,7 +23,7 @@ import kotlinx.coroutines.launch
 class AddPilihanViewModel(
     private val userRepository: UserRepository = Graph.userRepository,
     private val pilihanRepository: PilihanRepository = Graph.pilihanRepository,
-    private val pilihanStore: PilihanStore = Graph.pilihanStore,
+    private val formasiRepository: FormasiRepository = Graph.formasiRepository,
     private val formasiStore: FormasiStore = Graph.formasiStore
 ) : ViewModel() {
     private val _state = MutableStateFlow(AddPilihanViewState())
@@ -66,10 +67,25 @@ class AddPilihanViewModel(
         }
     }
 
+    fun refresh(force: Boolean) {
+        viewModelScope.launch {
+            try {
+                refreshing.value = true
+                formasiRepository.refreshFormasi(force)
+                // Handle the response
+            } catch (e: Exception) {
+                // Handle the error
+                Log.e("MhsViewModel", "Error refreshing MHS", e)
+            } finally {
+                refreshing.value = false
+            }
+        }
+    }
+
 
     private fun validateInput(uiState: PilihanRequest = state.value.pilihanUiState.pilihanDetails): Boolean {
         return with(uiState) {
-            pilihan1 != 0L && pilihan2 != 0L && pilihan3 != 0L
+            pilihan1 != 0L && pilihan2 != 0L && pilihan3 != 0L && pilihan1 != pilihan2 && pilihan1 != pilihan3 && pilihan2 != pilihan3
         }
     }
 

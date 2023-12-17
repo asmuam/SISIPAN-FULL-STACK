@@ -98,7 +98,7 @@ class EditPilihanViewModel(
 
     private fun validateInput(uiState: PilihanRequest = state.value.pilihanUiState.pilihanDetails): Boolean {
         return with(uiState) {
-            pilihan1 != 0L && pilihan2 != 0L && pilihan3 != 0L
+            pilihan1 != 0L && pilihan2 != 0L && pilihan3 != 0L && pilihan1 != pilihan2 && pilihan1 != pilihan3 && pilihan2 != pilihan3
         }
     }
 

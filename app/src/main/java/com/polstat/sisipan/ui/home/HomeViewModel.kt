@@ -17,20 +17,17 @@
 package com.polstat.sisipan.ui.home
 
 import android.util.Log
-import com.polstat.sisipan.data.UserRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.sisipan.Graph
-import com.polstat.sisipan.Graph.pilihanStore
 import com.polstat.sisipan.data.FormasiStore
 import com.polstat.sisipan.data.MahasiswaRepository
 import com.polstat.sisipan.data.MahasiswaStore
-import com.polstat.sisipan.data.Pilihan
 import com.polstat.sisipan.data.PilihanNested
 import com.polstat.sisipan.data.PilihanRepository
 import com.polstat.sisipan.data.PilihanStore
 import com.polstat.sisipan.data.ProvinsiRepository
-import com.polstat.sisipan.ui.formasi.FormasiViewState
+import com.polstat.sisipan.data.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -54,76 +51,75 @@ class HomeViewModel(
         get() = _state
 
     init {
-        Log.i("TAGHomebefore","DATABASE init ${Graph.isDatabaseInitialized()}")
-        Log.i("TAGHomebefore","DATABASE open ${Graph.isDatabaseOpen()}")
+        Log.i("TAGHomebefore", "DATABASE init ${Graph.isDatabaseInitialized()}")
+        Log.i("TAGHomebefore", "DATABASE open ${Graph.isDatabaseOpen()}")
         observeRefresh()
         refresh(force = false)
-        Log.i("TAGHomeafter","DATABASE init ${Graph.isDatabaseInitialized()}")
-        Log.i("TAGHomeafter","DATABASE open ${Graph.isDatabaseOpen()}")
+        Log.i("TAGHomeafter", "DATABASE init ${Graph.isDatabaseInitialized()}")
+        Log.i("TAGHomeafter", "DATABASE open ${Graph.isDatabaseOpen()}")
     }
 
     private fun observeRefresh() {
         viewModelScope.launch {
             combine(
                 refreshing
-            ) { refreshingValue  ->
+            ) { refreshingValue ->
                 val idmhs = userRepository.idMhs
-                Log.i("TAG", "observeRefresh: Checkpoint1")
-                if (idmhs!=null) {
-                    Log.i("TAG", "observeRefresh: Checkpoint2")
-                    val pilihan = pilihanStore.pilihanByMhs(idmhs)
-                    val memilih = true
-                    val mahasiswa = mahasiswaStore.getMahasiswa(pilihan.mahasiswa)
-                    val pilihan1 = formasiStore.formasiById(pilihan.pilihan1 ?: 0)
-                    val pilihan2 = formasiStore.formasiById(pilihan.pilihan2 ?: 0)
-                    val pilihan3 = formasiStore.formasiById(pilihan.pilihan3 ?: 0)
-                    val pilihanSistem = formasiStore.formasiById(pilihan.pilihanSistem ?: 0)
-                    val pilihanSaya = PilihanNested(
-                        id = pilihan.id,
+                val pilihan = idmhs?.let { pilihanStore.pilihanByMhs(it) }
+                val memilih = pilihan != null
+
+                val pilihanSaya = pilihan?.let {
+                    val mahasiswa = mahasiswaStore.getMahasiswa(it.mahasiswa)
+                    val pilihan1 = formasiStore.formasiById(it.pilihan1 ?: 0)
+                    val pilihan2 = formasiStore.formasiById(it.pilihan2 ?: 0)
+                    val pilihan3 = formasiStore.formasiById(it.pilihan3 ?: 0)
+                    val pilihanSistem = formasiStore.formasiById(it.pilihanSistem ?: 0)
+
+                    PilihanNested(
+                        id = it.id,
                         mahasiswa = mahasiswa,
                         pilihan1 = pilihan1,
                         pilihan2 = pilihan2,
                         pilihan3 = pilihan3,
                         pilihanSistem = pilihanSistem,
-                        indeksPilihan1 = pilihan.indeksPilihan1,
-                        indeksPilihan2 = pilihan.indeksPilihan2,
-                        indeksPilihan3 = pilihan.indeksPilihan3,
-                        ipk = pilihan.ipk,
-                        hasil = pilihan.hasil
+                        indeksPilihan1 = it.indeksPilihan1,
+                        indeksPilihan2 = it.indeksPilihan2,
+                        indeksPilihan3 = it.indeksPilihan3,
+                        ipk = it.ipk,
+                        hasil = it.hasil
                     )
-                    Log.i("TAG", "observeRefresh: Checkpoint3")
+                }
+
+                val homeViewState = if (idmhs != null) {
                     HomeViewState(
                         role = userRepository.role,
                         pilihanSaya = pilihanSaya,
                         mahasiswaMemilih = pilihanStore.count(),
                         jmlhMhs = mahasiswaStore.count(),
                         memilih = memilih,
-                        refreshing = refreshingValue.get(0) ,
+                        refreshing = refreshingValue.get(0),
                         errorMessage = null /* TODO */
                     )
-                } else{
-                    Log.i("TAG", "observeRefresh: Checkpoint4")
+                } else {
                     HomeViewState(
                         role = userRepository.role,
                         mahasiswaMemilih = pilihanStore.count(),
                         jmlhMhs = mahasiswaStore.count(),
                         memilih = false,
-                        refreshing = refreshingValue.get(0) ,
+                        refreshing = refreshingValue.get(0),
                         errorMessage = null /* TODO */
                     )
                 }
+
+                homeViewState // Return the computed HomeViewState
             }.catch { throwable ->
-                Log.i("TAG", "observeRefresh: Checkpoint5")
-                // TODO: emit a UI error here. For now, we'll just rethrow
+                // Handle errors here
                 throw throwable
             }.collect {
-                Log.i("TAG", "observeRefresh: Checkpoint6")
                 _state.value = it
-                Log.i("TAG", "DATABASE open after collect: ${Graph.isDatabaseOpen()}")
             }
         }
     }
-
 
 
     private fun doRefresh(force: Boolean) {
@@ -142,6 +138,15 @@ class HomeViewModel(
 
     fun refresh(force: Boolean) {
         doRefresh(force)
+    }
+
+    fun penempatan() {
+        Log.i("TAG", "penempatan: DO")
+        viewModelScope.launch {
+            Log.i("TAG", "start penempatan: DO")
+            pilihanRepository.doPenempatan()
+            Log.i("TAG", "finish penempatan: DO")
+        }
     }
 
 }

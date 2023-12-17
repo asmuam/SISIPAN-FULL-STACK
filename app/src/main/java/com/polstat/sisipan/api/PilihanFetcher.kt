@@ -1,5 +1,6 @@
 package com.polstat.sisipan.api
 
+import android.util.Log
 import com.polstat.sisipan.data.Pilihan
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -27,6 +28,12 @@ class PilihanFetcher(
             pilihanService.getAll()
         }
     }
+
+    override suspend fun doPenempatan(): ApiResponse<List<Pilihan>> {
+        return withContext(ioDispatcher) {
+            Log.i("TAG", "doPenempatanFetcher: DO")
+            pilihanService.doPenempatan()
+        }    }
 
     override suspend fun pilih(id: Long, request: PilihanRequest): ApiResponse<Pilihan> {
         return withContext(ioDispatcher) {

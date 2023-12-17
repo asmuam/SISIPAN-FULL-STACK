@@ -1,6 +1,7 @@
 package com.polstat.sisipan.data
 
 import android.util.Log
+import com.polstat.sisipan.api.FormasiFetcher
 import com.polstat.sisipan.api.FormasiService
 import com.polstat.sisipan.api.PilihanRequest
 import com.polstat.sisipan.data.room.TransactionRunner
@@ -10,7 +11,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class FormasiRepository(
-    private val formasiService: FormasiService,
+    private val formasiService: FormasiFetcher,
     private val formasiStore: FormasiStore,
     private val transactionRunner: TransactionRunner,
     private val mainDispatcher: CoroutineDispatcher

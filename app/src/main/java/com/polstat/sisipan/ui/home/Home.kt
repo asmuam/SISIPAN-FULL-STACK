@@ -63,6 +63,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardDefaults.cardElevation
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -106,16 +107,26 @@ fun Home(
     onEditPilihan: (Long) -> Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
+    Log.i(
+        "AccessHome",
+        "ExpiresIn: ${UserRepository.expiresIn} time now: ${System.currentTimeMillis()}"
+    )
+    Log.i(
+        "AccessHome",
+        "idmhs: ${UserRepository.idMhs} time now: ${System.currentTimeMillis()}"
+    )
+    Log.i(
+        "AccessHome",
+        "id: ${UserRepository.id} time now: ${System.currentTimeMillis()}"
+    )
+    Log.i(
+        "AccessHome",
+        "role: ${UserRepository.role} time now: ${System.currentTimeMillis()}"
+    )
     LaunchedEffect(viewState){
         viewModel.refresh(true)
     }
     Surface(Modifier.fillMaxSize()) {
-        Log.i(
-            "AccessHome",
-            "ExpiresIn: ${UserRepository.expiresIn} time now: ${System.currentTimeMillis()}"
-        )
-
-
         HomeContent(
             openDrawer,
             isRefreshing = viewState.refreshing,
@@ -123,7 +134,7 @@ fun Home(
             onAccount,
             viewState = viewState,
             doRefresh = { viewModel.refresh(force = true) },
-            doPenempatan = { },
+            doPenempatan = {viewModel.penempatan() },
             onAddPilihan = { onAddPilihan() },
             onEditPilihan = { onEditPilihan(it.id) },
             memilih = viewState.memilih,
@@ -176,7 +187,7 @@ fun HomeAppBar(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(
     openDrawer: () -> Unit,
@@ -284,11 +295,18 @@ fun HomeContent(
                                     .fillMaxWidth()
                                     .height(120.dp)
                                     .padding(16.dp)
-                                    .background(MaterialTheme.colorScheme.background)
-                                    .clickable { doPenempatan() }, // Customize the background color
+                                    .background(MaterialTheme.colorScheme.background),
                                 shape = RoundedCornerShape(8.dp),
-                                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary),// Customize the corner radius
-                                elevation = cardElevation(4.dp) // Add elevation for a shadow effect
+                                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary),
+                                elevation = cardElevation(4.dp),
+                                // Tentukan apakah card dapat diklik berdasarkan kondisi
+                                enabled = (viewState.jmlhMhs == viewState.mahasiswaMemilih),
+                                // Handle klik pada card hanya jika card dapat diklik
+                                onClick = {
+                                    if (viewState.jmlhMhs == viewState.mahasiswaMemilih) {
+                                        doPenempatan()
+                                    }
+                                }
                             ) {
                                 Row(
                                     modifier = Modifier
@@ -311,6 +329,7 @@ fun HomeContent(
                                     )
                                 }
                             }
+
                             Text(
                                 text = "Last Updated: ${getCurrentTimestamp()}",
                                 fontSize = 12.sp,

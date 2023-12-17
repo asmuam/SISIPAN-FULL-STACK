@@ -398,7 +398,9 @@ fun PilihanCard(
 
             // Bagian Kanan (Pilihan 1, Pilihan 2, Pilihan 3)
             Column(
-                modifier = Modifier
+                modifier = Modifier.fillMaxWidth()
+                    .weight(1.5f)
+                , // Memberikan lebar maksimal pada Column
             ) {
                 Spacer(
                     modifier = Modifier.height(
@@ -422,6 +424,7 @@ fun PilihanCard(
 @Composable
 fun PilihanPriorityItem(label: String, value: Formasi?) {
     Column(
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -439,6 +442,7 @@ fun PilihanPriorityItem(label: String, value: Formasi?) {
         )
     }
 }
+
 
 
 @Preview

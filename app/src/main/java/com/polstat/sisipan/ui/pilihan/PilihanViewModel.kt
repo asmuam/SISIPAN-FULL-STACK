@@ -39,6 +39,7 @@ class PilihanViewModel(
         viewModelScope.launch {
             // Combines the latest value from each of the flows, allowing us to generate a
             // view state instance which only contains the latest values.
+            refresh(true)
             combine(
                 pilihanStore.daftarPilihan(),
                 refreshing

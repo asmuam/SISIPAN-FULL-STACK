@@ -295,6 +295,10 @@ fun EditPilihanInputForm(
             text = stringResource(R.string.required_fields),
             modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_medium))
         )
+        Text(
+            text = stringResource(R.string.differ),
+            modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_medium))
+        )
     }
 }
 

@@ -37,6 +37,7 @@ fun SignInRoute(
     val authResult by signInViewModel.authResult.collectAsState()
 
     LaunchedEffect(authResult) {
+        Log.i("TAG", "SignInRoute: SUKSES LAUNCH ${authResult}")
         if (authResult == AuthResult.SUCCESS) {
             onLoginSuccess()
         }

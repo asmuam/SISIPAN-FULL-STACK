@@ -1,6 +1,7 @@
 package com.polstat.sisipan.data
 
 import android.util.Log
+import com.polstat.sisipan.api.ProvinsiFetcher
 import com.polstat.sisipan.api.ProvinsiService
 import com.polstat.sisipan.data.room.TransactionRunner
 import kotlinx.coroutines.CoroutineDispatcher
@@ -9,7 +10,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class ProvinsiRepository(
-    private val provinsiService: ProvinsiService,
+    private val provinsiService: ProvinsiFetcher,
     private val provinsiStore: ProvinsiStore,
     private val mainDispatcher: CoroutineDispatcher,
     private val transactionRunner: TransactionRunner

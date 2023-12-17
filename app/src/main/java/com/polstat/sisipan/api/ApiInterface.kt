@@ -47,6 +47,10 @@ interface PilihanService {
     suspend fun getAll(): ApiResponse<List<Pilihan>>
 
     @Headers("Content-Type: application/json")
+    @GET("penempatan")
+    suspend fun doPenempatan(): ApiResponse<List<Pilihan>>
+
+    @Headers("Content-Type: application/json")
     @POST("pilihan/{id}")
     suspend fun pilih(@Path ("id") id:Long, @Body request: PilihanRequest): ApiResponse<Pilihan>
 
