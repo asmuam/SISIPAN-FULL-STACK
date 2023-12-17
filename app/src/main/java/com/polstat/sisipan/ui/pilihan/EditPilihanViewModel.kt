@@ -80,7 +80,7 @@ class EditPilihanViewModel(
                 EditPilihanViewState(
                     pilihanSaya = pilihanNestedSaya,
                     role = userRepository.role ?: "", //default ""
-                    pilihanUiState = PilihanUiState(pilihanSaya,true),
+                    pilihanUiState = PilihanUiState(pilihanSaya,validateInput(pilihanSaya)),
                     formasiList = formasiList,
                     refreshing = refreshing,
                     errorMessage = null /* TODO */

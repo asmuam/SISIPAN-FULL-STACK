@@ -252,9 +252,9 @@ fun EditPilihanInputForm(
     var selectedFormasi3 by remember { mutableStateOf<Formasi?>(null) }
 
     // Mengambil nilai namaSatuanKerja dari pilihanSaya
-    val namaSatuanKerjaPilihan1 = pilihanSaya.pilihan1.collectAsState(initial = Formasi(0,0,"","",0,0,0)).value.namaSatuanKerja
-    val namaSatuanKerjaPilihan2 = pilihanSaya.pilihan2.collectAsState(initial = Formasi(0,0,"","",0,0,0)).value.namaSatuanKerja
-    val namaSatuanKerjaPilihan3 = pilihanSaya.pilihan3.collectAsState(initial = Formasi(0,0,"","",0,0,0)).value.namaSatuanKerja
+    val namaSatuanKerjaPilihan1 = pilihanSaya.pilihan1?.collectAsState(initial = Formasi(0, 0, "", "", 0, 0, 0))?.value?.namaSatuanKerja ?: ""
+    val namaSatuanKerjaPilihan2 = pilihanSaya.pilihan2?.collectAsState(initial = Formasi(0, 0, "", "", 0, 0, 0))?.value?.namaSatuanKerja ?: ""
+    val namaSatuanKerjaPilihan3 = pilihanSaya.pilihan3?.collectAsState(initial = Formasi(0, 0, "", "", 0, 0, 0))?.value?.namaSatuanKerja ?: ""
     // Callback untuk mengubah item yang dipilih
     val onFormasi1Selected: (Formasi) -> Unit = { formasi ->
         selectedFormasi1 = formasi

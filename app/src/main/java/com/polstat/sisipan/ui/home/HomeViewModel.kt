@@ -60,6 +60,7 @@ class HomeViewModel(
     }
 
     private fun observeRefresh() {
+        doRefresh(true)
         viewModelScope.launch {
             combine(
                 refreshing
@@ -67,7 +68,8 @@ class HomeViewModel(
                 val idmhs = userRepository.idMhs
                 val pilihan = idmhs?.let { pilihanStore.pilihanByMhs(it) }
                 val memilih = pilihan != null
-
+                Log.i("TAG", "memilih:${memilih} ")
+                Log.i("TAG", "memilih:${pilihan} ")
                 val pilihanSaya = pilihan?.let {
                     val mahasiswa = mahasiswaStore.getMahasiswa(it.mahasiswa)
                     val pilihan1 = formasiStore.formasiById(it.pilihan1 ?: 0)

@@ -107,22 +107,6 @@ fun Home(
     onEditPilihan: (Long) -> Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
-    Log.i(
-        "AccessHome",
-        "ExpiresIn: ${UserRepository.expiresIn} time now: ${System.currentTimeMillis()}"
-    )
-    Log.i(
-        "AccessHome",
-        "idmhs: ${UserRepository.idMhs} time now: ${System.currentTimeMillis()}"
-    )
-    Log.i(
-        "AccessHome",
-        "id: ${UserRepository.id} time now: ${System.currentTimeMillis()}"
-    )
-    Log.i(
-        "AccessHome",
-        "role: ${UserRepository.role} time now: ${System.currentTimeMillis()}"
-    )
     LaunchedEffect(viewState){
         viewModel.refresh(true)
     }
@@ -419,7 +403,8 @@ fun HomeContent(
                                                     initial = Formasi(0, 0, "", "", 0, 0, 0)
                                                 ).value
                                             )
-
+                                            Log.i("TAG", "PilihanState: ${pilihan1State},${pilihan2State},${pilihan3State}")
+                                            Log.i("TAG", "PilihanSaya: ${pilihanSaya}")
                                             PreviewPilihanState(pilihanState = pilihan1State)
                                             PreviewPilihanState(pilihanState = pilihan2State)
                                             PreviewPilihanState(pilihanState = pilihan3State)
@@ -475,9 +460,9 @@ fun HomeContent(
     }
 }
 @Composable
-fun PreviewPilihanState(pilihanState: Formasi) {
+fun PreviewPilihanState(pilihanState: Formasi?) {
     Text(
-        text = pilihanState.namaSatuanKerja,
+        text = pilihanState?.namaSatuanKerja ?: "Formasi Sudah Tidak Tersedia",
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
         color = Color.Black,
