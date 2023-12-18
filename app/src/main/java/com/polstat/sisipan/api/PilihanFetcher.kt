@@ -33,7 +33,8 @@ class PilihanFetcher(
         return withContext(ioDispatcher) {
             Log.i("TAG", "doPenempatanFetcher: DO")
             pilihanService.doPenempatan()
-        }    }
+        }
+    }
 
     override suspend fun pilih(id: Long, request: PilihanRequest): ApiResponse<Pilihan> {
         return withContext(ioDispatcher) {
@@ -47,9 +48,7 @@ class PilihanFetcher(
         }
     }
 
-    override suspend fun deleteAll(): ApiResponse<String> {
-        return withContext(ioDispatcher) {
-            pilihanService.deleteAll()
-        }
+    override suspend fun deleteAll() {
+        pilihanService.deleteAll()
     }
 }

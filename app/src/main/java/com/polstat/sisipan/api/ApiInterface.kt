@@ -64,7 +64,7 @@ interface PilihanService {
 
     @Headers("Content-Type: application/json")
     @POST("pilihan/delete-all")
-    suspend fun deleteAll(): ApiResponse<String>
+    suspend fun deleteAll()
 
 }
 

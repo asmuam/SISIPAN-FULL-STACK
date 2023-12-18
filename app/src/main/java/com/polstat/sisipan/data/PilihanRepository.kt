@@ -106,20 +106,11 @@ class PilihanRepository(
     fun deleteAll() {
         scope.launch {
             try {
-                val response = pilihanService.deleteAll()
-                if (response.httpStatusCode == 204) {
-                    // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
-                    refreshPilihan(force = false)
-                } else {
-                    // Handle kesalahan jika diperlukan
-                    Log.e(
-                        "FormasiRepository",
-                        "Failed to delete formasi. Response: ${response.message}"
-                    )
-                }
+                pilihanService.deleteAll()
+                refreshPilihan(false)
             } catch (e: Exception) {
                 // Handle exception jika terjadi kesalahan dalam komunikasi dengan server
-                Log.e("FormasiRepository", "Error deleting mhs", e)
+                Log.e("PilihanRepository", "Error deleting pilihan", e)
             }
         }
     }
