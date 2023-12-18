@@ -64,7 +64,7 @@ class ProfileViewModel(
         viewModelScope.launch {
             val idMhs: Long? = userRepository.idMhs
             combine(
-                idMhs?.let { mahasiswaStore.getMahasiswa(it) } ?: flowOf(null),
+                idMhs?.let { mahasiswaStore.getMahasiswaFlow(it) } ?: flowOf(null),
                 refreshing,
             ) { mahasiswaDetail, refreshing ->
                 val provinsi: Provinsi? = mahasiswaDetail?.id?.let { provinsiId ->

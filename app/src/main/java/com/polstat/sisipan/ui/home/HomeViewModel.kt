@@ -64,7 +64,7 @@ class HomeViewModel(
                 val memilih = pilihan != null
                 Log.i("HomeViewModel", "observeRefresh: COMBINE")
                 val pilihanSaya = pilihan?.let {
-                    val mahasiswa = mahasiswaStore.getMahasiswa(it.mahasiswa)
+                    val mahasiswa = mahasiswaStore.getMahasiswaFlow(it.mahasiswa)
                     val pilihan1 = formasiStore.formasiById(it.pilihan1 ?: 0)
                     val pilihan2 = formasiStore.formasiById(it.pilihan2 ?: 0)
                     val pilihan3 = formasiStore.formasiById(it.pilihan3 ?: 0)

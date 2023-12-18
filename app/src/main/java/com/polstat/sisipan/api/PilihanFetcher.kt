@@ -48,7 +48,7 @@ class PilihanFetcher(
         }
     }
 
-    override suspend fun deleteAll() {
-        pilihanService.deleteAll()
+    override suspend fun deleteAll():ApiResponse<String> {
+        return pilihanService.deleteAll()
     }
 }

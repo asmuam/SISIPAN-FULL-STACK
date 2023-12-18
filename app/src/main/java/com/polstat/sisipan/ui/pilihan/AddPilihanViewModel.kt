@@ -8,12 +8,14 @@ import com.polstat.sisipan.api.PilihanRequest
 import com.polstat.sisipan.data.Formasi
 import com.polstat.sisipan.data.FormasiRepository
 import com.polstat.sisipan.data.FormasiStore
+import com.polstat.sisipan.data.MahasiswaStore
 import com.polstat.sisipan.data.Pilihan
 import com.polstat.sisipan.data.PilihanRepository
 import com.polstat.sisipan.data.PilihanStore
 import com.polstat.sisipan.data.Provinsi
 import com.polstat.sisipan.data.ProvinsiStore
 import com.polstat.sisipan.data.UserRepository
+import com.polstat.sisipan.data.UserRepository.idMhs
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -24,7 +26,8 @@ class AddPilihanViewModel(
     private val userRepository: UserRepository = Graph.userRepository,
     private val pilihanRepository: PilihanRepository = Graph.pilihanRepository,
     private val formasiRepository: FormasiRepository = Graph.formasiRepository,
-    private val formasiStore: FormasiStore = Graph.formasiStore
+    private val formasiStore: FormasiStore = Graph.formasiStore,
+    private val mahasiswaStore: MahasiswaStore= Graph.mahasiswaStore
 ) : ViewModel() {
     private val _state = MutableStateFlow(AddPilihanViewState())
     private val refreshing = MutableStateFlow(true)
@@ -51,9 +54,18 @@ class AddPilihanViewModel(
                 formasiStore.formasiBuka(),
                 refreshing,
             ) { formasiList, refreshing ->
+                val prodi = mahasiswaStore.getMahasiswa(idMhs?:0).prodi
+                val filteredFormasiList = formasiList.filter { formasi ->
+                    when (prodi) {
+                        "D4_KS" -> formasi.kuotaKs > 0
+                        "D4_ST" -> formasi.kuotaSt > 0
+                        "D3_ST" -> formasi.kuotaD3 > 0
+                        else -> false // Handle other cases if needed
+                    }
+                }
                 AddPilihanViewState(
                     role = userRepository.role ?: "",
-                    formasiList = formasiList,
+                    formasiList = filteredFormasiList,
                     refreshing = refreshing,
                     errorMessage = null /* TODO */
                 )
@@ -102,13 +114,13 @@ class AddPilihanViewModel(
 
 data class AddPilihanViewState(
     val role: String = "",
-    val formasiList:List<Formasi> = emptyList(),
-    val pilihanUiState:PilihanUiState = PilihanUiState(),
+    val formasiList: List<Formasi> = emptyList(),
+    val pilihanUiState: PilihanUiState = PilihanUiState(),
     val refreshing: Boolean = false,
     val errorMessage: String? = null
 )
 
 data class PilihanUiState(
-    val pilihanDetails: PilihanRequest = PilihanRequest(0L,0L,0L),
+    val pilihanDetails: PilihanRequest = PilihanRequest(0L, 0L, 0L),
     val isEntryValid: Boolean = false
 )

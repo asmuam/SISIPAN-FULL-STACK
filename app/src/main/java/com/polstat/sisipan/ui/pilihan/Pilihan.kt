@@ -97,7 +97,7 @@ fun Pilihan(
             isRefreshing = viewState.refreshing,
             modifier = Modifier.fillMaxSize(),
             onAccount,
-            doRefresh = { viewModel.refresh(force = false) },
+            doRefresh = { viewModel.refresh(force = true) },
             pilihanSaya = viewState.pilihanSaya,
             role = viewState.role,
             deleteAll = { viewModel.deleteAll() } ,

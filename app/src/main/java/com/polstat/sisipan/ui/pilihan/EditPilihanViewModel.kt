@@ -54,7 +54,16 @@ class EditPilihanViewModel(
                 formasiStore.formasiBuka(),
                 refreshing,
             ) { formasiList, refreshing ->
-                val mahasiswa = mahasiswaStore.getMahasiswa(pilihanSaya.mahasiswa)
+                val prodi = mahasiswaStore.getMahasiswa(UserRepository.idMhs ?:0).prodi
+                val filteredFormasiList = formasiList.filter { formasi ->
+                    when (prodi) {
+                        "D4_KS" -> formasi.kuotaKs > 0
+                        "D4_ST" -> formasi.kuotaSt > 0
+                        "D3_ST" -> formasi.kuotaD3 > 0
+                        else -> false // Handle other cases if needed
+                    }
+                }
+                val mahasiswa = mahasiswaStore.getMahasiswaFlow(pilihanSaya.mahasiswa)
                 val pilihan1 = formasiStore.formasiById(pilihanSaya.pilihan1 ?: 0)
                 val pilihan2 = formasiStore.formasiById(pilihanSaya.pilihan2 ?: 0)
                 val pilihan3 = formasiStore.formasiById(pilihanSaya.pilihan3 ?: 0)
@@ -81,7 +90,7 @@ class EditPilihanViewModel(
                     pilihanSaya = pilihanNestedSaya,
                     role = userRepository.role ?: "",
                     pilihanUiState = PilihanUiState(pilihanSaya, validateInput(pilihanSaya)),
-                    formasiList = formasiList,
+                    formasiList = filteredFormasiList,
                     refreshing = refreshing,
                     errorMessage = null /* TODO */
                 )

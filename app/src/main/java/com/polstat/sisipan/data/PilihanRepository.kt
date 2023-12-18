@@ -21,8 +21,10 @@ class PilihanRepository(
     private val scope = CoroutineScope(mainDispatcher)
 
     suspend fun refreshPilihan(force: Boolean) {
+        Log.i("TAG", "refreshPilihan:REFRESH ")
         if (refreshingJob?.isActive == true) {
             refreshingJob?.join()
+            Log.e("PILIHAN_REPO", "job")
         } else if (force || pilihanStore.isEmpty()) {
             Log.e("PILIHAN_REPO", "cek")
             refreshingJob = scope.launch {
@@ -31,10 +33,10 @@ class PilihanRepository(
                         // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
                         val response = pilihanService.getAll()
                         Log.i("PILIHAN REPO", "refreshPilihan:${response} ")
-                        if (response.httpStatusCode==200) {
-                            if (response.data!=null) {
-                                if (response.data.isEmpty()){
-                                        pilihanStore.deleteAll()
+                        if (response.httpStatusCode == 200) {
+                            if (response.data != null) {
+                                if (response.data.isEmpty()) {
+                                    pilihanStore.deleteAll()
                                 }
                                 pilihanStore.savePilihanList(response.data)
                             }
@@ -59,7 +61,10 @@ class PilihanRepository(
                 refreshPilihan(force = true)
             } else {
                 // Handle kesalahan jika diperlukan
-                Log.e("PILIHANREPOSTATUS", "Failed to insert pilihan. Response: ${response.message}")
+                Log.e(
+                    "PILIHANREPOSTATUS",
+                    "Failed to insert pilihan. Response: ${response.message}"
+                )
             }
         } catch (e: Exception) {
             // Handle exception jika terjadi kesalahan dalam komunikasi dengan server atau operasi penyimpanan
@@ -79,7 +84,10 @@ class PilihanRepository(
                 refreshPilihan(force = false)
             } else {
                 // Handle kesalahan jika diperlukan
-                Log.e("PILIHANREPOResponse", "Failed to insert pilihan. Response: ${response.message}")
+                Log.e(
+                    "PILIHANREPOResponse",
+                    "Failed to insert pilihan. Response: ${response.message}"
+                )
             }
         } catch (e: Exception) {
             // Handle exception jika terjadi kesalahan dalam komunikasi dengan server atau operasi penyimpanan
@@ -96,9 +104,12 @@ class PilihanRepository(
                 refreshPilihan(force = false)
             } else {
                 // Handle kesalahan jika diperlukan
-                Log.e("PILIHANREPOResponse", "Failed to insert pilihan. Response: ${response.message}")
+                Log.e(
+                    "PILIHANREPOResponse",
+                    "Failed to insert pilihan. Response: ${response.message}"
+                )
             }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Log.e("PILIHANREPO", "Error do penempatan", e)
         }
     }
@@ -106,13 +117,16 @@ class PilihanRepository(
     fun deleteAll() {
         scope.launch {
             try {
-                pilihanService.deleteAll()
-                refreshPilihan(false)
+                val res = pilihanService.deleteAll()
+                if (res.httpStatusCode==204) {
+                    Log.i("PILIHAN REPO", "deleteAll: SUKSES")
+                    refreshPilihan(false)
+                }
             } catch (e: Exception) {
                 // Handle exception jika terjadi kesalahan dalam komunikasi dengan server
                 Log.e("PilihanRepository", "Error deleting pilihan", e)
             }
         }
     }
-        // Metode lain sesuai kebutuhan
+    // Metode lain sesuai kebutuhan
 }

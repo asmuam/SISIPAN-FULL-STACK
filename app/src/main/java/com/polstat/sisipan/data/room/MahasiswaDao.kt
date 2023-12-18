@@ -9,7 +9,9 @@ import kotlinx.coroutines.flow.Flow
 abstract class MahasiswaDao : BaseDao<Mahasiswa> {
 
     @Query("SELECT * FROM mahasiswa WHERE id=:id")
-    abstract fun findById(id: Long): Flow<Mahasiswa>
+    abstract fun findByIdFlow(id: Long): Flow<Mahasiswa>
+    @Query("SELECT * FROM mahasiswa WHERE id=:id")
+    abstract suspend fun findById(id: Long): Mahasiswa
     @Query("SELECT * FROM mahasiswa")
     abstract fun findAll(): Flow<List<Mahasiswa>>
 

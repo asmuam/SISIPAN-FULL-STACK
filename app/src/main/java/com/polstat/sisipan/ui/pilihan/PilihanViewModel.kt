@@ -37,15 +37,15 @@ class PilihanViewModel(
     init {
         Log.i("PilihanVM", "init start ")
         viewModelScope.launch {
-            refresh(true)
+            refresh(false)
             combine(
                 pilihanStore.daftarPilihan(),
                 refreshing
             ) { pilihanList, refreshing ->
                 Log.i("PilihanVM", "combine start ")
-
+                Log.i("TAG", "PILIHAN BARU:${pilihanList} ")
                 val mappedPilihanList = pilihanList.map { pilihan ->
-                    val mahasiswa = mahasiswaStore.getMahasiswa(pilihan.mahasiswa)
+                    val mahasiswa = mahasiswaStore.getMahasiswaFlow(pilihan.mahasiswa)
                     val pilihan1 = formasiStore.formasiById(pilihan.pilihan1 ?: 0)
                     val pilihan2 = formasiStore.formasiById(pilihan.pilihan2 ?: 0)
                     val pilihan3 = formasiStore.formasiById(pilihan.pilihan3 ?: 0)
@@ -70,7 +70,7 @@ class PilihanViewModel(
                 val filteredPilihanList = mappedPilihanList.filter { it.id != pilihanSaya?.id }
 
                 pilihanSaya?.run {
-                    val mahasiswa = mahasiswaStore.getMahasiswa(pilihanSaya.mahasiswa)
+                    val mahasiswa = mahasiswaStore.getMahasiswaFlow(pilihanSaya.mahasiswa)
                     val pilihan1 = formasiStore.formasiById(pilihanSaya.pilihan1 ?: 0)
                     val pilihan2 = formasiStore.formasiById(pilihanSaya.pilihan2 ?: 0)
                     val pilihan3 = formasiStore.formasiById(pilihanSaya.pilihan3 ?: 0)
@@ -113,8 +113,6 @@ class PilihanViewModel(
                 Log.i("PilihanVM", " update ui ")
             }
         }
-
-        refresh(force = false)
     }
 
     fun deleteAll() {
@@ -133,13 +131,13 @@ class PilihanViewModel(
                 refreshing.value = true
                 Log.i("PilihanViewModel", "Refreshing pilihan data")
                 pilihanRepository.refreshPilihan(force)
-                formasiRepository.refreshFormasi(force)
                 // Handle the response
             } catch (e: Exception) {
                 // Handle the error
                 Log.e("PilihanViewModel", "Error refreshing pilihan", e)
             } finally {
                 refreshing.value = false
+                Log.i("PilihanViewModel", "Refreshing ui ")
             }
         }
     }

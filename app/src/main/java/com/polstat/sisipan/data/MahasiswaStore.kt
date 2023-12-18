@@ -22,9 +22,14 @@ class MahasiswaStore(
         mahasiswaDao.insert(mahasiswa)
     }
 
-    suspend fun getMahasiswa(id: Long): Flow<Mahasiswa> {
+    suspend fun getMahasiswaFlow(id: Long): Flow<Mahasiswa> {
+        return mahasiswaDao.findByIdFlow(id)
+    }
+
+    suspend fun getMahasiswa(id: Long): Mahasiswa {
         return mahasiswaDao.findById(id)
     }
+
 
     suspend fun getAll(): Flow<List<Mahasiswa>> {
         return mahasiswaDao.findAll()
