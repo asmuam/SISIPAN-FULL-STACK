@@ -48,9 +48,13 @@ class FormasiRepository(
         // Misalnya, jika Anda memiliki service untuk menyimpan data ke server:
         try {
             val response = formasiService.insert(formasi)
-            if (response.httpStatusCode == 200) {
+            Log.e(
+                "FormasiRepository",
+                "insert formasi. Response: ${response}"
+            )
+            if (response.httpStatusCode == 201) {
                 // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
-                refreshFormasi(force = false)
+                refreshFormasi(force = true)
             } else {
                 // Handle kesalahan jika diperlukan
                 Log.e(
@@ -102,7 +106,7 @@ class FormasiRepository(
                 }
             } catch (e: Exception) {
                 // Handle exception jika terjadi kesalahan dalam komunikasi dengan server
-                Log.e("FormasiRepository", "Error inserting formasi", e)
+                Log.e("FormasiRepository", "Error deleting formasi", e)
             }
         }
     }

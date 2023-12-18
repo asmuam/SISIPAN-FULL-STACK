@@ -25,15 +25,12 @@ class AddFormasiViewModel(
     private val provinsiStore: ProvinsiStore = Graph.provinsiStore
 ) : ViewModel() {
     private val _state = MutableStateFlow(AddFormasiViewState())
-
     private val refreshing = MutableStateFlow(true)
 
     val state: StateFlow<AddFormasiViewState>
         get() = _state
 
-
     fun updateUiState(formasiDetails: FormasiDetails) {
-
         _state.value = _state.value.copy(
             formasiUiState = _state.value.formasiUiState.copy(
                 formasiDetails = formasiDetails,
@@ -43,6 +40,7 @@ class AddFormasiViewModel(
     }
 
     init {
+        Log.i("AddFormasiViewModel", "INIT")
         viewModelScope.launch {
             refresh(false)
             combine(
@@ -57,6 +55,7 @@ class AddFormasiViewModel(
                 )
             }.catch { throwable ->
                 // TODO: emit a UI error here. For now, we'll just rethrow
+                Log.e("AddFormasiViewModel", "Error in combine", throwable)
                 throw throwable
             }.collect {
                 _state.value = it
@@ -65,16 +64,18 @@ class AddFormasiViewModel(
     }
 
     fun refresh(force: Boolean) {
+        Log.i("AddFormasiViewModel", "refresh: START")
         viewModelScope.launch {
             try {
                 refreshing.value = true
                 provinsiRepository.refreshProvinsi(force)
                 // Handle the response
             } catch (e: Exception) {
-                Log.e("FormasiViewModel", "Error refreshing prov", e)
+                Log.e("AddFormasiViewModel", "Error refreshing prov", e)
                 // Handle the error
             } finally {
                 refreshing.value = false
+                Log.i("AddFormasiViewModel", "refresh: Done")
             }
         }
     }
@@ -90,14 +91,10 @@ class AddFormasiViewModel(
             viewModelScope.launch {
                 try {
                     formasiRepository.insertFormasi(state.value.formasiUiState.formasiDetails.toFormasi())
-                } catch (
-                    e:Exception
-                ){
-
+                } catch (e:Exception) {
+                    Log.e("AddFormasiViewModel", "Error saving formasi", e)
                 }
-                refresh(true)
             }
-
         }
     }
 }

@@ -36,7 +36,7 @@ class FormasiViewModel(
     private val formasiRepository: FormasiRepository = Graph.formasiRepository,
     private val formasiStore: FormasiStore = Graph.formasiStore,
     private val provinsiRepository: ProvinsiRepository = Graph.provinsiRepository,
-): ViewModel() {
+) : ViewModel() {
 
     // Holds our view state which the UI collects via [state]
     private val _state = MutableStateFlow(FormasiViewState())
@@ -44,16 +44,16 @@ class FormasiViewModel(
     private val refreshing = MutableStateFlow(true)
 
     val state: StateFlow<FormasiViewState>
-    get() = _state
+        get() = _state
 
     init {
+        Log.i("FormasiViewModel", "INIT")
         viewModelScope.launch {
             refresh(force = false)
             combine(
                 formasiStore.getAll(),
                 refreshing
             ) { formasiList, refreshing ->
-
                 FormasiViewState(
                     role = userRepository.role ?: "",
                     formasiBukaList = formasiList.filter { formasi ->
@@ -76,6 +76,7 @@ class FormasiViewModel(
     }
 
     fun refresh(force: Boolean) {
+        Log.i("FormasiViewModel", "refresh: START")
         viewModelScope.launch {
             try {
                 refreshing.value = true
@@ -87,20 +88,22 @@ class FormasiViewModel(
                 // Handle the error
             } finally {
                 refreshing.value = false
+                Log.i("FormasiViewModel", "refresh: Done")
             }
         }
     }
 
     fun deleteFormasi(id: Long) {
+        Log.i("FormasiViewModel", "deleteFormasi: START")
         viewModelScope.launch {
             refreshing.value = true
             formasiRepository.deleteFormasi(id)
         }
+        Log.i("FormasiViewModel", "deleteFormasi: done")
         refresh(true)
         refreshing.value = false
     }
 }
-
 data class FormasiViewState(
     val role: String = "",
     val formasiBukaList: List<Formasi> = emptyList(),

@@ -30,8 +30,7 @@ class EditFormasiViewModel(
     private val formasiStore: FormasiStore = Graph.formasiStore,
     private val provinsiStore: ProvinsiStore = Graph.provinsiStore,
     private val provinsiRepository: ProvinsiRepository = Graph.provinsiRepository,
-
-    ) : ViewModel() {
+) : ViewModel() {
     private val _state = MutableStateFlow(EditFormasiViewState())
     private val formasiId: Long = checkNotNull(savedStateHandle[Screen.EditFormasi.formasiIdArg])
     private val refreshing = MutableStateFlow(true)
@@ -49,6 +48,7 @@ class EditFormasiViewModel(
     }
 
     init {
+        Log.i("EditFormasiViewModel", "INIT")
         viewModelScope.launch {
             refresh(false)
             val formasiData = formasiStore.findFormasiById(formasiId)
@@ -65,14 +65,13 @@ class EditFormasiViewModel(
                 )
             }.catch { throwable ->
                 // TODO: emit a UI error here. For now, we'll just rethrow
+                Log.e("EditFormasiViewModel", "Error in combine", throwable)
                 throw throwable
             }.collect {
                 _state.value = it
             }
-
         }
     }
-
 
     private fun validateInput(uiState: FormasiDetails = state.value.formasiUiState.formasiDetails): Boolean {
         return with(uiState) {
@@ -89,24 +88,26 @@ class EditFormasiViewModel(
                         state.value.formasiUiState.formasiDetails.toFormasi()
                     )
                 } catch (e:Exception){
-
+                    Log.e("EditFormasiViewModel", "Error saving formasi", e)
                 }
                 refresh(true)
             }
-
         }
     }
+
     fun refresh(force: Boolean) {
+        Log.i("EditFormasiViewModel", "refresh: START")
         viewModelScope.launch {
             try {
                 refreshing.value = true
                 provinsiRepository.refreshProvinsi(force)
                 // Handle the response
             } catch (e: Exception) {
-                Log.e("FormasiViewModel", "Error refreshing prov", e)
+                Log.e("EditFormasiViewModel", "Error refreshing prov", e)
                 // Handle the error
             } finally {
                 refreshing.value = false
+                Log.i("EditFormasiViewModel", "refresh: Done")
             }
         }
     }

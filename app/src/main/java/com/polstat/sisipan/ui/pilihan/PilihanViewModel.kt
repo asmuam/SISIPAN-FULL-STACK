@@ -1,5 +1,6 @@
 package com.polstat.sisipan.ui.pilihan
 
+import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,34 +25,32 @@ class PilihanViewModel(
     private val pilihanStore: PilihanStore = Graph.pilihanStore,
     private val mahasiswaStore: MahasiswaStore = Graph.mahasiswaStore,
     private val formasiStore: FormasiStore = Graph.formasiStore,
-    private val formasiRepository: FormasiRepository=Graph.formasiRepository,
+    private val formasiRepository: FormasiRepository = Graph.formasiRepository,
 ) : ViewModel() {
 
-    // Holds our view state which the UI collects via [state]
     private val _state = MutableStateFlow(PilihanViewState())
-
     private val refreshing = MutableStateFlow(false)
 
     val state: StateFlow<PilihanViewState>
         get() = _state
 
     init {
+        Log.i("PilihanVM", "init start ")
         viewModelScope.launch {
-            // Combines the latest value from each of the flows, allowing us to generate a
-            // view state instance which only contains the latest values.
             refresh(true)
             combine(
                 pilihanStore.daftarPilihan(),
                 refreshing
             ) { pilihanList, refreshing ->
-                // Map PilihanList to PilihanNested
+                Log.i("PilihanVM", "combine start ")
+
                 val mappedPilihanList = pilihanList.map { pilihan ->
                     val mahasiswa = mahasiswaStore.getMahasiswa(pilihan.mahasiswa)
                     val pilihan1 = formasiStore.formasiById(pilihan.pilihan1 ?: 0)
                     val pilihan2 = formasiStore.formasiById(pilihan.pilihan2 ?: 0)
                     val pilihan3 = formasiStore.formasiById(pilihan.pilihan3 ?: 0)
                     val pilihanSistem = formasiStore.formasiById(pilihan.pilihanSistem ?: 0)
-
+                    Log.i("PilihanViewModel", "Combine Init ")
                     PilihanNested(
                         id = pilihan.id,
                         mahasiswa = mahasiswa,
@@ -66,46 +65,73 @@ class PilihanViewModel(
                         hasil = pilihan.hasil
                     )
                 }
-                val pilihanSaya = pilihanStore.pilihanByMhs(UserRepository.idMhs?:0)
+
+                val pilihanSaya = pilihanStore.pilihanByMhs(UserRepository.idMhs ?: 0)
                 val filteredPilihanList = mappedPilihanList.filter { it.id != pilihanSaya?.id }
+
                 pilihanSaya?.run {
                     val mahasiswa = mahasiswaStore.getMahasiswa(pilihanSaya.mahasiswa)
                     val pilihan1 = formasiStore.formasiById(pilihanSaya.pilihan1 ?: 0)
                     val pilihan2 = formasiStore.formasiById(pilihanSaya.pilihan2 ?: 0)
                     val pilihan3 = formasiStore.formasiById(pilihanSaya.pilihan3 ?: 0)
                     val pilihanSistem = formasiStore.formasiById(pilihanSaya.pilihanSistem ?: 0)
+
                     PilihanViewState(
-                        role = userRepository.role?:"",
+                        role = userRepository.role ?: "",
                         pilihanList = filteredPilihanList,
-                        pilihanSaya = PilihanNested(pilihanSaya.id,mahasiswa,pilihan1,pilihan2,pilihan3,pilihanSistem,pilihanSaya.indeksPilihan1,pilihanSaya.indeksPilihan2,pilihanSaya.indeksPilihan3,pilihanSaya.ipk,pilihanSaya.hasil),
+                        pilihanSaya = PilihanNested(
+                            pilihanSaya.id,
+                            mahasiswa,
+                            pilihan1,
+                            pilihan2,
+                            pilihan3,
+                            pilihanSistem,
+                            pilihanSaya.indeksPilihan1,
+                            pilihanSaya.indeksPilihan2,
+                            pilihanSaya.indeksPilihan3,
+                            pilihanSaya.ipk,
+                            pilihanSaya.hasil
+                        ),
                         refreshing = refreshing,
                         errorMessage = null /* TODO */
                     )
-                }?: run{
-                PilihanViewState(
-                    role = userRepository.role?:"",
-                    pilihanList = mappedPilihanList,
-                    pilihanSaya = null,
-                    refreshing = refreshing,
-                    errorMessage = null /* TODO */
-                )
+                } ?: run {
+                    Log.i("PilihanViewModel", "pilihanSaya is null")
+                    PilihanViewState(
+                        role = userRepository.role ?: "",
+                        pilihanList = mappedPilihanList,
+                        pilihanSaya = null,
+                        refreshing = refreshing,
+                        errorMessage = null /* TODO */
+                    )
                 }
             }.catch { throwable ->
-                // TODO: emit a UI error here. For now, we'll just rethrow
+                Log.e("PilihanViewModel", "Error in combine", throwable)
                 throw throwable
             }.collect {
                 _state.value = it
+                Log.i("PilihanVM", " update ui ")
             }
         }
 
         refresh(force = false)
     }
 
-
+    fun deleteAll() {
+        Log.i("PilViewModel", "deletePi: START")
+        viewModelScope.launch {
+            refreshing.value = true
+            pilihanRepository.deleteAll()
+        }
+        Log.i("PilViewModel", "deletePi: done")
+        refresh(true)
+        refreshing.value = false
+    }
     fun refresh(force: Boolean) {
         viewModelScope.launch {
             try {
                 refreshing.value = true
+                Log.i("PilihanViewModel", "Refreshing pilihan data")
                 pilihanRepository.refreshPilihan(force)
                 formasiRepository.refreshFormasi(force)
                 // Handle the response
@@ -117,9 +143,8 @@ class PilihanViewModel(
             }
         }
     }
-
-
 }
+
 
 data class PilihanViewState(
     val role: String = "",

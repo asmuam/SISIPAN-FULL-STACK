@@ -46,4 +46,10 @@ class PilihanFetcher(
             pilihanService.ubah(id, request)
         }
     }
+
+    override suspend fun deleteAll(): ApiResponse<String> {
+        return withContext(ioDispatcher) {
+            pilihanService.deleteAll()
+        }
+    }
 }

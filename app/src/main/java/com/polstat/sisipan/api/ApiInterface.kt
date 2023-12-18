@@ -62,6 +62,10 @@ interface PilihanService {
     @PUT("pilihan/{id}")
     suspend fun ubah(@Path ("id") id:Long, @Body request: PilihanRequest): ApiResponse<Pilihan>
 
+    @Headers("Content-Type: application/json")
+    @POST("pilihan/delete-all")
+    suspend fun deleteAll(): ApiResponse<String>
+
 }
 
 data class PilihanRequest(

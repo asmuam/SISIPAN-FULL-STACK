@@ -39,17 +39,17 @@ class MahasiswaViewModel(
     private val mahasiswaStore: MahasiswaStore = Graph.mahasiswaStore,
     private val provinsiStore: ProvinsiStore = Graph.provinsiStore,
 ) : ViewModel() {
-
-    // Holds our view state which the UI collects via [state]
     private val _state = MutableStateFlow(MahasiswaViewState())
-
     private val refreshing = MutableStateFlow(false)
 
     val state: StateFlow<MahasiswaViewState>
         get() = _state
 
     init {
+        Log.e("MahasiswaViewModel", "  start init ")
+
         viewModelScope.launch {
+
             refresh(force = false)
             combine(
                 mahasiswaStore.getAll(),
@@ -66,6 +66,8 @@ class MahasiswaViewModel(
                         ipk = mhs.ipk,
                     )
                 }
+                Log.e("MahasiswaViewModel", "  combine ")
+
                 MahasiswaViewState(
                     role = userRepository.role,
                     mahasiswa = mappedMahasiswaList,
@@ -73,35 +75,38 @@ class MahasiswaViewModel(
                     errorMessage = null, /* TODO */
                 )
             }.catch { throwable ->
-                // TODO: emit a UI error here. For now, we'll just rethrow
+                Log.e("MahasiswaViewModel", "Error during data collection", throwable)
                 throw throwable
             }.collect {
+                Log.e("MahasiswaViewModel", "  update UI ")
                 _state.value = it
             }
         }
     }
 
     fun refresh(force: Boolean) {
+        Log.e("MahasiswaViewModel", "  start refresh ")
         viewModelScope.launch {
             try {
                 refreshing.value = true
                 mahasiswaRepository.refreshMahasiswa(force)
                 provinsiRepository.refreshProvinsi(force)
-                // Handle the response
             } catch (e: Exception) {
-                // Handle the error
-                Log.e("MhsViewModel", "Error refreshing MHS", e)
+                Log.e("MahasiswaViewModel", "Error refreshing MHS", e)
             } finally {
+                Log.e("MahasiswaViewModel", "  done refresh ")
                 refreshing.value = false
             }
         }
     }
 
     fun deleteMahasiswa(id: Long) {
+        Log.i("MhsViewModel", "deleteMHS: START")
         viewModelScope.launch {
             refreshing.value = true
             mahasiswaRepository.delete(id)
         }
+        Log.i("MhsViewModel", "deleteMHS: done")
         refresh(true)
         refreshing.value = false
     }

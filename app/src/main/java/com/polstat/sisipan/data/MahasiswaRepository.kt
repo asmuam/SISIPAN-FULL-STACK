@@ -46,9 +46,9 @@ class MahasiswaRepository(
         // Misalnya, jika Anda memiliki service untuk menyimpan data ke server:
         try {
             val response = mahasiswaService.insert(mhs)
-            if (response.httpStatusCode == 200) {
+            if (response.httpStatusCode == 201) {
                 // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
-                refreshMahasiswa(force = false)
+                refreshMahasiswa(force = true)
             } else {
                 // Handle kesalahan jika diperlukan
                 Log.e("FormasiRepository", "Failed to insert formasi. Response: ${response.message}")
@@ -75,7 +75,7 @@ class MahasiswaRepository(
                 }
             } catch (e: Exception) {
                 // Handle exception jika terjadi kesalahan dalam komunikasi dengan server
-                Log.e("FormasiRepository", "Error inserting formasi", e)
+                Log.e("FormasiRepository", "Error deleting mhs", e)
             }
         }
     }

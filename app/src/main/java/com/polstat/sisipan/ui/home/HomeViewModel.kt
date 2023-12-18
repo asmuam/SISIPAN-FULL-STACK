@@ -53,19 +53,16 @@ class HomeViewModel(
         get() = _state
 
     init {
-        observeRefresh()
-        refresh(force = false)
-    }
-
-    private fun observeRefresh() {
+        Log.i("HomeViewModel", "observeRefresh: INIT")
         viewModelScope.launch {
             combine(
                 refreshing,
                 pilihanStore.daftarPilihan()
             ) { refreshingValue, daftarPilihan ->
                 val idmhs = userRepository.idMhs
-                val pilihan = idmhs?.let { pilihanStore.pilihanByMhs(it) }
+                val pilihan = idmhs?.let { daftarPilihan.find { it.mahasiswa == idmhs } }
                 val memilih = pilihan != null
+                Log.i("HomeViewModel", "observeRefresh: COMBINE")
                 val pilihanSaya = pilihan?.let {
                     val mahasiswa = mahasiswaStore.getMahasiswa(it.mahasiswa)
                     val pilihan1 = formasiStore.formasiById(it.pilihan1 ?: 0)
@@ -112,16 +109,18 @@ class HomeViewModel(
                 homeViewState // Return the computed HomeViewState
             }.catch { throwable ->
                 // Handle errors here
+                Log.e("HomeViewModel", "Error in combine", throwable)
                 throw throwable
             }.collect {
                 _state.value = it
             }
         }
-        doRefresh(false)
+        refresh(force = false)
+        Log.i("HomeViewModel", "observeRefresh: DONE INIT")
     }
 
-
-    private fun doRefresh(force: Boolean) {
+    fun refresh(force: Boolean) {
+        Log.i("HomeViewModel", "refresh: START")
         viewModelScope.launch {
             runCatching {
                 refreshing.value = true
@@ -133,10 +132,7 @@ class HomeViewModel(
             // TODO: handle result and show any errors
             refreshing.value = false
         }
-    }
-
-    fun refresh(force: Boolean) {
-        doRefresh(force)
+        Log.i("HomeViewModel", "refresh: Done")
     }
 
     fun penempatan() {
@@ -144,10 +140,8 @@ class HomeViewModel(
             refreshing.value = true
             pilihanRepository.doPenempatan()
             refreshing.value = false
-
         }
     }
-
 }
 
 data class HomeViewState(

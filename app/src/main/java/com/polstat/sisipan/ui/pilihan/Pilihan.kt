@@ -43,6 +43,7 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -99,6 +100,7 @@ fun Pilihan(
             doRefresh = { viewModel.refresh(force = false) },
             pilihanSaya = viewState.pilihanSaya,
             role = viewState.role,
+            deleteAll = { viewModel.deleteAll() } ,
         )
     }
 }
@@ -165,6 +167,7 @@ fun PilihanContent(
     modifier: Modifier = Modifier,
     onAccount: () -> Unit,
     doRefresh: () -> Unit,
+    deleteAll: () -> Unit,
     pilihanSaya: PilihanNested?,
     role: String,
 ) {
@@ -213,6 +216,24 @@ fun PilihanContent(
                     modifier = Modifier.fillMaxWidth(),
                     onAccount,
                 )
+                if (role == "ADMIN") {
+                    Column {
+                        OutlinedButton(
+                            onClick = { deleteAll() },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
+                            Text(text = "Hapus Semua Pilihan")
+                        }
+                        Divider(
+                            color = Color.Black,
+                            thickness = 2.dp,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
                 LazyColumn(
                     modifier = Modifier.pullRefresh(state)
                 ) {
@@ -416,7 +437,8 @@ fun PilihanCard(
 
             // Bagian Kanan (Pilihan 1, Pilihan 2, Pilihan 3)
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .weight(1.5f)
                 , // Memberikan lebar maksimal pada Column
             ) {
@@ -492,7 +514,8 @@ fun PilihanPreview() {
                 hasil = null
             ),
             role = "ADMIN",
-        )
+            deleteAll = { } ,
+            )
     }
 }
 

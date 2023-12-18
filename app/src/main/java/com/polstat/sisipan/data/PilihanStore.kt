@@ -31,4 +31,8 @@ class PilihanStore(
     suspend fun getById(id:Long): Pilihan{
         return pilihanDao.findById(id)
     }
+
+    suspend fun  deleteAll(){
+        pilihanDao.deleteAll()
+    }
 }

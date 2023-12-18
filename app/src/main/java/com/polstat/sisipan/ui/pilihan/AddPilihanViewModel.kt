@@ -27,62 +27,62 @@ class AddPilihanViewModel(
     private val formasiStore: FormasiStore = Graph.formasiStore
 ) : ViewModel() {
     private val _state = MutableStateFlow(AddPilihanViewState())
-
     private val refreshing = MutableStateFlow(true)
 
     val state: StateFlow<AddPilihanViewState>
         get() = _state
 
     fun updateUiState(pilihanDetails: PilihanRequest) {
-        Log.i("DETAILS?", "updateUiState:${pilihanDetails} ")
-
+        Log.i("AddPilihanViewModel", "updateUiState: $pilihanDetails")
         _state.value = _state.value.copy(
             pilihanUiState = _state.value.pilihanUiState.copy(
                 pilihanDetails = pilihanDetails,
                 isEntryValid = validateInput(pilihanDetails)
             )
         )
-        Log.i("DATA?", "updateUiState:${state.value.pilihanUiState.pilihanDetails} ")
-        Log.i("VALID?", "updateUiState:${state.value.pilihanUiState.isEntryValid} ")
+        Log.i("AddPilihanViewModel", "updateUiState: ${state.value.pilihanUiState.pilihanDetails}")
+        Log.i("AddPilihanViewModel", "updateUiState: ${state.value.pilihanUiState.isEntryValid}")
     }
 
     init {
+        Log.i("AddPilihanVM", "init start ")
         viewModelScope.launch {
             combine(
                 formasiStore.formasiBuka(),
                 refreshing,
             ) { formasiList, refreshing ->
                 AddPilihanViewState(
-                    role = userRepository.role ?: "", //default ""
+                    role = userRepository.role ?: "",
                     formasiList = formasiList,
                     refreshing = refreshing,
                     errorMessage = null /* TODO */
                 )
             }.catch { throwable ->
-                // TODO: emit a UI error here. For now, we'll just rethrow
+                Log.i("AddPilihanVM", "combine ")
                 throw throwable
             }.collect {
                 _state.value = it
+                Log.i("AddPilihanVM", "update ui ")
             }
         }
         refresh(false)
     }
 
     fun refresh(force: Boolean) {
+        Log.i("AddPilihanVM", "refresh start ")
         viewModelScope.launch {
             try {
                 refreshing.value = true
                 formasiRepository.refreshFormasi(force)
-                // Handle the response
             } catch (e: Exception) {
-                // Handle the error
-                Log.e("MhsViewModel", "Error refreshing MHS", e)
+                Log.e("AddPilihanViewModel", "Error refreshing MHS", e)
             } finally {
                 refreshing.value = false
+                Log.i("AddPilihanVM", "refresh done ")
+
             }
         }
     }
-
 
     private fun validateInput(uiState: PilihanRequest = state.value.pilihanUiState.pilihanDetails): Boolean {
         return with(uiState) {
@@ -92,13 +92,10 @@ class AddPilihanViewModel(
 
     suspend fun savePilihan() {
         val id = userRepository.idMhs
-        if (validateInput() && id!=null) {
+        if (validateInput() && id != null) {
             viewModelScope.launch {
-                refreshing.value = true
-                pilihanRepository.insertPilihan(id ,state.value.pilihanUiState.pilihanDetails)
+                pilihanRepository.insertPilihan(id, state.value.pilihanUiState.pilihanDetails)
             }
-            refresh(true)
-            refreshing.value = false
         }
     }
 }

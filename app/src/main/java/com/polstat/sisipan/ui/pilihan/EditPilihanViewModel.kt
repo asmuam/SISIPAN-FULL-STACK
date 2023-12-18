@@ -79,22 +79,20 @@ class EditPilihanViewModel(
                 )
                 EditPilihanViewState(
                     pilihanSaya = pilihanNestedSaya,
-                    role = userRepository.role ?: "", //default ""
-                    pilihanUiState = PilihanUiState(pilihanSaya,validateInput(pilihanSaya)),
+                    role = userRepository.role ?: "",
+                    pilihanUiState = PilihanUiState(pilihanSaya, validateInput(pilihanSaya)),
                     formasiList = formasiList,
                     refreshing = refreshing,
                     errorMessage = null /* TODO */
                 )
             }.catch { throwable ->
-                // TODO: emit a UI error here. For now, we'll just rethrow
+                Log.e("EditPilihanViewModel", "Error in combine", throwable)
                 throw throwable
             }.collect {
                 _state.value = it
             }
-
         }
     }
-
 
     private fun validateInput(uiState: PilihanRequest = state.value.pilihanUiState.pilihanDetails): Boolean {
         return with(uiState) {
@@ -104,11 +102,31 @@ class EditPilihanViewModel(
 
     suspend fun savePilihan() {
         if (validateInput()) {
-            Log.i("TAG", "savePilihan: ${state.value.pilihanSaya.id}")
+            Log.i("EditPlihanViewModel", "save: start")
             pilihanRepository.ubahPilihan(state.value.pilihanSaya.id, state.value.pilihanUiState.pilihanDetails)
+            refresh(true)
+            Log.i("EditPlihanViewModel", "save: done")
+        }
+    }
+    fun refresh(force: Boolean) {
+        Log.i("EditPlihanViewModel", "refresh: START")
+        viewModelScope.launch {
+            try {
+                refreshing.value = true
+                pilihanRepository.refreshPilihan(force)
+                // Handle the response
+            } catch (e: Exception) {
+                Log.e("EditPlihanViewModel", "Error refreshing prov", e)
+                // Handle the error
+            } finally {
+                refreshing.value = false
+                Log.i("EditPlihanViewModel", "refresh: Done")
+            }
         }
     }
 }
+
+
 
 data class EditPilihanViewState(
     val role: String = "",

@@ -29,11 +29,17 @@ class PilihanRepository(
                 try {
                     transactionRunner {
                         // Jika memaksa atau data di store kosong, panggil service dan simpan ke store
-                        val pilihanList = pilihanService.getAll().data
-                        Log.i("TAG", "refreshPilihan: ${pilihanList}")
-                        pilihanList?.let {
-                            pilihanStore.savePilihanList(it)
+                        val response = pilihanService.getAll()
+                        Log.i("PILIHAN REPO", "refreshPilihan:${response} ")
+                        if (response.httpStatusCode==200) {
+                            if (response.data!=null) {
+                                if (response.data.isEmpty()){
+                                        pilihanStore.deleteAll()
+                                }
+                                pilihanStore.savePilihanList(response.data)
+                            }
                         }
+
                     }
                 } catch (e: Exception) {
                     // Tangani kesalahan saat menyimpan data ke store
@@ -50,10 +56,10 @@ class PilihanRepository(
             val response = pilihanService.pilih(id, pilihan)
             if (response.httpStatusCode == 200) {
                 // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
-                refreshPilihan(force = false)
+                refreshPilihan(force = true)
             } else {
                 // Handle kesalahan jika diperlukan
-                Log.e("PILIHANREPO", "Failed to insert pilihan. Response: ${response.message}")
+                Log.e("PILIHANREPOSTATUS", "Failed to insert pilihan. Response: ${response.message}")
             }
         } catch (e: Exception) {
             // Handle exception jika terjadi kesalahan dalam komunikasi dengan server atau operasi penyimpanan
@@ -94,6 +100,27 @@ class PilihanRepository(
             }
         } catch (e: Exception){
             Log.e("PILIHANREPO", "Error do penempatan", e)
+        }
+    }
+
+    fun deleteAll() {
+        scope.launch {
+            try {
+                val response = pilihanService.deleteAll()
+                if (response.httpStatusCode == 204) {
+                    // Jika penyimpanan berhasil, refresh data atau lakukan tindakan lain
+                    refreshPilihan(force = false)
+                } else {
+                    // Handle kesalahan jika diperlukan
+                    Log.e(
+                        "FormasiRepository",
+                        "Failed to delete formasi. Response: ${response.message}"
+                    )
+                }
+            } catch (e: Exception) {
+                // Handle exception jika terjadi kesalahan dalam komunikasi dengan server
+                Log.e("FormasiRepository", "Error deleting mhs", e)
+            }
         }
     }
         // Metode lain sesuai kebutuhan
